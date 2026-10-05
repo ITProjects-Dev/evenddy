@@ -1,0 +1,1 @@
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:55px;align-items:center}.detail-grid img{width:100%;height:520px;object-fit:cover;border-radius:10px}.detail-grid p:not(.eyebrow){color:var(--muted);line-height:1.8;font-size:12px}@media(max-width:680px){.detail-grid{grid-template-columns:1fr}.detail-grid img{height:350px}}

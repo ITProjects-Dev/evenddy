@@ -1,0 +1,2 @@
+import { stories } from "../../data/siteData"; import StoryCard from "../../components/StoryCard/StoryCard"; import "./Blog.css";
+export default function Blog(){return <><section className="page-hero"><div className="container"><p className="eyebrow">STORIES & INSPIRATION</p><h1>Ideas for your next <em>celebration.</em></h1><p>Planning notes, inspiration and practical ideas from the Evenddy world.</p></div></section><section className="section"><div className="container story-grid">{stories.map(s=><StoryCard key={s.slug} story={s}/>)}</div></section></>}

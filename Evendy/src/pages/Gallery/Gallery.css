@@ -1,0 +1,1 @@
+.gallery-page-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.gallery-page-grid img{width:100%;height:330px;object-fit:cover;border-radius:7px}.gallery-page-grid img:nth-child(3n+1){height:430px}@media(max-width:680px){.gallery-page-grid{grid-template-columns:1fr 1fr}.gallery-page-grid img,.gallery-page-grid img:nth-child(3n+1){height:220px}}
