@@ -16,7 +16,7 @@ import NotFound from "../pages/NotFound/NotFound";
 
 export default function AppRoutes() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/demo">
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
