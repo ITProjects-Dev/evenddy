@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import PlannerMap from "../../components/PlannerMap/PlannerMap";
 export default function PlannerForm() {
 
   const serviceOptions = [
@@ -369,85 +369,41 @@ export default function PlannerForm() {
 
           {/* MAP */}
 
-          <div className="planner-map">
+                  {/* SERVICE AREA */}
 
-            <div className="map-ring ring-1"></div>
+        <div className="planner-service-area">
 
-            <div className="map-ring ring-2"></div>
+          {/* <span className="planner-area-label">
+            SERVICE AREA
+          </span>
 
-            <div className="map-ring ring-3"></div>
+          <h3>
+            Visakhapatnam &amp; nearby
+          </h3>
 
+          <p>
+            Local crews, local pricing — operating across the Vizag belt.
+          </p> */}
 
-            <div className="map-center">
+          {/* REAL MAP */}
+          <PlannerMap />
 
-              <span>
-                ✦
-              </span>
+          {/* LOCATION TAGS */}
+          {/* <div className="planner-area-tags">
+            <span><b>●</b> Visakhapatnam</span>
+            <span><b>●</b> Bheemili</span>
+            <span><b>●</b> Gajuwaka</span>
+            <span><b>●</b> Anakapalle</span>
+            <span><b>●</b> Vizianagaram</span>
+            <span><b>●</b> Araku</span>
+          </div> */}
 
-              <small>
-                Vizag
-              </small>
-
-            </div>
-
-
-            <span className="map-location bheemili">
-
-              <i>
-                ⌖
-              </i>
-
-              <small>
-                Bheemili
-              </small>
-
-            </span>
-
-
-            <span className="map-location anakapalle">
-
-              <i>
-                ⌖
-              </i>
-
-              <small>
-                Anakapalle
-              </small>
-
-            </span>
-
-
-            <span className="map-location gajuwaka">
-
-              <i>
-                ⌖
-              </i>
-
-              <small>
-                Gajuwaka
-              </small>
-
-            </span>
-
-
-            <span className="map-location araku">
-
-              <i>
-                ⌖
-              </i>
-
-              <small>
-                Araku
-              </small>
-
-            </span>
-
-          </div>
+        </div>
 
 
           {/* LOCATION TAGS */}
 
-          <div className="planner-area-tags">
+          {/* <div className="planner-area-tags">
 
             <span>
               <b>●</b>
@@ -479,7 +435,7 @@ export default function PlannerForm() {
               Araku
             </span>
 
-          </div>
+          </div> */}
 
         </div>
 
