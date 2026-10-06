@@ -12,7 +12,7 @@ export default function HeroSection() {
               <div className="home-hero-content">
     
                 <div className="hero-location-badge">
-                  <span className="hero-badge-icon">✧</span>
+                  <span className="hero-badge-icon"><Star size={14}/></span>
                   <span>Now serving in Vizag and nearby</span>
                 </div>
     
