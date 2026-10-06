@@ -66,7 +66,7 @@
 
     max-width: 540px;
 
-    font-family: inherit;
+    font-family: "Sora", sans-serif;
     font-size: clamp(55px, 5vw, 68px);
     font-weight: 400;
 
@@ -279,7 +279,7 @@
     background: #fffdf9;
 
     border: 1px solid #e6ddd3;
-    border-radius: 17px;
+    border-radius: 14px;
 
     box-shadow:
         0 12px 25px rgba(44, 27, 18, 0.12);
@@ -311,7 +311,7 @@
 
     color: #2c2522;
 
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 600;
 
     line-height: 1.2;
@@ -324,7 +324,7 @@
 
     color: #766b65;
 
-    font-size: 8px;
+    font-size: 12px;
 
     line-height: 1;
 }
@@ -457,7 +457,7 @@
 /* CARD CONTENT */
 
 .service-card-content {
-    min-height: 160px;
+    min-height: 140px;
 
     padding: 22px 23px 18px;
 
@@ -477,8 +477,6 @@
 }
 
 .service-card-content p {
-    max-width: 285px;
-
     margin: 0;
 
     color: #6d625c;
@@ -1115,7 +1113,7 @@
 
     color: #625751;
 
-    font-family: inherit;
+    font-family: "Sora", sans-serif;
 
     font-size: 11px;
     font-weight: 400;
@@ -1316,7 +1314,7 @@
 
     color: #504640;
 
-    font-family: inherit;
+    font-family: "Sora", sans-serif;
 
     font-size: 10px;
     font-weight: 400;
@@ -1379,13 +1377,15 @@
 .planner-service-help {
     display: block;
 
-    margin-top: 9px;
+    margin-top: 18px;
 
     color: #8a7d75;
 
-    font-size: 8px;
+    font-size: 10px;
 
     line-height: 1.3;
+
+
 }
 
 
@@ -1415,7 +1415,7 @@
 
     color: #ffffff;
 
-    font-family: inherit;
+    font-family: "Sora", sans-serif;
 
     font-size: 11px;
     font-weight: 500;
@@ -1454,7 +1454,7 @@
 
     text-align: center;
 
-    font-size: 8px;
+    font-size: 12px;
 
     line-height: 1.5;
 }
@@ -1483,8 +1483,6 @@
     position: relative;
 
     box-sizing: border-box;
-
-    min-height: 337px;
 
     padding: 21px;
 
@@ -1544,182 +1542,41 @@
     line-height: 1.55;
 }
 
-
 /* =========================================================
-   MAP
+   REAL MAP
 ========================================================= */
 
-.planner-map {
-    position: relative;
-
+.planner-map-real {
     width: 100%;
-    height: 135px;
-
-    box-sizing: border-box;
-
+    height: 160px;
     margin-top: 16px;
-
-    overflow: hidden;
-
-    background:
-        radial-gradient(circle at 50% 50%,
-            rgba(238, 176, 83, 0.45),
-            rgba(238, 176, 83, 0.14) 27%,
-            rgba(238, 176, 83, 0.05) 28%,
-            transparent 52%),
-        rgba(255, 255, 255, 0.04);
-
-    border: 1px solid rgba(255, 255, 255, 0.17);
-
     border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.17);
+    position: relative;
+    z-index: 0;
 }
 
-
-/* MAP RINGS */
-
-.map-ring {
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    transform: translate(-50%, -50%);
-
-    box-sizing: border-box;
-
-    border: 1px solid rgba(239, 186, 93, 0.55);
-
-    border-radius: 50%;
-
-    pointer-events: none;
+/* Ensure Leaflet sits properly inside the dark planner card */
+.planner-map-real .leaflet-container {
+    background: #2a0018;
+    font-family: inherit;
 }
 
-.ring-1 {
-    width: 42px;
-    height: 42px;
+/* Customize the popup */
+.planner-map-real .leaflet-popup-content-wrapper {
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
-.ring-2 {
-    width: 75px;
-    height: 75px;
+.planner-map-real .leaflet-popup-content {
+    margin: 10px 14px;
+    font-size: 12px;
+    color: #211918;
 }
 
-.ring-3 {
-    width: 112px;
-    height: 112px;
-}
-
-
-/* =========================================================
-   MAP CENTER
-========================================================= */
-
-.map-center {
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    z-index: 5;
-
-    width: 38px;
-    height: 38px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    flex-direction: column;
-
-    transform: translate(-50%, -50%);
-
-    border-radius: 50%;
-
-    background: #d99a45;
-
-    color: #ffffff;
-
-    box-shadow:
-        0 2px 8px rgba(50, 20, 20, 0.12);
-}
-
-.map-center span {
-    font-size: 11px;
-
-    line-height: 1;
-}
-
-.map-center small {
-    margin-top: 2px;
-
-    font-size: 7px;
-
-    line-height: 1;
-}
-
-
-/* =========================================================
-   MAP LOCATIONS
-========================================================= */
-
-.map-location {
-    position: absolute;
-
-    z-index: 6;
-
-    display: flex;
-    align-items: center;
-
-    flex-direction: column;
-
-    color: #ffffff;
-
-    font-size: 9px;
-
-    line-height: 1;
-}
-
-.map-location i {
-    margin-bottom: 2px;
-
-    color: #ffffff;
-
-    font-size: 10px;
-
-    font-style: normal;
-
-    line-height: 1;
-}
-
-.map-location small {
-    color: #f3dce6;
-
-    font-size: 7px;
-
-    line-height: 1;
-}
-
-
-/* POSITIONS */
-
-.bheemili {
-    left: 25%;
-    top: 25%;
-}
-
-.anakapalle {
-    right: 17%;
-    top: 40%;
-}
-
-.gajuwaka {
-    right: 28%;
-    bottom: 22%;
-}
-
-.araku {
-    left: 18%;
-    bottom: 22%;
+.planner-map-real .leaflet-popup-tip {
+    background: #fff;
 }
 
 
@@ -1848,7 +1705,7 @@
 
     color: #82756d;
 
-    font-size: 9px;
+    font-size: 12px;
 
     line-height: 1.2;
 }
@@ -1861,7 +1718,7 @@
 
     color: #211918;
 
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
 
     line-height: 1.2;
@@ -2147,31 +2004,305 @@
     line-height: 1;
 }
 
+.gallery-plan-button span{
+    font-size: 12px;
+}
 
 /* =========================================================
    GALLERY STRIP (FULL-BLEED SPREAD)
 ========================================================= */
+/* =========================================================
+   PORTFOLIO SECTION
+========================================================= */
 
-.gallery-strip {
+.gallery-preview {
+    background: #fcf7ef;
+    padding: 55px 0 70px;
+    overflow: hidden;
+}
+
+.gallery-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin: 0 auto 38px;
+    gap: 30px;
+}
+
+.gallery-eyebrow {
+    margin: 0 0 8px;
+    color: #c99436;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.gallery-heading {
+    max-width: 700px;
+}
+
+.gallery-heading h2 {
+    margin: 0;
+    color: #211918;
+    font-size: 39px;
+    font-weight: 400;
+    line-height: 1.03;
+    letter-spacing: -1.5px;
+}
+
+.gallery-heading h2 em {
+    color: #d00062;
+    font-style: normal;
+}
+
+.gallery-description {
+    max-width: 650px;
+    margin: 13px 0 0;
+    color: #655b56;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.gallery-plan-button {
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    padding: 0 13px;
+    box-sizing: border-box;
+    border: 1px solid #d9c3c2;
+    border-radius: 18px;
+    background: transparent;
+    color: #74173b;
+    font-size: 9px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.gallery-plan-button strong {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+/* =========================================================
+   BIG IMAGE MARQUEE — ROW 1 + ROW 2
+========================================================= */
+
+.gallery-big-marquee {
     position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-    /* Perfectly centers the wide strip */
-    width: 110vw;
-    /* Wider than the screen to create the cut-off edges */
-    max-width: 1400px;
-    /* Prevents it from getting too huge on ultra-wide monitors */
+    width: 100%;
+    overflow: hidden;
+    padding: 8px 0;
 
-    display: grid;
+    /* Soft fade on edges */
+    mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        #000 6%,
+        #000 94%,
+        transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        #000 6%,
+        #000 94%,
+        transparent 100%
+    );
+}
 
-    /* 4 large center columns, with narrow 30px cut-off columns on the edges */
-    grid-template-columns: 30px 1fr 1fr 1fr 1fr 30px;
+/* Second row sits below the first */
+.gallery-big-marquee + .gallery-big-marquee {
+    margin-top: 14px;
+}
 
-    /* Adjusted heights to match the image proportions */
-    grid-template-rows: 180px 240px 180px;
+.gallery-big-track {
+    display: flex;
+    gap: 14px;
+    width: max-content;
+    animation: big-marquee-left 70s linear infinite;
+}
 
-    column-gap: 12px;
-    row-gap: 12px;
+/* Row 2 slides the opposite direction */
+.gallery-big-marquee-reverse .gallery-big-track {
+    animation: big-marquee-right 70s linear infinite;
+}
+
+/* Pause on hover */
+.gallery-big-marquee:hover .gallery-big-track {
+    animation-play-state: paused;
+}
+
+/* Keyframes */
+@keyframes big-marquee-left {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+
+@keyframes big-marquee-right {
+    from { transform: translateX(-50%); }
+    to   { transform: translateX(0); }
+}
+
+/* =========================================================
+   BIG CARD — Multiple sizes
+========================================================= */
+
+.gallery-big-card {
+    position: relative;
+    flex-shrink: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    isolation: isolate;
+    background: #ddd;
+    height: 260px;
+    transition: transform 0.4s ease;
+}
+
+/* Small — narrow cut-off look */
+.gallery-big-card.size-small {
+    width: 140px;
+}
+
+/* Medium — standard square-ish */
+.gallery-big-card.size-medium {
+    width: 260px;
+}
+
+/* Large — wide landscape */
+.gallery-big-card.size-large {
+    width: 420px;
+}
+
+.gallery-big-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+}
+
+.gallery-big-card:hover img {
+    transform: scale(1.06);
+}
+
+.gallery-big-card:hover {
+    transform: translateY(-4px);
+}
+
+/* Bottom gradient overlay */
+.gallery-big-card::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 55%;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(20, 10, 8, 0.68) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Category tag (top-left) */
+.gallery-tag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 10px;
+    background: rgba(255, 253, 249, 0.94);
+    border-radius: 11px;
+    color: #403934;
+    font-size: 10px;
+    line-height: 1;
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+/* Title (bottom) */
+.gallery-title {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 12px;
+    z-index: 5;
+    color: #ffffff;
+    font-family: inherit;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: -0.2px;
+    line-height: 1.2;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+    .gallery-big-track {
+        animation-duration: 55s;
+    }
+
+    .gallery-big-card {
+        height: 220px;
+    }
+    .gallery-big-card.size-small  { width: 120px; }
+    .gallery-big-card.size-medium { width: 220px; }
+    .gallery-big-card.size-large  { width: 340px; }
+}
+
+@media (max-width: 680px) {
+    .gallery-preview {
+        padding: 48px 0 55px;
+    }
+
+    .gallery-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    .gallery-heading h2 {
+        font-size: 29px;
+    }
+
+    .gallery-big-track {
+        animation-duration: 45s;
+    }
+
+    .gallery-big-card {
+        height: 180px;
+        border-radius: 10px;
+    }
+    .gallery-big-card.size-small  { width: 100px; }
+    .gallery-big-card.size-medium { width: 180px; }
+    .gallery-big-card.size-large  { width: 260px; }
+
+    .gallery-title {
+        font-size: 12px;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+    }
+
+    .gallery-tag {
+        font-size: 9px;
+        height: 20px;
+        top: 10px;
+        left: 10px;
+        padding: 0 8px;
+    }
 }
 
 
@@ -2286,10 +2417,7 @@
 
     color: #ffffff;
 
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
+    font-family: "Sora", sans-serif;
 
     font-size: 12px;
 
@@ -2508,7 +2636,7 @@
 }
 
 .quote-icon {
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: "Sora", sans-serif;
     font-size: 36px;
     color: #c99436;
     /* Gold color matching the eyebrow text */
@@ -2519,8 +2647,7 @@
 }
 
 .quote-text {
-    font-family: Georgia, "Times New Roman", serif;
-    /* Serif font for the quote itself */
+    font-family: "Sora", sans-serif;
     font-size: 14px;
     line-height: 1.6;
     color: #4a403a;
@@ -2546,14 +2673,14 @@
     font-size: 13px;
     font-weight: 600;
     color: #211918;
-    font-family: inherit;
+    font-family: "Sora", sans-serif;
     /* Ensures the name uses your site's sans-serif font */
 }
 
 .author-info span {
     font-size: 11px;
     color: #82756d;
-    font-family: inherit;
+    font-family: "Sora", sans-serif;
 }
 
 /* =========================================
@@ -3157,7 +3284,7 @@
 }
 
 .app-content h2 em {
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: "Sora", sans-serif;
     font-style: italic;
     color: #d00062; /* Brand pink for "pocket." */
 }
@@ -3535,7 +3662,7 @@
 }
 
 .faq-header h2 em {
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: "Sora", sans-serif;
     font-style: italic;
     color: #d00062; /* Brand pink for "Answered." */
 }

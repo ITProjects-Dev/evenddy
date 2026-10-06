@@ -1,4 +1,4 @@
-import React, { useState, } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Camera,
     Building,
@@ -11,7 +11,9 @@ import {
     Mail,
     Car,
     Mic,
-    PlusCircle
+    PlusCircle,
+    ArrowLeft,
+    ArrowRight
 } from 'lucide-react';
 import './VendorOnboarding.css';
 
@@ -50,7 +52,17 @@ const VendorOnboarding = () => {
         instagram: '',
         termsAccepted: false,
     });
+    // Ref to the scrollable main area
+    const mainRef = useRef(null);
 
+    // Auto-scroll to top whenever the step changes
+    useEffect(() => {
+        if (mainRef.current) {
+            mainRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        // Also scroll the window as a fallback
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [step]);
     const steps = [
         'Vendor category',
         'Business Info',
@@ -69,23 +81,11 @@ const VendorOnboarding = () => {
         setFormData(prev => ({ ...prev, [name]: !prev[name] }));
     };
     const handleNext = () => {
-        if (step < 6) {
-            setStep(prev => prev + 1);
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
+        if (step < 6) setStep(prev => prev + 1);
     };
 
     const handleBack = () => {
-        if (step > 1) {
-            setStep(prev => prev - 1);
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
+        if (step > 1) setStep(prev => prev - 1);
     };
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -355,9 +355,9 @@ const VendorOnboarding = () => {
             </aside>
 
             {/* Main Content */}
-            <main className="onboarding-main">
+            <main className="onboarding-main" ref={mainRef}>
                 <div className="onboarding-top-nav">
-                    <a href="/" className="back-link">← Back to Home</a>
+                    <a href="/demo/" className="back-link"> <ArrowLeft size={16} /> Back to Home</a>
                 </div>
 
                 <div className="onboarding-header">
@@ -377,13 +377,21 @@ const VendorOnboarding = () => {
 
                 <div className="onboarding-footer">
                     {step > 1 ? (
-                        <button type="button" className="btn-onboard-outline" onClick={handleBack}>← Back</button>
+                        <button type="button" className="btn-onboard-outline" onClick={handleBack}>
+                            <ArrowLeft size={16} /> Back
+                        </button>
                     ) : <div style={{ width: '80px' }}></div>}
+
                     <span className="step-counter-text">Step {step} of 6</span>
+
                     {step < 6 ? (
-                        <button type="button" className="btn-onboard-primary" onClick={handleNext}>Continue →</button>
+                        <button type="button" className="btn-onboard-primary" onClick={handleNext}>
+                            Continue <ArrowRight size={16} />
+                        </button>
                     ) : (
-                        <button type="button" className="btn-onboard-primary" onClick={handleSubmit}>Submit application →</button>
+                        <button type="button" className="btn-onboard-primary" onClick={handleSubmit}>
+                            Submit application <ArrowRight size={16} />
+                        </button>
                     )}
                 </div>
             </main>

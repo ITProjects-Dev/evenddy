@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import banner1 from "../../assets/images/banner1.svg";
 import banner2 from "../../assets/images/banner2.svg";
+import { Star } from "lucide-react";
 
 export default function HeroSection() {
   return (
@@ -87,7 +88,7 @@ export default function HeroSection() {
                 <div className="hero-city-card">
     
                   <div className="hero-city-icon">
-                    ✦
+                    <Star/>
                   </div>
     
                   <div>

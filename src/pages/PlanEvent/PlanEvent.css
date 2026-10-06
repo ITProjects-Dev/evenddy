@@ -33,7 +33,7 @@
 }
 
 .page-hero h1 em {
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: "Sora", sans-serif;
     font-style: italic;
     color: #d00062;
 }
@@ -115,7 +115,7 @@ section.section:has(.plan-form-wrap) {
     background: #f8f1e9;
     padding: 12px 14px;
     font-size: 13px;
-    font-family: inherit;
+    font-family: "Sora", sans-serif;
     color: #211918;
     outline: none;
     transition:
@@ -181,7 +181,7 @@ section.section:has(.plan-form-wrap) {
     padding: 0 32px;
     font-size: 13px;
     font-weight: 500;
-    font-family: inherit;
+    font-family: "Sora", sans-serif;
     cursor: pointer;
     transition: background 0.2s ease, transform 0.15s ease;
     width: fit-content;

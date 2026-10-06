@@ -15,7 +15,7 @@ export const images = {
 
 export const services = [
   { number:"01", title:"Catering", slug:"catering", image:images.food, description:"From intimate tables to grand feasts, delicious food is part of every great celebration." },
-  { number:"02", title:"Décor", slug:"decor", image:images.decor, description:"Thoughtful styling, florals, lighting and beautiful details that transform your venue." },
+  { number:"02", title:"Decor", slug:"decor", image:images.decor, description:"Thoughtful styling, florals, lighting and beautiful details that transform your venue." },
   { number:"03", title:"Event Management", slug:"event-management", image:images.wedding, description:"From planning to execution, our team keeps your celebration moving smoothly." }
 ];
 

@@ -23,7 +23,7 @@
   display: flex;
   min-height: 100vh;
   background-color: var(--brand-bg-cream);
-  font-family: inherit;
+  font-family: "Sora", sans-serif;
   color: var(--brand-text-dark);
 }
 
@@ -58,7 +58,7 @@
   justify-content: center;
   font-size: 24px;
   font-weight: bold;
-  font-family: serif;
+  font-family: "Sora", sans-serif;
 }
 
 .brand-text h1 {
@@ -322,7 +322,7 @@
   border: 1px solid var(--brand-input-border);
   border-radius: 8px;
   font-size: 13px;
-  font-family: inherit;
+  font-family: "Sora", sans-serif;
   color: var(--brand-text-muted);
   background-color: var(--brand-input-bg);
   transition: all 0.2s ease;
@@ -582,35 +582,46 @@
 }
 
 .btn-onboard-primary, .btn-onboard-outline {
-  padding: 12px 24px;
-  border-radius: 22px;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
-  font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;              /* Space between icon and text */
+    padding: 12px 24px;
+    border-radius: 22px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: "Sora", sans-serif;
+    line-height: 1;
 }
 
 .btn-onboard-primary {
-  background-color: var(--brand-maroon);
-  color: #fff;
-  border: 1px solid var(--brand-maroon);
+    background-color: var(--brand-maroon);
+    color: #fff;
+    border: 1px solid var(--brand-maroon);
 }
 
 .btn-onboard-primary:hover {
-  background-color: var(--brand-maroon-dark);
-  border-color: var(--brand-maroon-dark);
+    background-color: var(--brand-maroon-dark);
+    border-color: var(--brand-maroon-dark);
 }
 
 .btn-onboard-outline {
-  background-color: transparent;
-  color: var(--brand-maroon);
-  border: 1px solid #cf9ab1;
+    background-color: transparent;
+    color: var(--brand-maroon);
+    border: 1px solid #cf9ab1;
 }
 
 .btn-onboard-outline:hover {
-  background-color: #f4d6e4;
+    background-color: #f4d6e4;
+}
+
+/* Ensures the SVG icons don't inherit text cursor */
+.btn-onboard-primary svg,
+.btn-onboard-outline svg {
+    flex-shrink: 0;
+    display: block;
 }
 
 /* =========================================
@@ -646,4 +657,37 @@
   .onboarding-grid { grid-template-columns: 1fr; }
   .onboarding-card-wrapper { padding: 24px; }
   .onboarding-footer { flex-direction: column; gap: 16px; }
+}
+
+/* ---- TOP NAV (Back to Home) ---- */
+.onboarding-top-nav {
+    margin-bottom: 24px;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--brand-maroon);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+    padding: 6px 0;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.back-link:hover {
+    color: var(--brand-maroon-dark);
+    transform: translateX(-3px);   /* Subtle nudge on hover */
+}
+
+/* Ensures the SVG icon sits perfectly vertical */
+.back-link svg {
+    display: block;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    top: 1px;    /* Micro-adjust if the icon looks slightly high */
 }
