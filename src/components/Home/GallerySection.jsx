@@ -11,13 +11,13 @@ export default function GallerySection() {
     { img: "food",    tag: "♧ Catering",     title: "Fine dining",       size: "medium" },
     { img: "party",   tag: "♧ Makeup Artist",title: "Bridal moments",    size: "medium" },
     { img: "event",   tag: "♧ Decor",        title: "Candlelit dinner",  size: "medium" },
-    { img: "wedding", tag: null,             title: "Wedding moments",   size: "medium" },
+    { img: "wedding", tag: "♧ Wedding",             title: "Wedding moments",   size: "medium" },
     { img: "food",    tag: "♧ Catering",     title: "Fine dining",       size: "small" },
   ];
 
   // Row 2 — bigger cards
   const row2 = [
-    { img: "wedding", tag: null,             title: "Wedding moments",   size: "large" },
+    { img: "wedding", tag: "♧ Wedding",             title: "Wedding moments",   size: "large" },
     { img: "event",   tag: "♧ Decor",        title: "Candlelit dinner",  size: "large" },
     { img: "wedding", tag: "♧ Catering",     title: "Candlelit dinner",  size: "large" },
     { img: "event",   tag: "♧ Decor",        title: "Reception setup",   size: "small" },
