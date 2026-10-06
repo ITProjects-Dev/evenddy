@@ -242,7 +242,7 @@
     position: absolute;
 
     left: 0;
-  
+
     top: 175px;
 
 
@@ -328,6 +328,7 @@
 
     line-height: 1;
 }
+
 /* =========================================
    SERVICES SECTION
 ========================================= */
@@ -919,7 +920,7 @@
 ========================================================= */
 
 .planner-preview {
-       background: #ede9e3;
+    background: #ede9e3;
     padding: 65px 0 75px;
 }
 
@@ -995,7 +996,7 @@
 
 /* DESCRIPTION */
 
-.planner-heading > p {
+.planner-heading>p {
     width: min(620px, 100%);
 
     margin: 0 auto;
@@ -1531,7 +1532,7 @@
 
 /* SERVICE AREA DESCRIPTION */
 
-.planner-service-area > p {
+.planner-service-area>p {
     max-width: 300px;
 
     margin: 0;
@@ -1561,13 +1562,11 @@
     overflow: hidden;
 
     background:
-        radial-gradient(
-            circle at 50% 50%,
+        radial-gradient(circle at 50% 50%,
             rgba(238, 176, 83, 0.45),
             rgba(238, 176, 83, 0.14) 27%,
             rgba(238, 176, 83, 0.05) 28%,
-            transparent 52%
-        ),
+            transparent 52%),
         rgba(255, 255, 255, 0.04);
 
     border: 1px solid rgba(255, 255, 255, 0.17);
@@ -1946,7 +1945,7 @@
     }
 
 
-    .planner-heading > p {
+    .planner-heading>p {
         font-size: 12px;
     }
 
@@ -2032,28 +2031,22 @@
 
 .gallery-preview {
     background: #fcf7ef;
-
     padding: 55px 0 58px;
-
     overflow: hidden;
 }
-
 
 /* =========================================================
    TOP CONTENT
 ========================================================= */
 
 .gallery-top {
-    width: min(835px, calc(100% - 30px));
-
-    margin: 0 auto 27px;
-
+    width: 100%;
+    /* Changed from min(835px...) to match the container width of Services */
+    margin: 0 auto 38px;
+    /* Changed 27px to 38px to match Services spacing */
     display: flex;
-
     align-items: flex-end;
-
     justify-content: space-between;
-
     gap: 30px;
 }
 
@@ -2063,60 +2056,53 @@
 ========================================================= */
 
 .gallery-heading {
-    max-width: 480px;
+    max-width: 700px;
+    /* Changed from 480px to match .services-heading */
 }
 
 .gallery-eyebrow {
     margin: 0 0 8px;
-
-    color: #c8953c;
-
-    font-size: 8px;
+    color: #c99436;
+    /* Matched to .services-eyebrow */
+    font-size: 10px;
+    /* Matched to .services-eyebrow */
     font-weight: 600;
-
     letter-spacing: 2px;
-
-    line-height: 1;
-
     text-transform: uppercase;
 }
 
 
 .gallery-heading h2 {
     margin: 0;
-
     color: #211918;
-
-    font-size: 31px;
+    font-size: 39px;
+    /* Matched to .services-heading h2 */
     font-weight: 400;
-
-    line-height: 1.02;
-
-    letter-spacing: -1.2px;
+    line-height: 1.03;
+    /* Matched to .services-heading h2 */
+    letter-spacing: -1.5px;
+    /* Matched to .services-heading h2 */
 }
-
 
 .gallery-heading h2 em {
     color: #d00062;
-
-    font-style: italic;
-
-    font-weight: 500;
+    /* Matched to .services-heading h2 span */
+    font-style: normal;
+    /* Changed from italic to normal to match the span style exactly */
 }
 
 
 .gallery-description {
-    max-width: 430px;
-
-    margin: 11px 0 0;
-
-    color: #6b605a;
-
-    font-size: 10px;
-
+    max-width: 650px;
+    /* Matched to .services-description */
+    margin: 13px 0 0;
+    /* Matched to .services-description */
+    color: #655b56;
+    /* Matched to .services-description */
+    font-size: 14px;
+    /* Matched to .services-description */
     line-height: 1.55;
 }
-
 
 /* =========================================================
    CTA
@@ -2163,36 +2149,29 @@
 
 
 /* =========================================================
-   GALLERY STRIP
+   GALLERY STRIP (FULL-BLEED SPREAD)
 ========================================================= */
 
 .gallery-strip {
     position: relative;
-
     left: 50%;
-
-    width: 1030px;
-
-    margin-left: -515px;
+    transform: translateX(-50%);
+    /* Perfectly centers the wide strip */
+    width: 110vw;
+    /* Wider than the screen to create the cut-off edges */
+    max-width: 1400px;
+    /* Prevents it from getting too huge on ultra-wide monitors */
 
     display: grid;
 
-    grid-template-columns:
-        40px
-        190px
-        200px
-        200px
-        190px
-        190px;
+    /* 4 large center columns, with narrow 30px cut-off columns on the edges */
+    grid-template-columns: 30px 1fr 1fr 1fr 1fr 30px;
 
-    grid-template-rows:
-        148px
-        190px
-        148px;
+    /* Adjusted heights to match the image proportions */
+    grid-template-rows: 180px 240px 180px;
 
-    column-gap: 10px;
-
-    row-gap: 10px;
+    column-gap: 12px;
+    row-gap: 12px;
 }
 
 
@@ -2246,11 +2225,9 @@
     height: 50%;
 
     background:
-        linear-gradient(
-            to bottom,
+        linear-gradient(to bottom,
             transparent 0%,
-            rgba(20, 10, 8, .62) 100%
-        );
+            rgba(20, 10, 8, .62) 100%);
 
     z-index: 1;
 
@@ -2473,25 +2450,14 @@
 
 
     .gallery-strip {
-        width: 900px;
+        width: 130vw;
+        /* Make it even wider on mobile so the cut-off is visible */
+        margin-left: 0;
+        /* Remove old margin */
 
-        margin-left: -450px;
-
-        grid-template-columns:
-            30px
-            165px
-            175px
-            175px
-            165px
-            165px;
-
-        grid-template-rows:
-            120px
-            155px
-            120px;
-
+        grid-template-columns: 20px 1fr 1fr 1fr 1fr 20px;
+        grid-template-rows: 120px 160px 120px;
         column-gap: 8px;
-
         row-gap: 8px;
     }
 
@@ -2506,65 +2472,613 @@
     }
 }
 
+/* =========================================
+   TESTIMONIALS SECTION
+========================================= */
+
+.testimonials-section {
+    background: #fcf7ef;
+    /* Matches the portfolio/hero cream background */
+    padding: 70px 0 80px;
+}
+
 .testimonial-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 14px
+    gap: 24px;
+    margin-top: 40px;
+    /* Spacing between the heading and cards */
+}
+
+.testimonial-card-custom {
+    background: #fffdf9;
+    border: 1px solid #e6ddd3;
+    border-radius: 16px;
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 15px rgba(50, 30, 20, 0.03);
+    /* Very subtle shadow */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.testimonial-card-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(50, 30, 20, 0.06);
+}
+
+.quote-icon {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 36px;
+    color: #c99436;
+    /* Gold color matching the eyebrow text */
+    line-height: 1;
+    margin-bottom: 12px;
+    height: 28px;
+    /* Prevents layout shift */
+}
+
+.quote-text {
+    font-family: Georgia, "Times New Roman", serif;
+    /* Serif font for the quote itself */
+    font-size: 14px;
+    line-height: 1.6;
+    color: #4a403a;
+    margin-bottom: 28px;
+    flex-grow: 1;
+    /* Pushes the divider and author to the bottom */
+}
+
+.quote-divider {
+    height: 1px;
+    background-color: #e6ddd3;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.author-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.author-info strong {
+    font-size: 13px;
+    font-weight: 600;
+    color: #211918;
+    font-family: inherit;
+    /* Ensures the name uses your site's sans-serif font */
+}
+
+.author-info span {
+    font-size: 11px;
+    color: #82756d;
+    font-family: inherit;
+}
+
+/* =========================================
+   RESPONSIVE TESTIMONIALS
+========================================= */
+@media (max-width: 900px) {
+    .testimonial-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .testimonial-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .testimonials-section {
+        padding: 50px 0 60px;
+    }
+}
+
+/* =========================================
+   BUSINESS / VENDOR SECTION
+========================================= */
+/* =========================================
+   VENDOR HERO SECTION
+========================================= */
+
+.vendor-hero {
+    position: relative;
+    min-height: 620px;
+    /* Matches the height of the image */
+    width: 100%;
+    overflow: hidden;
+    background: #fcf7ef;
+    display: flex;
+    align-items: center;
+}
+
+.vendor-hero-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* 👇 FIXED: Centers the image so it isn't stretched or pushed right */
+    object-position: center;
+    z-index: 1;
+}
+
+/* 👇 FIXED: A very soft gradient ONLY on the left side to make text readable
+   without washing out the handshake in the middle. */
+.vendor-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.vendor-hero-container {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* ---- LEFT CONTENT ---- */
+.vendor-hero-content {
+    width: 100%;
+    max-width: 520px;
+    padding: 0 100px;
+    /* Use padding instead of margin to avoid overflow */
+    box-sizing: border-box;
+}
+
+.vendor-eyebrow {
+    color: #c99436;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.vendor-hero-content h2 {
+    font-size: 44px;
+    /* Matches the image size */
+    font-weight: 400;
+    color: #211918;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 20px;
+}
+
+.vendor-hero-content h2 span {
+    color: #d00062;
+    /* Pink color for EVENDDY */
+    font-weight: 600;
+    font-style: italic;
+}
+
+.vendor-desc {
+    font-size: 14px;
+    color: #4a403a;
+    line-height: 1.65;
+    margin-bottom: 30px;
+    max-width: 450px;
+}
+
+.vendor-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #72002f;
+    /* Maroon button */
+    color: #ffffff;
+    padding: 12px 24px;
+    border-radius: 22px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s ease;
+    margin-bottom: 45px;
+}
+
+.vendor-btn:hover {
+    background: #940043;
+}
+
+.vendor-btn span {
+    font-size: 16px;
+    line-height: 1;
+}
+
+/* ---- STATS ---- */
+.vendor-stats {
+    display: flex;
+    gap: 45px;
+}
+
+.v-stat strong {
+    display: block;
+    font-size: 26px;
+    color: #940043;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.v-stat small {
+    display: block;
+    font-size: 11px;
+    color: #766b65;
+}
+
+/* ---- RIGHT FLOATING CARDS ---- */
+.vendor-cards {
+    position: relative;
+    width: 50%;
+    height: 520px;
+    /* Container height for absolute cards */
+}
+
+.v-card {
+    position: absolute;
+    background: #fffdf9;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(50, 30, 20, 0.06);
+    /* Soft shadow */
+    width: 260px;
+    transition: transform 0.3s ease;
+}
+
+.v-card:hover {
+    transform: translateY(-5px);
+}
+
+.v-card-icon {
+    width: 36px;
+    height: 36px;
+    background: #f5ead4;
+    color: #c99436;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.v-card h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #211918;
+    margin-bottom: 8px;
+}
+
+.v-card p {
+    font-size: 11px;
+    color: #6d625c;
+    line-height: 1.5;
+}
+
+/* 👇 FIXED: Card positions matched exactly to the screenshot */
+.v-card-1 {
+    top: 0;
+    left: 10%;
+}
+
+.v-card-2 {
+    top: 60px;
+    right: 30px;
+}
+
+.v-card-3 {
+    bottom: 60px;
+    left: 0;
+}
+
+.v-card-4 {
+    bottom: 0;
+    right: 10%;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 1024px) {
+    .vendor-hero-content h2 {
+        font-size: 38px;
+    }
+
+    .v-card {
+        width: 230px;
+        padding: 20px;
+    }
+
+    .vendor-hero::before {
+        background: linear-gradient(90deg, #fcf7ef 20%, rgba(252, 247, 239, 0.7) 50%, transparent 80%);
+    }
+}
+
+@media (max-width: 900px) {
+    .vendor-hero {
+        min-height: auto;
+        padding: 60px 0;
+    }
+
+    .vendor-hero::before {
+        background: rgba(252, 247, 239, 0.9);
+        /* Solid overlay on mobile for readability */
+    }
+
+    .vendor-hero-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 60px;
+    }
+
+    .vendor-hero-content {
+        max-width: 100%;
+    }
+
+    .vendor-cards {
+        width: 100%;
+        height: auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .v-card {
+        position: relative;
+        width: 100%;
+        top: auto !important;
+        bottom: auto !important;
+        left: auto !important;
+        right: auto !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .vendor-hero-content h2 {
+        font-size: 34px;
+    }
+
+    .vendor-stats {
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .vendor-cards {
+        grid-template-columns: 1fr;
+    }
 }
 
 .business-section {
-    background: #f1e6dc;
-    overflow: hidden
+    background-color: #fcf7ef;
+    /* Fallback color */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 100px 0;
+    position: relative;
+    overflow: hidden;
 }
 
-.business-inner {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    min-height: 430px;
-    align-items: center
+.business-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 550px;
+    position: relative;
 }
 
-.business-copy {
-    padding: 65px 0
+/* ---- LEFT CONTENT ---- */
+.business-content {
+    width: 100%;
+    max-width: 480px;
+    z-index: 2;
 }
 
-.business-copy h2 {
-    font-size: 56px;
-    margin-bottom: 10px
+.business-eyebrow {
+    color: #c99436;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
 }
 
-.business-copy h2 span {
-    color: var(--pink-2)
+.business-content h2 {
+    font-size: 42px;
+    font-weight: 400;
+    color: #211918;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 20px;
 }
 
-.business-copy>p {
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.7;
-    max-width: 470px
+.business-content h2 span {
+    color: #d00062;
+    font-weight: 600;
+    font-style: italic;
 }
 
+.business-desc {
+    font-size: 14px;
+    color: #4a403a;
+    line-height: 1.65;
+    margin-bottom: 30px;
+    max-width: 420px;
+}
+
+.business-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #72002f;
+    color: #ffffff;
+    padding: 12px 24px;
+    border-radius: 22px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s ease;
+    margin-bottom: 40px;
+}
+
+.business-btn:hover {
+    background: #940043;
+}
+
+.business-btn span {
+    font-size: 16px;
+    line-height: 1;
+}
+
+/* ---- STATS ---- */
 .business-stats {
     display: flex;
-    gap: 35px;
-    margin-top: 30px
+    gap: 40px;
 }
 
-.business-stats b {
-    font-size: 16px;
-    color: var(--pink)
-}
-
-.business-stats small {
+.stat-item strong {
     display: block;
-    font-size: 8px;
-    color: var(--muted)
+    font-size: 24px;
+    color: #940043;
+    font-weight: 500;
+    margin-bottom: 4px;
 }
 
-.business-visual {
-    height: 100%;
+.stat-item small {
+    display: block;
+    font-size: 10px;
+    color: #766b65;
+}
+
+/* ---- RIGHT FLOATING CARDS ---- */
+.business-cards {
     position: relative;
-    min-height: 430px
+    width: 50%;
+    height: 500px;
+    z-index: 2;
+}
+
+.b-card {
+    position: absolute;
+    background: #fffdf9;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(50, 30, 20, 0.08);
+    width: 250px;
+    transition: transform 0.3s ease;
+}
+
+.b-card:hover {
+    transform: translateY(-5px);
+}
+
+.b-card-icon {
+    width: 36px;
+    height: 36px;
+    background: #f5ead4;
+    color: #c99436;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.b-card h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #211918;
+    margin-bottom: 8px;
+}
+
+.b-card p {
+    font-size: 11px;
+    color: #6d625c;
+    line-height: 1.5;
+}
+
+/* Positioning the cards to match the design */
+.b-card-1 {
+    top: 0;
+    left: 10%;
+}
+
+.b-card-2 {
+    top: 40px;
+    right: 0;
+}
+
+.b-card-3 {
+    bottom: 40px;
+    left: 0;
+}
+
+.b-card-4 {
+    bottom: 0;
+    right: 10%;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 1024px) {
+    .business-content h2 {
+        font-size: 36px;
+    }
+
+    .b-card {
+        width: 220px;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 900px) {
+    .business-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 60px;
+    }
+
+    .business-content {
+        max-width: 100%;
+    }
+
+    .business-cards {
+        width: 100%;
+        height: auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .b-card {
+        position: relative;
+        width: 100%;
+        top: auto !important;
+        bottom: auto !important;
+        left: auto !important;
+        right: auto !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .business-section {
+        padding: 60px 0;
+    }
+
+    .business-content h2 {
+        font-size: 32px;
+    }
+
+    .business-stats {
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .business-cards {
+        grid-template-columns: 1fr;
+    }
 }
 
 .hand-shape {
@@ -2602,80 +3116,205 @@
     right: 70px
 }
 
-.app-section {
-    background: #fbf7f0
-}
+/* =========================================
+   APP SECTION (REDESIGNED)
+========================================= */
 
-.app-grid {
-    display: grid;
-    grid-template-columns: 1fr .75fr;
-    align-items: center;
-    min-height: 440px
-}
-
-.app-grid p:not(.eyebrow) {
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.75
-}
-
-.store-buttons {
-    display: flex;
-    gap: 8px;
-    margin-top: 25px
-}
-
-.store-buttons button {
-    background: #171313;
-    color: #fff;
-    border: 0;
-    border-radius: 6px;
-    padding: 11px 16px;
-    font-size: 10px
-}
-
-.phone {
-    width: 225px;
-    height: 440px;
-    background: #151111;
-    border-radius: 30px;
-    padding: 9px;
-    margin: auto;
-    box-shadow: 0 20px 45px rgba(30, 10, 10, .2);
-    transform: rotate(3deg)
-}
-
-.phone>div {
-    height: 100%;
-    border-radius: 22px;
-    background: #f9f2e9;
+.app-section-custom {
+    background: #fcf7ef; /* Cream background */
+    padding: 100px 0;
     overflow: hidden;
-    padding: 17px
 }
 
-.phone small {
+.app-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+/* ---- LEFT COLUMN ---- */
+.app-content {
+    max-width: 480px;
+}
+
+.app-eyebrow {
+    color: #c99436;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.app-content h2 {
+    font-size: 42px;
+    font-weight: 400;
+    color: #211918;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 20px;
+}
+
+.app-content h2 em {
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    color: #d00062; /* Brand pink for "pocket." */
+}
+
+.app-desc {
+    font-size: 14px;
+    color: #6a5f59;
+    line-height: 1.65;
+    margin-bottom: 30px;
+}
+
+/* Form */
+.app-notify-form {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.app-notify-form input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #e5dbd1;
+    border-radius: 8px;
+    background: #fffdf9;
+    font-size: 13px;
+    color: #211918;
+    outline: none;
+}
+
+.app-notify-form input::placeholder {
+    color: #9a8f88;
+}
+
+.app-notify-form button {
+    background: #72002f;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 0 24px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.app-notify-form button:hover {
+    background: #940043;
+}
+
+/* Store Buttons */
+.app-store-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.store-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #171313;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    cursor: pointer;
+    text-align: left;
+    transition: opacity 0.2s ease;
+}
+
+.store-btn:hover {
+    opacity: 0.9;
+}
+
+.store-btn svg {
+    color: #ffffff;
+}
+
+.store-text small {
+    display: block;
     font-size: 8px;
-    color: var(--pink);
-    font-weight: 800
+    color: #aaaaaa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
 }
 
-.phone img {
-    height: 170px;
+.store-text strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ---- RIGHT COLUMN (PHONE IMAGE) ---- */
+.app-visual {
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.phone-mockup {
+    position: relative;
     width: 100%;
-    object-fit: cover;
-    border-radius: 12px;
-    margin-top: 15px
+    max-width: 340px; /* Limits the max size of your phone image */
 }
 
-.phone h3 {
-    font-size: 20px;
-    line-height: 1.05;
-    margin: 20px 0
-}
-
-.phone .btn {
+.phone-mockup img {
     width: 100%;
-    font-size: 9px
+    height: auto;
+    display: block;
+    /* Adds the floating shadow effect seen in the image */
+    filter: drop-shadow(0 30px 50px rgba(50, 30, 20, 0.15));
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 1024px) {
+    .app-content h2 { font-size: 36px; }
+    .phone-mockup { max-width: 300px; }
+}
+
+@media (max-width: 900px) {
+    .app-layout {
+        grid-template-columns: 1fr;
+        gap: 60px;
+    }
+    .app-content {
+        max-width: 100%;
+        text-align: center;
+    }
+    .app-notify-form {
+        justify-content: center;
+    }
+    .app-store-buttons {
+        justify-content: center;
+    }
+    .app-visual {
+        order: -1; /* Puts the phone above the text on mobile */
+    }
+}
+
+@media (max-width: 600px) {
+    .app-content h2 { font-size: 32px; }
+    .app-notify-form {
+        flex-direction: column;
+    }
+    .app-notify-form button {
+        padding: 14px;
+    }
+    .app-store-buttons {
+        flex-direction: column;
+    }
+    .store-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    .phone-mockup {
+        max-width: 260px;
+    }
 }
 
 .stories-preview {
@@ -2687,6 +3326,44 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 14px
 }
+/* =========================================
+   STORIES SPLIT HEADING (Justify Start & End)
+========================================= */
+
+.split-heading {
+    display: flex;
+    justify-content: space-between; /* Pushes the heading left and link right */
+    align-items: flex-end;          /* Aligns them along the baseline */
+    margin-bottom: 40px;            /* Space before the story cards */
+    gap: 20px;                      /* Prevents touching on smaller widths */
+}
+
+.text-button {
+    color: #72002f;                 /* Brand maroon */
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;            /* Keeps "View all stories →" on one line */
+    margin-bottom: 6px;             /* Small nudge to align with heading baseline */
+    transition: color 0.2s ease;
+}
+
+.text-button:hover {
+    color: #d00062;                 /* Pink on hover */
+}
+
+/* =========================================
+   RESPONSIVE (Stories Split Heading)
+========================================= */
+@media (max-width: 600px) {
+    .split-heading {
+        flex-direction: column;      /* Stacks them on mobile */
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+}
+
 
 .faq-container {
     max-width: 760px
@@ -2821,5 +3498,198 @@
 
     .app-grid {
         gap: 40px
+    }
+}
+
+/* =========================================
+   FAQ SECTION (REDESIGNED)
+========================================= */
+
+.faq-custom-section {
+    background: #fcf7ef; /* Matches the cream background */
+    padding: 100px 0;
+    scroll-margin-top: 66px;
+}
+
+/* ---- HEADER ---- */
+.faq-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.faq-eyebrow {
+    color: #c99436;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.faq-header h2 {
+    font-size: 42px;
+    font-weight: 400;
+    color: #211918;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+}
+
+.faq-header h2 em {
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    color: #d00062; /* Brand pink for "Answered." */
+}
+
+/* ---- ACCORDION LIST ---- */
+.faq-list {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Space between each card */
+}
+
+.faq-item {
+    background: #ffffff;
+    border: 1px solid #e5dbd1;
+    border-radius: 12px;
+    padding: 18px 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02); /* Very subtle shadow */
+}
+
+.faq-item:hover {
+    border-color: #c99436; /* Gold border on hover */
+}
+
+.faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    color: #211918;
+    font-weight: 500;
+}
+
+.faq-icon {
+    color: #6d625c;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+}
+
+.faq-item.open .faq-icon {
+    transform: rotate(180deg); /* Flips the chevron when open */
+}
+
+.faq-answer {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f0e7e3;
+    font-size: 14px;
+    color: #6d625c;
+    line-height: 1.6;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 600px) {
+    .faq-custom-section {
+        padding: 60px 0;
+    }
+    .faq-header h2 {
+        font-size: 32px;
+    }
+    .faq-item {
+        padding: 16px 20px;
+    }
+    .faq-question {
+        font-size: 14px;
+    }
+}
+
+/* =========================================
+   FINAL CTA SECTION
+========================================= */
+
+.final-cta {
+    position: relative;
+    padding: 110px 20px;
+    text-align: center;
+    overflow: hidden;
+    background-color: #72002f; /* Fallback deep maroon */
+}
+
+/* The background image sits absolutely behind everything */
+.final-cta-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures it fills the space without distorting */
+    z-index: 1;
+}
+
+/* The content sits on top of the image */
+.final-content {
+    position: relative;
+    z-index: 2;
+    max-width: 650px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Heading Styling */
+.final-content h2 {
+    font-size: 44px;
+    font-weight: 400;
+    color: #ffffff;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 16px;
+}
+
+/* Subtitle Styling */
+.final-content p {
+    font-size: 14px;
+    color: #e8c9d6; /* Soft pink text */
+    line-height: 1.6;
+    margin-bottom: 36px;
+}
+
+/* Gold Button Styling */
+.cta-btn {
+    display: inline-block;
+    background: #cfa05a;
+    color: #2c1a10;
+    padding: 14px 36px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.cta-btn:hover {
+    background: #b88c4a;
+    transform: translateY(-2px);
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 600px) {
+    .final-cta {
+        padding: 80px 20px;
+    }
+    .final-content h2 {
+        font-size: 32px;
+    }
+    .final-content p {
+        font-size: 13px;
+        margin-bottom: 24px;
+    }
+    .cta-btn {
+        padding: 12px 28px;
+        font-size: 12px;
     }
 }

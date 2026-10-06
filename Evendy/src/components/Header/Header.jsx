@@ -1,14 +1,37 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Header.css";
 import logoImage from "../../assets/evenddy-logo.svg";
 
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const location = useLocation();
   const navigate = useNavigate();
 
   const close = () => setOpen(false);
+
+  useEffect(() => {
+    if (location.pathname !== "/" || location.hash !== "#home-faq") {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById("home-faq")?.scrollIntoView({ behavior: "smooth" });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [location.pathname, location.hash]);
+
+  const handleFaqClick = (event) => {
+    close();
+
+    if (location.pathname === "/" && location.hash === "#home-faq") {
+      event.preventDefault();
+      document.getElementById("home-faq")?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <header className="site-header">
@@ -20,9 +43,10 @@ export default function Header() {
         <nav className={open ? "nav-links open" : "nav-links"}>
           <Link to="/services" onClick={close}>Services</Link>
           <Link to="/gallery" onClick={close}>Gallery</Link>
-          <Link to="/events" onClick={close}>Vendors</Link>
+          <Link to="/vendors" onClick={close}>Vendors</Link>
+          <Link to="/events" onClick={close}>Events</Link>
           <Link to="/blog" onClick={close}>Blog</Link>
-          <Link to="/faq" onClick={close}>FAQ</Link>
+          <Link to="/#home-faq" onClick={handleFaqClick}>FAQ</Link>
         </nav>
 
         <button className="btn btn-dark nav-cta" onClick={() => { close(); navigate("/plan-event"); }}>

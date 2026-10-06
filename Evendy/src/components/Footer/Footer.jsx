@@ -1,12 +1,15 @@
 import { Link } from "react-router-dom";
 import "./Footer.css";
+import logo from "../../assets/evenddy-logo.svg"
 
 export default function Footer() {
   return (
     <footer className="footer">
       <div className="container footer-top">
         <div className="footer-brand">
-          <div className="footer-logo"><span className="brand-mark">E</span> EVENDDY</div>
+          <div className="footer-logo">
+            <img src={logo} alt="" />
+          </div>
           <p>Curating unforgettable celebrations, one beautiful detail at a time.</p>
         </div>
         <div>

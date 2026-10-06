@@ -13,6 +13,7 @@ import Contact from "../pages/Contact/Contact";
 import FAQPage from "../pages/FAQPage/FAQPage";
 import PlanEvent from "../pages/PlanEvent/PlanEvent";
 import NotFound from "../pages/NotFound/NotFound";
+import VendorOnboarding from "../pages/Vendor/VendorOnboarding";
 
 export default function AppRoutes() {
   return (
@@ -23,6 +24,7 @@ export default function AppRoutes() {
           <Route path="/services" element={<Services />} />
           <Route path="/services/:slug" element={<ServiceDetails />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/vendors" element={<VendorOnboarding />} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/:slug" element={<EventDetails />} />
           <Route path="/blog" element={<Blog />} />
