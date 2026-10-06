@@ -1,1 +1,242 @@
-.plan-form-wrap{max-width:800px}.plan-form{background:#fffdf9;border:1px solid var(--line);border-radius:10px;padding:30px;display:flex;flex-direction:column;gap:16px}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.plan-form input,.plan-form select,.plan-form textarea{border:1px solid var(--line);border-radius:4px;background:#fff;padding:12px;font-size:10px}.plan-form label{font-size:9px;color:#625650;display:flex;flex-direction:column;gap:7px}@media(max-width:680px){.field-row{grid-template-columns:1fr}}
+/* =========================================
+   PLAN EVENT PAGE — PAGE HERO
+========================================= */
+
+.page-hero {
+    background: #fcf7ef;
+    padding: 90px 0 60px;
+    text-align: center;
+}
+
+.page-hero .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.page-hero .eyebrow {
+    color: #c99436;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0 0 14px;
+}
+
+.page-hero h1 {
+    font-size: clamp(36px, 4.5vw, 56px);
+    font-weight: 400;
+    color: #211918;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin: 0 0 18px;
+}
+
+.page-hero h1 em {
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    color: #d00062;
+}
+
+.page-hero p {
+    font-size: 15px;
+    color: #6a5f59;
+    line-height: 1.65;
+    max-width: 580px;
+    margin: 0 auto;
+}
+
+/* =========================================
+   PLAN FORM SECTION
+========================================= */
+
+section.section:has(.plan-form-wrap) {
+    background: #fcf7ef;
+    padding: 60px 0 100px;
+}
+
+.plan-form-wrap {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* =========================================
+   FORM CARD
+========================================= */
+
+.plan-form {
+    background: #fffdf9;
+    border: 1px solid #e5dbd1;
+    border-radius: 18px;
+    padding: 36px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    box-shadow: 0 4px 15px rgba(50, 30, 20, 0.03);
+}
+
+/* =========================================
+   FIELD ROWS
+========================================= */
+
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* =========================================
+   LABELS
+========================================= */
+
+.plan-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #211918;
+    letter-spacing: 0.3px;
+    width: 100%;
+}
+
+/* =========================================
+   INPUTS / SELECT / TEXTAREA
+========================================= */
+
+.plan-form input,
+.plan-form select,
+.plan-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #e4d9cf;
+    border-radius: 8px;
+    background: #f8f1e9;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-family: inherit;
+    color: #211918;
+    outline: none;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.plan-form input::placeholder,
+.plan-form textarea::placeholder {
+    color: #9a8f88;
+}
+
+.plan-form input:focus,
+.plan-form select:focus,
+.plan-form textarea:focus {
+    border-color: #a0004a;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(160, 0, 74, 0.07);
+}
+
+/* Date input */
+.plan-form input[type="date"] {
+    color: #756a64;
+    cursor: pointer;
+}
+
+.plan-form input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.65;
+    cursor: pointer;
+}
+
+/* Select */
+.plan-form select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23756a64' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+/* Textarea */
+.plan-form textarea {
+    resize: vertical;
+    min-height: 140px;
+    line-height: 1.6;
+}
+
+/* =========================================
+   SUBMIT BUTTON
+========================================= */
+
+.plan-form button,
+.plan-form .btn-primary {
+    background: #920043;
+    color: #ffffff;
+    border: 1px solid #920043;
+    border-radius: 22px;
+    height: 46px;
+    padding: 0 32px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+    width: fit-content;
+    margin-top: 8px;
+    align-self: flex-start;
+}
+
+.plan-form button:hover,
+.plan-form .btn-primary:hover {
+    background: #72002f;
+    border-color: #72002f;
+}
+
+.plan-form button:active,
+.plan-form .btn-primary:active {
+    transform: scale(0.99);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 680px) {
+    .field-row {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .plan-form {
+        padding: 26px 22px;
+        border-radius: 14px;
+        gap: 18px;
+    }
+
+    .plan-form button,
+    .plan-form .btn-primary {
+        width: 100%;
+        align-self: stretch;
+    }
+}
+
+@media (max-width: 600px) {
+    .page-hero {
+        padding: 60px 0 40px;
+    }
+
+    .page-hero h1 {
+        font-size: 32px;
+    }
+
+    section.section:has(.plan-form-wrap) {
+        padding: 40px 0 70px;
+    }
+
+    .plan-form {
+        padding: 22px 18px;
+    }
+}
