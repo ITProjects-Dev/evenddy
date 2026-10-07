@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import "./decor.css";
+import "./Decor.css";
 
 /* Decor explore flow (single file, like CateringExplore).
    Rendered by ServiceDetails when the slug contains "decor".

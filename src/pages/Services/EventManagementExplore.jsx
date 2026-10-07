@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import "./eventmanagement.css";
+import "./Eventmanagement.css";
 
 /* Event Management / Plan Your Event page (single file, like CateringExplore / DecorExplore).
    Rendered by ServiceDetails when the slug contains "event".

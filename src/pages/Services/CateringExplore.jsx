@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useId } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import "./catering.css";
+import "./Catering.css";
 
 /* Styled with plain CSS (catering.css, everything scoped under .ev). No Tailwind needed.
    Keep catering.css in the same folder as this file. */
