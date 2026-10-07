@@ -3460,26 +3460,90 @@
    STORIES SPLIT HEADING (Justify Start & End)
 ========================================= */
 
+/* =========================================
+   STORIES SPLIT HEADING
+========================================= */
+
 .split-heading {
     display: flex;
-    justify-content: space-between; /* Pushes the heading left and link right */
-    align-items: flex-end;          /* Aligns them along the baseline */
-    margin-bottom: 40px;            /* Space before the story cards */
-    gap: 20px;                      /* Prevents touching on smaller widths */
+    justify-content: space-between;   /* Heading left, link right */
+    align-items: flex-end;
+    margin-bottom: 40px;
+    gap: 20px;
 }
 
+/* "View all stories →" link */
 .text-button {
-    color: #72002f;                 /* Brand maroon */
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #72002f;
     font-size: 13px;
     font-weight: 500;
     text-decoration: none;
-    white-space: nowrap;            /* Keeps "View all stories →" on one line */
-    margin-bottom: 6px;             /* Small nudge to align with heading baseline */
-    transition: color 0.2s ease;
+    white-space: nowrap;
+    margin-bottom: 6px;
+    transition: color 0.2s ease, gap 0.2s ease;
 }
 
 .text-button:hover {
-    color: #d00062;                 /* Pink on hover */
+    color: #d00062;
+    gap: 10px;   /* Icon slides right on hover */
+}
+
+.text-button svg {
+    display: block;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+}
+
+.text-button:hover svg {
+    transform: translateX(2px);
+}
+
+/* =========================================
+   STORIES SECTION
+========================================= */
+
+.stories-preview {
+    background: #f8f3eb;
+    padding: 70px 0 80px;
+}
+
+.stories-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+    .stories-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .stories-preview {
+        padding: 50px 0 60px;
+    }
+
+    .split-heading {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .stories-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
 }
 
 /* =========================================
