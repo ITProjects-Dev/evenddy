@@ -1,0 +1,693 @@
+/* =========================================
+   EVENDDY VENDOR ONBOARDING STYLES
+   Matches App.css Brand Identity
+========================================= */
+
+:root {
+  --brand-maroon: #940043;
+  --brand-maroon-dark: #72002f;
+  --brand-gold: #c99436;
+  --brand-pink: #d00062;
+  --brand-bg-cream: #fcf7ef;
+  --brand-bg-beige: #ede9e3;
+  --brand-bg-card: #fffdfb;
+  --brand-text-dark: #211918;
+  --brand-text-muted: #665a55;
+  --brand-border: #e5dbd1;
+  --brand-input-bg: #f8f1e9;
+  --brand-input-border: #e4d9cf;
+}
+
+/* Base Layout */
+.onboarding-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--brand-bg-cream);
+  font-family: "Sora", sans-serif;
+  color: var(--brand-text-dark);
+}
+
+/* =========================================
+   SIDEBAR
+========================================= */
+.onboarding-sidebar {
+  width: 280px;
+  background-color: var(--brand-bg-card);
+  border-right: 1px solid var(--brand-border);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 48px;
+}
+
+.brand-icon {
+  width: 40px;
+  height: 40px;
+  background-color: var(--brand-maroon);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  font-family: "Sora", sans-serif;
+}
+
+.brand-text h1 {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--brand-maroon);
+  margin: 0;
+}
+
+.brand-text p {
+  font-size: 10px;
+  color: var(--brand-text-muted);
+  margin: 0;
+}
+
+.onboarding-stepper {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  padding-bottom: 32px;
+}
+
+.step-item:last-child {
+  padding-bottom: 0;
+}
+
+.step-marker {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--brand-bg-beige);
+  color: var(--brand-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 2;
+  flex-shrink: 0;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.step-item.active .step-marker {
+  background-color: var(--brand-maroon);
+  color: #fff;
+  border-color: #f4d6e4;
+}
+
+.step-item.completed .step-marker {
+  background-color: var(--brand-maroon);
+  color: #fff;
+  font-size: 14px;
+}
+
+.step-connector {
+  position: absolute;
+  left: 13px;
+  top: 28px;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--brand-bg-beige);
+  z-index: 1;
+}
+
+.step-item.completed .step-connector {
+  background-color: var(--brand-maroon);
+}
+
+.step-name {
+  font-size: 14px;
+  color: var(--brand-text-muted);
+  font-weight: 400;
+}
+
+.step-item.active .step-name {
+  color: var(--brand-text-dark);
+  font-weight: 600;
+}
+
+/* =========================================
+   MAIN CONTENT AREA
+========================================= */
+.onboarding-main {
+  flex: 1;
+  padding: 32px 48px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.onboarding-top-nav {
+  margin-bottom: 24px;
+}
+
+.back-link {
+  color: var(--brand-maroon);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.back-link:hover {
+  color: var(--brand-maroon-dark);
+}
+
+.onboarding-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.onboarding-eyebrow {
+  color: var(--brand-gold);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.onboarding-header h2 {
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: -1px;
+  margin-bottom: 8px;
+  color: var(--brand-text-dark);
+}
+
+.onboarding-subtitle {
+  color: var(--brand-text-muted);
+  font-size: 14px;
+}
+
+/* =========================================
+   FORM CARD & CONTENT
+========================================= */
+.onboarding-card-wrapper {
+  background-color: var(--brand-bg-card);
+  border: 1px solid var(--brand-border);
+  border-radius: 18px;
+  padding: 40px;
+  box-shadow: 0 2px 3px rgba(50, 30, 20, 0.06);
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: 500px;
+}
+
+.step-content h3 {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: var(--brand-text-dark);
+}
+
+.step-desc {
+  color: var(--brand-text-muted);
+  font-size: 13px;
+  margin-bottom: 32px;
+}
+
+/* =========================================
+   STEP 1: CATEGORY GRID
+========================================= */
+.onboarding-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.onboarding-card {
+  border: 1px solid var(--brand-input-border);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: var(--brand-input-bg);
+}
+
+.onboarding-card:hover {
+  border-color: var(--brand-maroon);
+  background-color: #fff;
+}
+
+.onboarding-card.selected {
+  border-color: var(--brand-maroon);
+  background-color: #fff;
+  box-shadow: 0 0 0 2px rgba(148, 0, 67, 0.1);
+}
+
+.card-icon {
+  width: 36px;
+  height: 36px;
+  background-color: var(--brand-bg-beige);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: var(--brand-maroon);
+}
+
+.onboarding-card.selected .card-icon {
+  background-color: var(--brand-maroon);
+  color: #fff;
+}
+
+.onboarding-card h4 {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: var(--brand-text-dark);
+}
+
+.onboarding-card p {
+  font-size: 11px;
+  color: var(--brand-text-muted);
+  line-height: 1.4;
+}
+
+/* =========================================
+   FORM FIELDS & GRID
+========================================= */
+.onboarding-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.onboarding-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.onboarding-field label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--brand-text-dark);
+}
+
+.req { color: var(--brand-pink); }
+.opt { color: var(--brand-text-muted); font-weight: 400; font-size: 10px; }
+
+.onboarding-input, .onboarding-select, .onboarding-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--brand-input-border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: "Sora", sans-serif;
+  color: var(--brand-text-muted);
+  background-color: var(--brand-input-bg);
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.onboarding-input:focus, .onboarding-select:focus, .onboarding-textarea:focus {
+  border-color: var(--brand-maroon);
+  background-color: #fff;
+  box-shadow: 0 0 0 2px rgba(148, 0, 67, 0.07);
+}
+
+.onboarding-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Custom Select Dropdown */
+.onboarding-select-wrapper {
+  position: relative;
+}
+
+.onboarding-select-wrapper::after {
+  content: "⌄";
+  position: absolute;
+  top: 50%;
+  right: 13px;
+  transform: translateY(-50%);
+  color: var(--brand-text-muted);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.onboarding-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 35px;
+  cursor: pointer;
+}
+
+/* =========================================
+   TOGGLES
+========================================= */
+.onboarding-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.onboarding-toggle {
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  background-color: var(--brand-bg-beige);
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.onboarding-toggle.on {
+  background-color: var(--brand-maroon);
+}
+
+.toggle-dot {
+  width: 20px;
+  height: 20px;
+  background-color: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.onboarding-toggle.on .toggle-dot {
+  transform: translateX(20px);
+}
+
+.toggle-label {
+  font-size: 12px;
+  color: var(--brand-text-muted);
+}
+
+/* =========================================
+   FILE UPLOAD
+========================================= */
+.file-upload-box {
+  border: 1px dashed var(--brand-input-border);
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  background-color: var(--brand-input-bg);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.file-upload-box:hover {
+  border-color: var(--brand-maroon);
+  background-color: #fff;
+}
+
+.file-input-hidden {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0; left: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-upload-label {
+  font-size: 13px;
+  color: var(--brand-text-muted);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.upload-icon { font-size: 16px; color: var(--brand-maroon); }
+
+.field-note {
+  font-size: 10px;
+  color: var(--brand-text-muted);
+  margin-top: -4px;
+}
+
+/* =========================================
+   AMENITIES PILLS
+========================================= */
+.amenities-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.amenity-pill {
+  padding: 8px 16px;
+  border: 1px solid var(--brand-input-border);
+  border-radius: 20px;
+  background-color: var(--brand-input-bg);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--brand-text-muted);
+}
+
+.amenity-pill:hover {
+  border-color: var(--brand-maroon);
+  color: var(--brand-maroon);
+}
+
+.amenity-pill.active {
+  background-color: var(--brand-maroon);
+  color: #fff;
+  border-color: var(--brand-maroon);
+}
+
+/* =========================================
+   STEP 6: REVIEW SECTION
+========================================= */
+.review-block {
+  border: 1px solid var(--brand-border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  background-color: var(--brand-input-bg);
+}
+
+.review-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.review-block-header h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand-text-dark);
+}
+
+.edit-link {
+  background: none;
+  border: none;
+  color: var(--brand-maroon);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.review-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  font-size: 12px;
+  border-bottom: 1px solid var(--brand-border);
+}
+
+.review-row:last-child {
+  border-bottom: none;
+}
+
+.review-row span:first-child {
+  color: var(--brand-text-muted);
+  flex: 1;
+}
+
+.review-row span:last-child {
+  color: var(--brand-text-dark);
+  font-weight: 500;
+  flex: 1;
+  text-align: right;
+}
+
+.terms-box {
+  margin-top: 24px;
+  background-color: #f4d6e4;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--brand-text-dark);
+}
+
+.terms-box input {
+  margin-right: 8px;
+  accent-color: var(--brand-maroon);
+}
+
+.terms-box a {
+  color: var(--brand-maroon);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* =========================================
+   FOOTER & BUTTONS
+========================================= */
+.onboarding-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1000px;
+  margin: 32px auto 0;
+  width: 100%;
+}
+
+.step-counter-text {
+  color: var(--brand-text-muted);
+  font-size: 13px;
+}
+
+.btn-onboard-primary, .btn-onboard-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;              /* Space between icon and text */
+    padding: 12px 24px;
+    border-radius: 22px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: "Sora", sans-serif;
+    line-height: 1;
+}
+
+.btn-onboard-primary {
+    background-color: var(--brand-maroon);
+    color: #fff;
+    border: 1px solid var(--brand-maroon);
+}
+
+.btn-onboard-primary:hover {
+    background-color: var(--brand-maroon-dark);
+    border-color: var(--brand-maroon-dark);
+}
+
+.btn-onboard-outline {
+    background-color: transparent;
+    color: var(--brand-maroon);
+    border: 1px solid #cf9ab1;
+}
+
+.btn-onboard-outline:hover {
+    background-color: #f4d6e4;
+}
+
+/* Ensures the SVG icons don't inherit text cursor */
+.btn-onboard-primary svg,
+.btn-onboard-outline svg {
+    flex-shrink: 0;
+    display: block;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+@media (max-width: 1024px) {
+  .onboarding-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 800px) {
+  .onboarding-layout { flex-direction: column; }
+  .onboarding-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--brand-border);
+    padding: 16px;
+  }
+  .onboarding-stepper {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .step-item {
+    padding-bottom: 0;
+    padding-right: 24px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .step-connector { display: none; }
+  .onboarding-main { padding: 16px; }
+  .onboarding-form-grid { grid-template-columns: 1fr; }
+  .full-width { grid-column: span 1; }
+  .onboarding-grid { grid-template-columns: 1fr; }
+  .onboarding-card-wrapper { padding: 24px; }
+  .onboarding-footer { flex-direction: column; gap: 16px; }
+}
+
+/* ---- TOP NAV (Back to Home) ---- */
+.onboarding-top-nav {
+    margin-bottom: 24px;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--brand-maroon);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+    padding: 6px 0;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.back-link:hover {
+    color: var(--brand-maroon-dark);
+    transform: translateX(-3px);   /* Subtle nudge on hover */
+}
+
+/* Ensures the SVG icon sits perfectly vertical */
+.back-link svg {
+    display: block;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    top: 1px;    /* Micro-adjust if the icon looks slightly high */
+}

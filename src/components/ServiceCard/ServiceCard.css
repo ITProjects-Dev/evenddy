@@ -1,0 +1,43 @@
+.service-card {
+    background: #fffdfa;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    overflow: hidden
+}
+
+.service-card>img {
+    height: 210px;
+    width: 100%;
+    object-fit: cover
+}
+
+.service-card-body {
+    padding: 18px
+}
+
+.mini-label {
+    font-size: 8px;
+    color: #b4a49b
+}
+
+.service-card h3 {
+    font-size: 18px;
+    margin: 5px 0 8px
+}
+
+.service-card p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.65;
+    min-height: 52px
+}
+
+.service-card a {
+    font-size: 9px;
+    color: var(--pink);
+    font-weight: 700
+}
+
+.service-card a span {
+    margin-left: 9px
+}

@@ -1,0 +1,103 @@
+.site-header {
+    height: 66px;
+    background: rgba(248, 243, 235, .95);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid rgba(36, 27, 25, .04)
+}
+
+.nav {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+     font-size: 14px;
+    font-weight: 800;
+    letter-spacing: .08em
+}
+
+.brand-mark {
+    width: 27px;
+    height: 27px;
+    border: 1px solid var(--pink);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: var(--pink);
+    font-family: "Sora", sans-serif;
+    font-size: 15px
+}
+
+.nav-links {
+    display: flex;
+    gap: 40px;
+    margin-left: auto
+}
+
+.nav-links a {
+    font-size: 14px;
+    color: #4b403c
+}
+
+.nav-cta {
+    padding: 10px 16px;
+    font-size: 14px;
+      background: #730039 !important;
+      border-radius: 50px;
+}
+
+.hamburger {
+    display: none;
+    background: none;
+    padding: 5px
+}
+
+.hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--ink);
+    margin: 4px
+}
+
+@media(max-width:680px) {
+    .nav-cta {
+        display: none
+    }
+
+    .hamburger {
+        display: block
+    }
+
+    .nav-links {
+        display: none
+    }
+
+    .nav-links.open {
+        display: flex;
+        position: absolute;
+        top: 94px;
+        left: 15px;
+        right: 15px;
+        padding: 15px;
+        flex-direction: column;
+        gap: 0;
+        background: #fffdf8;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow)
+    }
+
+    .nav-links.open a {
+        padding: 10px
+    }
+}

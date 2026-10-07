@@ -1,0 +1,55 @@
+name: Build and Deploy Evenddy
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build React application
+        run: npm run build
+
+      - name: Prepare deploy branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git clone --branch deploy https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git deploy-branch
+
+          cd deploy-branch
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
+
+          cp -R "$GITHUB_WORKSPACE/dist/." .
+
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No changes to deploy."
+          else
+            git commit -m "Deploy production build from main"
+            git push origin deploy
+          fi
