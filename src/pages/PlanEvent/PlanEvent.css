@@ -4,13 +4,12 @@
 
 .page-hero {
     background: #fcf7ef;
-    padding: 90px 0 60px;
+    padding: 40px 0 0 0;
     text-align: center;
 }
 
 .page-hero .container {
-    max-width: 780px;
-    margin: 0 auto;
+
     padding: 0 20px;
 }
 
@@ -52,7 +51,7 @@
 
 section.section:has(.plan-form-wrap) {
     background: #fcf7ef;
-    padding: 60px 0 100px;
+    padding: 40px;
 }
 
 .plan-form-wrap {
@@ -89,16 +88,20 @@ section.section:has(.plan-form-wrap) {
 /* =========================================
    LABELS
 ========================================= */
-
 .plan-form label {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    width: 100%;
+}
+
+.plan-form label>span {
+    display: block;
     font-size: 11px;
     font-weight: 500;
     color: #211918;
     letter-spacing: 0.3px;
-    width: 100%;
+    line-height: 1;
 }
 
 /* =========================================
@@ -110,18 +113,31 @@ section.section:has(.plan-form-wrap) {
 .plan-form textarea {
     width: 100%;
     box-sizing: border-box;
+    height: 48px;
+    /* 👈 Same height for all three */
     border: 1px solid #e4d9cf;
     border-radius: 8px;
     background: #f8f1e9;
-    padding: 12px 14px;
+    padding: 0 14px;
+    /* Vertical centering via padding */
     font-size: 13px;
     font-family: "Sora", sans-serif;
     color: #211918;
     outline: none;
+    line-height: 1.4;
     transition:
         border-color 0.2s ease,
         box-shadow 0.2s ease,
         background 0.2s ease;
+}
+
+.plan-form textarea {
+    height: auto;
+    /* Textarea grows with content */
+    padding: 12px 14px;
+    min-height: 140px;
+    line-height: 1.6;
+    resize: vertical;
 }
 
 .plan-form input::placeholder,
@@ -148,7 +164,7 @@ section.section:has(.plan-form-wrap) {
     cursor: pointer;
 }
 
-/* Select */
+/* Select — custom chevron */
 .plan-form select {
     appearance: none;
     -webkit-appearance: none;
@@ -160,30 +176,28 @@ section.section:has(.plan-form-wrap) {
     cursor: pointer;
 }
 
-/* Textarea */
-.plan-form textarea {
-    resize: vertical;
-    min-height: 140px;
-    line-height: 1.6;
-}
-
 /* =========================================
    SUBMIT BUTTON
 ========================================= */
 
 .plan-form button,
 .plan-form .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     background: #920043;
     color: #ffffff;
     border: 1px solid #920043;
     border-radius: 22px;
     height: 46px;
-    padding: 0 32px;
+    padding: 0 28px;
     font-size: 13px;
     font-weight: 500;
     font-family: "Sora", sans-serif;
+    line-height: 1;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.15s ease;
+    transition: background 0.2s ease, transform 0.15s ease, gap 0.2s ease;
     width: fit-content;
     margin-top: 8px;
     align-self: flex-start;
@@ -193,11 +207,20 @@ section.section:has(.plan-form-wrap) {
 .plan-form .btn-primary:hover {
     background: #72002f;
     border-color: #72002f;
+    gap: 12px;
+    /* Arrow slides right on hover */
 }
 
 .plan-form button:active,
 .plan-form .btn-primary:active {
     transform: scale(0.99);
+}
+
+.plan-form button svg {
+    display: block;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
 }
 
 /* =========================================
