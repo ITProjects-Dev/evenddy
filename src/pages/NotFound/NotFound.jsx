@@ -1,1 +1,17 @@
-import { Link } from "react-router-dom"; export default function NotFound(){return <section className="section center"><div className="container"><p className="eyebrow">404</p><h1>Page not <em>found.</em></h1><p>The page you requested doesn't exist.</p><Link className="btn btn-primary" to="/">Back home</Link></div></section>}
+import { Link } from "react-router-dom";
+
+export default function NotFound() {
+    return (
+        <>
+            <section className="section center">
+                <div className="container">
+                    <p className="eyebrow">404</p>
+                    <h1>Page not <em>found.</em></h1>
+                    <p>The page you requested doesn't exist.</p>
+                    <Link className="btn btn-primary mt-2" to="/">Back home</Link>
+                </div>
+            </section>
+        </>
+    )
+
+}
