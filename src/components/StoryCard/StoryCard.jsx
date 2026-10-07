@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import "./StoryCard.css";
+import { ArrowRight } from "lucide-react";
 
 export default function StoryCard({ story }) {
   return (
@@ -8,7 +9,7 @@ export default function StoryCard({ story }) {
       <div>
         <small>{story.category}</small>
         <h3>{story.title}</h3>
-        <Link to={`/blog/${story.slug}`}>Read story →</Link>
+        <Link to={`/blog/${story.slug}`}>Read story <ArrowRight size={16}/></Link>
       </div>
     </article>
   );

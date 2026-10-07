@@ -1,8 +1,9 @@
+import { Star } from "lucide-react";
 import PlannerForm from "./PlannerForm";
 
 export default function PlannerSection() {
   return (
-    <section className="section planner-preview">
+    <section id="plan-event" className="section planner-preview">
             <div className="container">
     
               {/* =========================================
@@ -12,7 +13,7 @@ export default function PlannerSection() {
               <div className="planner-heading">
     
                 <div className="planner-badge">
-                  <span>✧</span>
+                  <span><Star size={16}/></span>
                   Free planning consultation
                 </div>
     

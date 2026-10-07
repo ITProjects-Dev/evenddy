@@ -4,6 +4,7 @@ import photographyIcon from "../../assets/icons/photography.png";
 import venueIcon from "../../assets/icons/venue-booking.png";
 import makeupIcon from "../../assets/icons/makeups.png";
 import entertainmentIcon from "../../assets/icons/entertainment.png";
+import { ArrowRight } from "lucide-react";
 
 export default function ServicesSection() {
   return (
@@ -45,7 +46,7 @@ export default function ServicesSection() {
                       <p>{service.description}</p>
     
                       <Link to={`/services/${service.slug}`}>
-                        Explore <span>→</span>
+                        Explore <ArrowRight size={16}/>
                       </Link>
     
                     </div>
