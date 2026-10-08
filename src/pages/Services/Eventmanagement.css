@@ -1,6 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
-
-.em{--font-head:'Plus Jakarta Sans','Inter',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif;
+.em{--font-head:var(--font-family-base);--font-body:var(--font-family-base);
 --cream:#faf5ee;--peach:#fdece3;--maroon:#750a3d;--pink:#d4005f;--green:#1fa75a;--ink:#1a1516;--mute:#6b6567;--line:#d9d3df;--card:#fffdfa;
 font-family:var(--font-body);background:var(--cream);color:var(--ink);min-height:70vh;padding-bottom:64px}
 .em *{box-sizing:border-box}

@@ -66,7 +66,7 @@ const VendorOnboarding = () => {
     const steps = [
         'Vendor category',
         'Business Info',
-        'Venue details',
+        'Category details',
         'Pricing & availability',
         'Contact & more',
         'Review & submit'
@@ -295,7 +295,7 @@ const VendorOnboarding = () => {
 
             <div className="review-block">
                 <div className="review-block-header">
-                    <h4>Venue details</h4>
+                    <h4>Category details</h4>
                     <button onClick={() => setStep(3)} className="edit-link">Edit</button>
                 </div>
                 <div className="review-row"><span>Venue type</span><span>{formData.venueType || '-'}</span></div>

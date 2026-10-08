@@ -8,9 +8,9 @@ body {
   margin: 0;
   background: var(--cream);
   color: var(--ink);
-  font-family: "Sora", sans-serif;
+  font-family: var(--font-family-base);
 }
-body, button, input, select, textarea { font-family: "Sora", sans-serif; }
+body, button, input, select, textarea { font-family: var(--font-family-base); }
 button, a { cursor: pointer; }
 button { border: 0; }
 img { max-width: 100%; display: block; }

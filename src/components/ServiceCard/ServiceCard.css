@@ -1,56 +1,71 @@
 .service-card {
-  background: #fffdfa;
-  border: 1px solid var(--line);
-  border-radius: 9px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   height: 100%;
+  background: #fffdf9;
+  border: 1px solid #ded5cc;
+  border-radius: 18px;
+  box-shadow: 0 2px 3px rgba(50, 30, 20, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.service-card > img {
-  height: 210px;
+.service-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(50, 30, 20, 0.1);
+}
+
+.service-card-image {
+  height: 214px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.service-card-image img {
+  height: 100%;
   width: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.4s ease;
 }
 
-.service-card-body {
-  padding: 18px;
+.service-card:hover .service-card-image img {
+  transform: scale(1.03);
+}
+
+.service-card-content {
+  min-height: 140px;
+  padding: 22px 23px 18px;
   display: flex;
   flex-direction: column;
   flex: 1;
 }
 
-.mini-label {
-  font-size: 8px;
-  color: #b4a49b;
-}
-
 .service-card h3 {
-  font-size: 18px;
-  margin: 5px 0 8px;
+  color: #211918;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 0 0 4px;
 }
 
 .service-card p {
-  font-size: 14px;
-  color: var(--muted);
+  color: #6d625c;
+  font-size: 13px;
   line-height: 1.65;
-  min-height: 52px;
-  margin-bottom: 16px;
+  margin: 0;
 }
 
 .service-card a {
-  font-size: 12px;
-  color: var(--pink);
-  font-weight: 700;
-  text-decoration: none;
-
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-
+  gap: 7px;
   margin-top: auto;
+  width: fit-content;
+  color: #72002f;
+  font-size: 11px;
+  font-weight: 500;
+  text-decoration: none;
 }
 
 .service-card a svg {

@@ -1,4 +1,8 @@
 :root {
+  --font-family-base: "Sora", sans-serif;
+  --font-size-body: 15px;
+  --font-size-page-title: clamp(36px, 5vw, 56px);
+  --font-size-section-title: clamp(30px, 4vw, 44px);
   --cream: #f8f3eb;
   --paper: #fffdf8;
   --ink: #241b19;
