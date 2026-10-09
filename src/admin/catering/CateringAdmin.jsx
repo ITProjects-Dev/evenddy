@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 const TABS = [
     { id: "landing", label: "Landing" },
     { id: "mealbox", label: "Meal Box" },
-    { id: "menu", label: "Delivery Box · Menu items" },
+    { id: "menu", label: "Delivery Box" },
     { id: "full", label: "Full Catering" },
     { id: "global", label: "Global" },
 ];
