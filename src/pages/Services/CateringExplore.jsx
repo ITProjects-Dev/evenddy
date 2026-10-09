@@ -1,86 +1,12 @@
 import { useState, useMemo, useEffect, useId } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useSiteData } from "../../admin/SiteDataContext";
+import { addEnquiry } from "../../admin/store";
 import "./Catering.css";
 
-/* Styled with plain CSS (catering.css, everything scoped under .ev). No Tailwind needed.
-   Keep catering.css in the same folder as this file. */
-
-/* ---------- Config: replace images + numbers with your own ---------- */
-const WHATSAPP_NUMBER = "919999999999"; // country code + number, no "+"
-const PHONE = "+91 99999 99999";
-const IMG = {
-  mealbox: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=900",
-  delivery: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=900",
-  full: "https://images.unsplash.com/photo-1555244162-803834f70033?w=900",
-}; // replace with your design photos (Meal Box lunch box, Evenddy delivery box, live counter)
-
-/* ---- Full Catering config: replace with your own photos / data ---- */
-const GALLERY = [
-  "https://images.unsplash.com/photo-1555244162-803834f70033?w=600",
-  "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600",
-  "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600",
-  "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600",
-]; // replace with your own portfolio photos
-const CUISINES = ["North Indian", "South Indian", "Continental", "Chinese", "Mexican", "Lebanese"];
-const PLATE_PRICES = ["₹500 – ₹800", "₹800 – ₹1,200", "₹1,200 – ₹2,000", "₹2,000+"];
-const FOOD_TYPES = ["Veg", "Non-Veg", "Veg + Non-Veg"];
-const SERVICE_TAGS = ["Multi-cuisine", "South Indian", "Continental", "Chinese", "Mexican", "Lebanese", "Live Counters", "Chaat Counter", "BBQ & Grill Station", "Dessert Bar"];
-const FULL_MENU = {
-  Sweets: [{ n: "Gulab Jamun", veg: true }, { n: "Rasmalai", veg: true }, { n: "Double Ka Meetha", veg: true }, { n: "Ice Cream Bar", veg: true }],
-  Starters: [{ n: "Paneer Tikka", veg: true }, { n: "Gobi Manchurian", veg: true }, { n: "Chicken 65", veg: false }, { n: "Fish Fingers", veg: false }],
-  "Flavored Rice": [{ n: "Jeera Rice", veg: true }, { n: "Veg Pulao", veg: true }, { n: "Chicken Biryani", veg: false }, { n: "Veg Biryani", veg: true }],
-  Curries: [{ n: "Dal Tadka", veg: true }, { n: "Paneer Butter Masala", veg: true }, { n: "Chicken Curry", veg: false }, { n: "Mutton Curry", veg: false }],
-  "Rotis / Chaats": [{ n: "Butter Naan", veg: true }, { n: "Tandoori Roti", veg: true }, { n: "Pani Puri", veg: true }, { n: "Dahi Puri", veg: true }],
-  Other: [{ n: "Salad Bar", veg: true }, { n: "Soup Station", veg: true }, { n: "Welcome Drinks", veg: true }],
-};
-const REVIEWS = [
-  { who: "Ravi K.", text: "Food was fresh and the serving staff were very professional. Guests loved the live counters." },
-  { who: "Sneha P.", text: "Handled 400 guests at our wedding without a single hiccup. Great value for the price." },
-  { who: "Arjun M.", text: "Custom menu was exactly what we wanted. Timely setup and clean-up." },
-];
-const BOX_SIZES = [
-  { items: 3, price: 150, note: "onwards" },
-  { items: 5, price: 240, note: "onwards" },
-  { items: 8, price: 380, note: "onwards" },
-];
-const MENU = [
-  { id: 1, name: "Masala Dosa", cat: "Breakfast", veg: true },
-  { id: 2, name: "Idli Sambar", cat: "Breakfast", veg: true },
-  { id: 3, name: "Egg Puffs", cat: "Breakfast", veg: false },
-  { id: 4, name: "Poha", cat: "Breakfast", veg: true },
-  { id: 5, name: "Masala Chai & Biscuits", cat: "Tea/Snacks", veg: true },
-  { id: 6, name: "Samosa", cat: "Tea/Snacks", veg: true },
-  { id: 7, name: "Chicken Roll", cat: "Tea/Snacks", veg: false },
-  { id: 8, name: "Veg Cutlet", cat: "Tea/Snacks", veg: true },
-  { id: 9, name: "Paneer Tikka", cat: "Starters", veg: true },
-  { id: 10, name: "Chicken 65", cat: "Starters", veg: false },
-  { id: 11, name: "Gobi Manchurian", cat: "Starters", veg: true },
-  { id: 12, name: "Fish Fingers", cat: "Starters", veg: false },
-  { id: 13, name: "Upma", cat: "Breakfast", veg: true },
-  { id: 14, name: "Ven Pongal", cat: "Breakfast", veg: true },
-  { id: 15, name: "Medu Vada", cat: "Breakfast", veg: true },
-  { id: 16, name: "Mirchi Bajji", cat: "Tea/Snacks", veg: true },
-  { id: 17, name: "Onion Pakoda", cat: "Tea/Snacks", veg: true },
-  { id: 18, name: "Hara Bhara Kebab", cat: "Starters", veg: true },
-  { id: 19, name: "Veg Spring Roll", cat: "Starters", veg: true },
-  { id: 20, name: "Chilli Chicken", cat: "Starters", veg: false },
-  { id: 21, name: "Pesarattu", cat: "Breakfast", veg: true },
-  { id: 22, name: "Corn Cutlet", cat: "Tea/Snacks", veg: true },
-  { id: 23, name: "Crispy Corn", cat: "Starters", veg: true },
-];
-// One slot per item in the box (3 / 5 / 8 items show the first 3 / 5 / 8 slots). v = veg
-const MEALBOX_SLOTS = [
-  { icon: "bowl", options: [{ n: "Dal Makhani", v: true }, { n: "Paneer Butter Masala", v: true }, { n: "Chicken Curry", v: false }] },
-  { icon: "rice", options: [{ n: "Steamed Basmati Rice", v: true }, { n: "Jeera Rice", v: true }, { n: "Veg Pulao", v: true }] },
-  { icon: "cup", options: [{ n: "Fresh Curd with Boondi", v: true }, { n: "Gulab Jamun", v: true }, { n: "Fruit Custard", v: true }] },
-  { icon: "bowl", options: [{ n: "Butter Naan", v: true }, { n: "Tandoori Roti", v: true }, { n: "Plain Paratha", v: true }] },
-  { icon: "bowl", options: [{ n: "Paneer Tikka", v: true }, { n: "Veg Cutlet", v: true }, { n: "Chicken 65", v: false }] },
-  { icon: "cup", options: [{ n: "Green Salad", v: true }, { n: "Kachumber", v: true }, { n: "Sprouts Chaat", v: true }] },
-  { icon: "cup", options: [{ n: "Masala Buttermilk", v: true }, { n: "Sweet Lassi", v: true }, { n: "Lemon Soda", v: true }] },
-  { icon: "bowl", options: [{ n: "Papad & Pickle", v: true }, { n: "Boondi Raita", v: true }, { n: "Onion Raita", v: true }] },
-];
-
-/* ---------- Small line icons (landing cards + chips) ---------- */
+/* ======================================================
+   ICONS (kept local — UI primitive, not data)
+====================================================== */
 const ICONS = {
   box: <><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></>,
   truck: <><path d="M3 6h11v10H3zM14 9h4l3 3v4h-7" /><circle cx="7" cy="18" r="1.8" /><circle cx="17" cy="18" r="1.8" /></>,
@@ -101,17 +27,19 @@ const ICONS = {
   rice: <path d="M4 12h16a8 8 0 0 1-16 0zM8 12a4 4 0 0 1 8 0" />,
   cup: <path d="M5 8h14l-1.5 11h-11zM4 8h16M9 8c0-2 1.5-3 3-3s3 1 3 3" />,
 };
+
 function Icon({ name, size = 14 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      {ICONS[name]}
+      {ICONS[name] || ICONS.bowl}
     </svg>
   );
 }
 
 const cx = (...a) => a.filter(Boolean).join(" ");
+const inr = (n) => "₹" + Number(n || 0).toLocaleString("en-IN");
 
-/* ---------- Shared ---------- */
+/* ---------- Shared primitives (unchanged) ---------- */
 function Crumb({ go, current, embedded }) {
   const sep = <i>›</i>;
   return (
@@ -173,16 +101,18 @@ function WhatsAppRow({ on, setOn }) {
   );
 }
 
-/* ---------- Order summary (shared by Meal Box + Delivery Box) ---------- */
-// bold = Delivery Box look (semibold heading)
+/* ---------- Order summary ---------- */
 function OrderSummary({ lines, submitLines, total, onRemove, showGuests, showDelivery, header, bold }) {
+  const data = useSiteData();
+  const WHATSAPP_NUMBER = data.global.whatsapp;
+  const PHONE = data.global.phone;
+
   const [form, setForm] = useState({ name: "", phone: "", guests: "", date: "", delivery: "yes", serving: "no", location: "", wa: true });
   const [errors, setErrors] = useState({});
   const [sent, setSent] = useState(false);
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
   const send = () => {
-    // if nothing was touched yet, the default selection (submitLines) is what gets sent
     const items = lines.length ? lines : submitLines || [];
     const e = {};
     if (!form.name.trim()) e.name = 1;
@@ -191,6 +121,20 @@ function OrderSummary({ lines, submitLines, total, onRemove, showGuests, showDel
     if (!items.length) e.items = 1;
     setErrors(e);
     if (Object.keys(e).length) return;
+
+    /* ---- Save to admin enquiries ---- */
+    addEnquiry({
+      type: header,
+      subject: `${items.length} item${items.length === 1 ? "" : "s"}`,
+      name: form.name,
+      phone: form.phone,
+      guests: form.guests,
+      eventDate: form.date,
+      location: form.location,
+      items: items.map((l) => ({ name: l.name, qty: l.qty, sub: l.sub || "" })),
+      fields: showDelivery ? { delivery: form.delivery, serving: form.serving } : {},
+    });
+
     const msg = [
       `Catering enquiry – ${header}`,
       ...items.flatMap((l) => [`• ${l.name} × ${l.qty}`, l.sub && `   (${l.sub})`]),
@@ -224,7 +168,7 @@ function OrderSummary({ lines, submitLines, total, onRemove, showGuests, showDel
               {onRemove && !l.fixed && <button aria-label={`Remove ${l.name}`} onClick={() => onRemove(l.key)}>✕</button>}
             </div>
           ))}
-          {total ? <div className="est">Estimated <b>₹{total.toLocaleString("en-IN")}</b> onwards</div> : null}
+          {total ? <div className="est">Estimated <b>{inr(total)}</b> onwards</div> : null}
         </div>
       )}
 
@@ -257,7 +201,6 @@ function OrderSummary({ lines, submitLines, total, onRemove, showGuests, showDel
 }
 
 /* ---------- Menu list ---------- */
-// compact = Delivery Box look (smaller text, tighter "Select" button)
 function MenuList({ items, qtyById, toggle, cta = "Add", ctaOn = "Added", compact }) {
   if (!items.length) return <p className="empty-note">No items here yet. Try switching on "Include Non-Veg".</p>;
   return (
@@ -272,7 +215,6 @@ function MenuList({ items, qtyById, toggle, cta = "Add", ctaOn = "Added", compac
   );
 }
 
-/* Pure Veg  ⇄  Include Non-Veg (default: pure veg) */
 function VegToggle({ nonVeg, setNonVeg }) {
   return (
     <div className="vegtoggle">
@@ -285,29 +227,33 @@ function VegToggle({ nonVeg, setNonVeg }) {
 
 const Tab = ({ on, small, ...p }) => <button className={cx("tab", small && "sm", on && "on")} {...p} />;
 
-/* ---------- Landing ---------- */
+/* ======================================================
+   LANDING
+====================================================== */
 function Landing({ go, embedded }) {
-  // tone → eyebrow, top line and button colour (gold / maroon / orange)
-  const options = [
-    { id: "mealbox", title: "Meal Box", img: IMG.mealbox, tone: "gold", icon: "box", eyebrow: "Individual & Packed Meals",
-      paras: [
-        "Perfect for individual meals, small celebrations, office meals, birthdays, gatherings and functions.",
-        "Choose from structured meal boxes with 3, 5 or 6 items and customize eligible items with same-price swaps.",
-      ],
-      chips: [["leaf", "Veg & Non-Veg"], ["grid", "3/5/6 Item Options"], ["swap", "Same-Price Item Swaps"]], cta: "Explore Meal Box" },
-    { id: "delivery", title: "Delivery Box", img: IMG.delivery, flip: true, tone: "maroon", icon: "truck", eyebrow: "Party Food Delivered To You",
-      paras: [
-        "Perfect for house parties, get-togethers, farm-house parties and casual events, generally for 10+ people.",
-        "Choose party food, select quantities based on people or servings, and get it delivered to your event location.",
-      ],
-      chips: [["people", "Generally for 10+ People"], ["delivery", "Delivery Included"], ["dish", "Optional Serving"]], cta: "Explore Delivery Box" },
-    { id: "full", title: "Full Catering", img: IMG.full, tone: "orange", icon: "fork", eyebrow: "Complete Event Catering", price: "Starting from ₹200 /plate",
-      paras: [
-        "Best for weddings, celebrations, corporate events and other occasions requiring complete food service.",
-        "Build your menu, customize food selections, request items that are not listed and add live counters.",
-      ],
-      chips: [["menu", "Custom Menu"], ["chef", "Live Counters"]], cta: "Explore Full Catering" },
-  ];
+  const data = useSiteData();
+  const PHONE = data.global.phone;
+  const landing = data.catering.landing;
+
+  const FALLBACK = {
+    mealbox: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=900",
+    delivery: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=900",
+    full: "https://images.unsplash.com/photo-1555244162-803834f70033?w=900",
+  };
+
+  const options = landing.map((c, i) => ({
+    id: c.id,
+    title: c.title,
+    eyebrow: c.eyebrow,
+    icon: c.icon,
+    tone: c.tone,
+    image: c.image || FALLBACK[c.id] || FALLBACK.full,
+    price: c.price,
+    paras: c.paras || [],
+    chips: (c.chips || []).map((ch) => [ch.icon, ch.text]),
+    cta: c.cta,
+    flip: i === 1,
+  }));
 
   const picks = [
     ["box", "Meal Box", "Individual portions, perfect for structured meals.", "mealbox", "green"],
@@ -328,16 +274,16 @@ function Landing({ go, embedded }) {
         <div className="opts">
           {options.map((o) => (
             <article key={o.id} className={cx("opt", `tone-${o.tone}`, o.flip && "flip")}>
-              <div className="media" role="img" aria-label={o.title} style={{ backgroundImage: `url(${o.img})` }} />
+              <div className="media" role="img" aria-label={o.title} style={{ backgroundImage: `url(${o.image})` }} />
               <div className="body">
                 <span className="tag"><Icon name={o.icon} size={15} />{o.eyebrow}</span>
                 <div className="title-row">
                   <h2>{o.title}</h2>
                   {o.price && <span className="price-badge">{o.price}</span>}
                 </div>
-                {o.paras.map((p) => <p key={p}>{p}</p>)}
+                {o.paras.map((p, i) => <p key={i}>{p}</p>)}
                 <div className="chips">
-                  {o.chips.map(([ic, tx]) => <span key={tx} className="chip"><Icon name={ic} size={12} />{tx}</span>)}
+                  {o.chips.map(([ic, tx], i) => <span key={i} className="chip"><Icon name={ic} size={12} />{tx}</span>)}
                 </div>
                 <button className="btn" onClick={() => go(o.id)}>{o.cta}</button>
               </div>
@@ -369,41 +315,79 @@ function Landing({ go, embedded }) {
   );
 }
 
-/* ---------- Meal Box ---------- */
+/* ======================================================
+   MEAL BOX
+====================================================== */
 function MealBox({ go, embedded }) {
-  const TABS = ["Meal Box", "Breakfast", "Tea/Snacks", "Starters"];
+  const data = useSiteData();
+  const cfg = data.catering.mealBox;
+  const MENU = data.catering.menuItems;
+  const menuCategories = data.catering.menuCategories;
+
+  const BOX_SIZES = cfg.boxSizes || [];
+  const MEALBOX_SLOTS = cfg.slots || [];
+  const PRESETS = cfg.presets || [10, 25, 50, 100, 250];
+  const MIN_G = cfg.minGuests ?? 10;
+  const STEP = cfg.guestStep ?? 5;
+  const TABS = ["Meal Box", ...menuCategories];
+
   const [tab, setTab] = useState("Meal Box");
   const [nonVeg, setNonVeg] = useState(false);
-  const [touched, setTouched] = useState(false); // summary stays "No items added" until the guest interacts
+  const [touched, setTouched] = useState(false);
   const [size, setSize] = useState(0);
-  const [picks, setPicks] = useState(MEALBOX_SLOTS.map(() => 0));
-  const [guests, setGuests] = useState(10);
-  const [extra, setExtra] = useState({}); // id -> item (menu tabs)
+  const [picks, setPicks] = useState(() => MEALBOX_SLOTS.map(() => 0));
+  const [guests, setGuests] = useState(MIN_G);
+  const [extra, setExtra] = useState({});
 
-  const slotCount = BOX_SIZES[size].items;
-  // the option shown for a slot (falls back to the first veg option when "Pure Veg" is on)
+  /* Keep picks array length in sync if slots change from admin */
+  useEffect(() => { setPicks(MEALBOX_SLOTS.map((_, i) => picks[i] ?? 0)); /* eslint-disable-next-line */ }, [MEALBOX_SLOTS.length]);
+
+  /* Clamp current size index if admin removes box sizes */
+  const safeSize = Math.min(size, Math.max(0, BOX_SIZES.length - 1));
+  const safeBox = BOX_SIZES[safeSize];
+  const slotCount = safeBox ? Math.min(safeBox.items, MEALBOX_SLOTS.length) : 0;
+
   const current = (i) => {
-    const o = MEALBOX_SLOTS[i].options;
-    const c = o[picks[i]];
-    return !nonVeg && !c.v ? o.find((x) => x.v) : c;
+    const slot = MEALBOX_SLOTS[i];
+    if (!slot) return { n: "—", v: true };
+    const o = slot.options || [];
+    if (!o.length) return { n: "—", v: true };
+    const c = o[picks[i] ?? 0] || o[0];
+    if (!nonVeg && !c.v) return o.find((x) => x.v) || c;
+    return c;
   };
+
   const cycle = (i) => {
-    const o = MEALBOX_SLOTS[i].options;
+    const slot = MEALBOX_SLOTS[i];
+    if (!slot) return;
+    const o = slot.options || [];
     const allowed = o.filter((x) => nonVeg || x.v);
-    const next = allowed[(allowed.findIndex((x) => x.n === current(i).n) + 1) % allowed.length];
+    if (!allowed.length) return;
+    const cur = current(i).n;
+    const idx = allowed.findIndex((x) => x.n === cur);
+    const next = allowed[(idx + 1) % allowed.length];
     setPicks((p) => p.map((v, k) => (k === i ? o.findIndex((x) => x.n === next.n) : v)));
     setTouched(true);
   };
-  const toggle = (m) => { setTouched(true); setExtra((e) => { const n = { ...e }; n[m.id] ? delete n[m.id] : (n[m.id] = m); return n; }); };
+
+  const toggle = (m) => {
+    setTouched(true);
+    setExtra((e) => { const n = { ...e }; n[m.id] ? delete n[m.id] : (n[m.id] = m); return n; });
+  };
   const pickSize = (i) => { setSize(i); setTouched(true); };
   const setGuestCount = (fn) => { setGuests(fn); setTouched(true); };
 
   const chosen = MEALBOX_SLOTS.slice(0, slotCount).map((_, i) => current(i).n);
-  const boxLine = { key: "box", fixed: true, name: `${slotCount} Items Meal Box`, qty: guests, sub: chosen.join(", ") };
-  const allLines = [boxLine, ...Object.values(extra).map((m) => ({ key: m.id, name: m.name, qty: guests }))];
+  const boxLine = safeBox
+    ? { key: "box", fixed: true, name: `${slotCount} Items Meal Box`, qty: guests, sub: chosen.join(", ") }
+    : null;
+  const allLines = [boxLine, ...Object.values(extra).map((m) => ({ key: m.id, name: m.name, qty: guests }))].filter(Boolean);
   const lines = touched ? allLines : [];
-  const total = BOX_SIZES[size].price * guests;
-  const menuItems = useMemo(() => MENU.filter((m) => m.cat === tab && (nonVeg || m.veg)), [tab, nonVeg]);
+  const total = safeBox ? safeBox.price * guests : 0;
+  const menuItems = useMemo(
+    () => MENU.filter((m) => m.cat === tab && (nonVeg || m.veg)),
+    [MENU, tab, nonVeg]
+  );
 
   return (
     <div className="wrap">
@@ -421,13 +405,17 @@ function MealBox({ go, embedded }) {
             <>
               <section className="panel">
                 <div className="step">STEP 01</div><h3>Choose your box size</h3>
-                <div className="sizes">
-                  {BOX_SIZES.map((b, i) => (
-                    <button key={b.items} className={cx("size", size === i && "on")} aria-pressed={size === i} onClick={() => pickSize(i)}>
-                      <small>{b.items} Items Box</small><b>₹{b.price}</b><em>{b.note}</em>
-                    </button>
-                  ))}
-                </div>
+                {BOX_SIZES.length === 0 ? (
+                  <p className="empty-note">No box sizes configured yet.</p>
+                ) : (
+                  <div className="sizes">
+                    {BOX_SIZES.map((b, i) => (
+                      <button key={i} className={cx("size", safeSize === i && "on")} aria-pressed={safeSize === i} onClick={() => pickSize(i)}>
+                        <small>{b.items} Items Box</small><b>{inr(b.price)}</b><em>{b.note}</em>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </section>
 
               <section className="panel">
@@ -451,7 +439,7 @@ function MealBox({ go, embedded }) {
               <section className="panel">
                 <div className="panel-head">
                   <div><div className="step">STEP 03</div><h3>Number of Guests / Box Quantity</h3></div>
-                  <span className="hint">Min. 10 Boxes</span>
+                  <span className="hint">Min. {MIN_G} Boxes</span>
                 </div>
                 <div className="guestbox">
                   <div>
@@ -460,16 +448,16 @@ function MealBox({ go, embedded }) {
                   </div>
                   <div className="stepper">
                     <div className="box">
-                      <button aria-label="Decrease" onClick={() => setGuestCount((g) => Math.max(10, g - 5))}>−</button>
+                      <button aria-label="Decrease" onClick={() => setGuestCount((g) => Math.max(MIN_G, g - STEP))}>−</button>
                       <strong>{guests}</strong>
-                      <button aria-label="Increase" onClick={() => setGuestCount((g) => g + 5)}>+</button>
+                      <button aria-label="Increase" onClick={() => setGuestCount((g) => g + STEP)}>+</button>
                     </div>
                     <span>Boxes</span>
                   </div>
                 </div>
                 <div className="presets">
                   <span>Quick Presets:</span>
-                  {[10, 25, 50, 100, 250].map((n) => (
+                  {PRESETS.map((n) => (
                     <button key={n} className={guests === n ? "on" : ""} onClick={() => setGuestCount(() => n)}>{n} Boxes</button>
                   ))}
                 </div>
@@ -495,14 +483,25 @@ function MealBox({ go, embedded }) {
   );
 }
 
-/* ---------- Delivery Box ---------- */
-// Same design as the Delivery Box mock: white menu card (title + Pure Veg toggle, divider, pill tabs,
-// two-column rows with a "Select" button) next to the Order Summary card.
+/* ======================================================
+   DELIVERY BOX
+====================================================== */
 function DeliveryBox({ go, embedded }) {
-  const FILTERS = ["All", "Breakfast", "Tea/Snacks", "Starters"];
+  const data = useSiteData();
+  const MENU = data.catering.menuItems;
+  const menuCategories = data.catering.menuCategories;
+  const FILTERS = ["All", ...menuCategories];
+
   const [filter, setFilter] = useState("All");
   const [nonVeg, setNonVeg] = useState(false);
   const [sel, setSel] = useState({});
+
+  /* Reset filter if admin deletes the currently selected category */
+  useEffect(() => {
+    if (!FILTERS.includes(filter)) setFilter("All");
+    // eslint-disable-next-line
+  }, [menuCategories.length]);
+
   const toggle = (m) => setSel((s) => { const n = { ...s }; n[m.id] ? delete n[m.id] : (n[m.id] = m); return n; });
   const items = MENU.filter((m) => (filter === "All" || m.cat === filter) && (nonVeg || m.veg));
   const lines = Object.values(sel).map((m) => ({ key: m.id, name: m.name, qty: 1 }));
@@ -534,13 +533,21 @@ function DeliveryBox({ go, embedded }) {
   );
 }
 
-/* ---------- Full Catering ---------- */
+/* ======================================================
+   FULL CATERING
+====================================================== */
 function buildMsg(title, rows) {
   return [title, ...rows.filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`)].join("\n");
 }
 
-/* Detailed quote form (modal) */
 function QuoteModal({ onClose }) {
+  const data = useSiteData();
+  const WHATSAPP_NUMBER = data.global.whatsapp;
+  const CUISINES = data.catering.full.cuisines;
+  const PLATE_PRICES = data.catering.full.platePrices;
+  const FOOD_TYPES = data.catering.full.foodTypes;
+  const FULL_MENU = data.catering.full.menu;
+
   const [vegOnly, setVegOnly] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", cuisine: "", plate: "", guests: "", date: "", foodType: "", location: "", counter: "yes" });
   const [menu, setMenu] = useState({});
@@ -562,6 +569,7 @@ function QuoteModal({ onClose }) {
     setErrors(e);
     return !Object.keys(e).length;
   };
+
   const message = () =>
     buildMsg("Full catering enquiry", [
       ["Name", form.name], ["Phone", form.phone], ["Cuisine", form.cuisine], ["Plate price", form.plate],
@@ -569,8 +577,31 @@ function QuoteModal({ onClose }) {
       ["Location", form.location], ["Live counter", form.counter === "yes" ? "Yes" : "No"],
       ...Object.entries(menu).map(([k, v]) => [k, v]),
     ]);
+
   const whatsapp = () => validate() && window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message())}`, "_blank");
-  const request = () => validate() && setSent(true);
+
+  const request = () => {
+    if (!validate()) return;
+
+    addEnquiry({
+      type: "Full Catering",
+      subject: "Detailed quote request",
+      name: form.name,
+      phone: form.phone,
+      guests: form.guests,
+      eventDate: form.date,
+      location: form.location,
+      fields: {
+        cuisine: form.cuisine,
+        plate: form.plate,
+        foodType: vegOnly ? "Veg only" : form.foodType,
+        counter: form.counter === "yes" ? "Yes" : "No",
+        menu,
+      },
+    });
+
+    setSent(true);
+  };
 
   return (
     <div className="modal-back" onClick={onClose}>
@@ -584,11 +615,20 @@ function QuoteModal({ onClose }) {
         <div className="grid2">
           <Field label="Name" placeholder="Enter your name" value={form.name} onChange={set("name")} error={errors.name} />
           <Field label="Phone No." type="tel" placeholder="Enter phone number" value={form.phone} onChange={set("phone")} error={errors.phone} />
-          <SelectField label="Cuisine type" value={form.cuisine} onChange={set("cuisine")}><option value="">Select cuisine</option>{CUISINES.map((x) => <option key={x}>{x}</option>)}</SelectField>
-          <SelectField label="Plate Price" value={form.plate} onChange={set("plate")}><option value="">Select price</option>{PLATE_PRICES.map((x) => <option key={x}>{x}</option>)}</SelectField>
+          <SelectField label="Cuisine type" value={form.cuisine} onChange={set("cuisine")}>
+            <option value="">Select cuisine</option>
+            {CUISINES.map((x) => <option key={x}>{x}</option>)}
+          </SelectField>
+          <SelectField label="Plate Price" value={form.plate} onChange={set("plate")}>
+            <option value="">Select price</option>
+            {PLATE_PRICES.map((x) => <option key={x}>{x}</option>)}
+          </SelectField>
           <Field label="No. of Guests" type="number" min="1" placeholder="Guest count" value={form.guests} onChange={set("guests")} />
           <Field label="Event date" type="date" icon="calendar" value={form.date} onChange={set("date")} error={errors.date} />
-          <SelectField label="Food type" value={vegOnly ? "Veg" : form.foodType} disabled={vegOnly} onChange={set("foodType")}><option value="">Select type</option>{FOOD_TYPES.map((x) => <option key={x}>{x}</option>)}</SelectField>
+          <SelectField label="Food type" value={vegOnly ? "Veg" : form.foodType} disabled={vegOnly} onChange={set("foodType")}>
+            <option value="">Select type</option>
+            {FOOD_TYPES.map((x) => <option key={x}>{x}</option>)}
+          </SelectField>
           <Field label="Event location" icon="pin" placeholder="City / area" value={form.location} onChange={set("location")} />
         </div>
 
@@ -617,8 +657,11 @@ function QuoteModal({ onClose }) {
   );
 }
 
-/* Side "Request Quote" card */
 function QuoteSide({ onOpenDetailed }) {
+  const data = useSiteData();
+  const WHATSAPP_NUMBER = data.global.whatsapp;
+  const PHONE = data.global.phone;
+
   const [form, setForm] = useState({ name: "", phone: "", guests: "", date: "", location: "", wa: true });
   const [errors, setErrors] = useState({});
   const [sent, setSent] = useState(false);
@@ -631,7 +674,21 @@ function QuoteSide({ onOpenDetailed }) {
     if (!form.date) e.date = 1;
     setErrors(e);
     if (Object.keys(e).length) return;
-    const msg = buildMsg("Full catering enquiry", [["Name", form.name], ["Phone", form.phone], ["Guests", form.guests], ["Event date", form.date], ["Location", form.location]]);
+
+    addEnquiry({
+      type: "Full Catering",
+      subject: "Quick enquiry",
+      name: form.name,
+      phone: form.phone,
+      guests: form.guests,
+      eventDate: form.date,
+      location: form.location,
+    });
+
+    const msg = buildMsg("Full catering enquiry", [
+      ["Name", form.name], ["Phone", form.phone], ["Guests", form.guests],
+      ["Event date", form.date], ["Location", form.location],
+    ]);
     if (form.wa) window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
     setSent(true);
   };
@@ -655,16 +712,25 @@ function QuoteSide({ onOpenDetailed }) {
 }
 
 function FullCatering({ go, embedded }) {
+  const data = useSiteData();
+  const FULL = data.catering.full;
+  const landing = data.catering.landing.find((c) => c.id === "full");
+  const IMG_FULL = landing?.image || "https://images.unsplash.com/photo-1555244162-803834f70033?w=900";
+
   const TABS = [["about", "About"], ["portfolio", "Portfolio (140)"], ["reviews", "Reviews (84)"]];
   const [tab, setTab] = useState("about");
   const [modal, setModal] = useState(false);
+
+  const GALLERY = FULL.gallery || [];
+  const SERVICE_TAGS = FULL.serviceTags || [];
+  const REVIEWS = FULL.reviews || [];
 
   return (
     <div className="wrap">
       <Crumb go={go} current="Full Catering" embedded={embedded} />
       <div className="layout">
         <div>
-          <div className="fc-hero" role="img" aria-label="Evenddy Full catering" style={{ backgroundImage: `url(${IMG.full})` }} />
+          <div className="fc-hero" role="img" aria-label="Evenddy Full catering" style={{ backgroundImage: `url(${IMG_FULL})` }} />
           <div className="fc-title">
             <h1>Evenddy Full catering Service</h1>
             <span className="badge">Evenddy Certified</span>
@@ -686,7 +752,9 @@ function FullCatering({ go, embedded }) {
               <h3>Evenddy Full Catering Service</h3>
               <p className="fc-text">Evenddy Full Catering Service delivers end-to-end dining with a wide range of multi-cuisine menus: Indian, Continental, Chinese, Mexican and Lebanese, from intimate gatherings to large-scale celebrations. We take care of everything from menu planning to live counters, serving staff and setup so your guests experience a seamless, flavourful occasion.</p>
               <div className="step pink mt">CUISINES &amp; SERVICES</div>
-              <div className="chips">{SERVICE_TAGS.map((t) => <span className="chip" key={t}>{t}</span>)}</div>
+              <div className="chips">
+                {SERVICE_TAGS.map((t) => <span className="chip" key={t}>{t}</span>)}
+              </div>
               <div className="stats3">
                 {[["500+", "Events Catered"], ["15+", "Cuisine Types"], ["3", "Price Ranges"]].map(([n, l]) => (
                   <div key={l}><b>{n}</b><span>{l}</span></div>
@@ -700,7 +768,12 @@ function FullCatering({ go, embedded }) {
               <div className="step pink">OUR CELEBRATIONS</div>
               <h3>Portfolio Gallery (140)</h3>
               <div className="gallery4">
-                {GALLERY.map((src, i) => <div key={i} role="img" aria-label={`Portfolio ${i + 1}`} style={{ backgroundImage: `url(${src})` }} />)}
+                {GALLERY.length === 0 ? (
+                  <p className="empty-note">Add gallery images from the admin panel.</p>
+                ) : GALLERY.map((src, i) => (
+                  <div key={i} role="img" aria-label={`Portfolio ${i + 1}`}
+                       style={{ backgroundImage: src ? `url(${src})` : "none", background: src ? undefined : "#f0eef7" }} />
+                ))}
               </div>
               <div className="center"><button className="btn ghost">Explore 600+ creations (140 images) →</button></div>
             </section>
@@ -709,8 +782,10 @@ function FullCatering({ go, embedded }) {
           {tab === "reviews" && (
             <section className="panel">
               <h3>Reviews (84)</h3>
-              {REVIEWS.map((r) => (
-                <div className="slot rev" key={r.who}>
+              {REVIEWS.length === 0 ? (
+                <p className="empty-note">No reviews yet.</p>
+              ) : REVIEWS.map((r, i) => (
+                <div className="slot rev" key={i}>
                   <b>{r.who} · ★ 5</b><span>{r.text}</span>
                 </div>
               ))}
@@ -724,9 +799,10 @@ function FullCatering({ go, embedded }) {
   );
 }
 
-/* ---------- Page (swap `view` state for React Router if you use it) ---------- */
+/* ======================================================
+   MAIN
+====================================================== */
 export default function CateringExplore({ embedded = false }) {
-  // view lives in the URL (?view=mealbox) so the browser Back button returns to the previous step
   const [params, setParams] = useSearchParams();
   const VIEWS = ["landing", "mealbox", "delivery", "full"];
   const q = params.get("view");
@@ -735,10 +811,10 @@ export default function CateringExplore({ embedded = false }) {
 
   return (
     <div className={cx("ev", view === "landing" ? "is-landing" : "is-booking", embedded && "embedded")}>
-      {view === "landing" && <Landing go={go} embedded={embedded} />}
-      {view === "mealbox" && <MealBox go={go} embedded={embedded} />}
+      {view === "landing"  && <Landing  go={go} embedded={embedded} />}
+      {view === "mealbox"  && <MealBox  go={go} embedded={embedded} />}
       {view === "delivery" && <DeliveryBox go={go} embedded={embedded} />}
-      {view === "full" && <FullCatering go={go} embedded={embedded} />}
+      {view === "full"     && <FullCatering go={go} embedded={embedded} />}
       <div style={{ height: 48 }} />
     </div>
   );

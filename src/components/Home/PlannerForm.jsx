@@ -458,7 +458,7 @@ export default function PlannerForm() {
               </small>
 
               <strong>
-                +91 99999 99999
+                +91 9XXXX XXXXX
               </strong>
 
             </div>

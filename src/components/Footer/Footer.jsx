@@ -109,7 +109,7 @@ export default function Footer() {
           
           <a href="tel:+919999999999" className="footer-contact-item" onClick={scrollToTop}>
             <Phone size={14} className="footer-icon" />
-            <span>+91 99999 99999</span>
+            <span>+91 9XXXX XXXXX</span>
           </a>
           
           <span className="footer-contact-item">
