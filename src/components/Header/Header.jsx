@@ -12,13 +12,18 @@ export default function Header() {
 
   const close = () => setOpen(false);
 
+
   useEffect(() => {
-    if (location.pathname !== "/" || location.hash !== "#home-faq") {
+    const sectionId = location.hash.slice(1);
+
+    if (location.pathname !== "/" || !sectionId) {
       return;
     }
 
     const frame = window.requestAnimationFrame(() => {
-      document.getElementById("home-faq")?.scrollIntoView({ behavior: "smooth" });
+      document.getElementById(sectionId)?.scrollIntoView({
+        behavior: "smooth",
+      });
     });
 
     return () => window.cancelAnimationFrame(frame);
@@ -37,7 +42,7 @@ export default function Header() {
     <header className="site-header">
       <div className="container nav">
         <Link className="brand" to="/" onClick={close}>
-    <img src={logoImage} alt="EVENDDY" />
+          <img src={logoImage} alt="EVENDDY" />
         </Link>
 
         <nav className={open ? "nav-links open" : "nav-links"}>
@@ -49,12 +54,19 @@ export default function Header() {
           <Link to="/#home-faq" onClick={handleFaqClick}>FAQ</Link>
         </nav>
 
-        <button className="btn btn-dark nav-cta" onClick={() => { close(); navigate("/plan-event"); }}>
-          Get Quote
-        </button>
+
+        <Link
+          to="/#plan-event"
+          className="btn btn-dark nav-cta"
+          onClick={close}
+        >
+          Get in touch
+        </Link>
+
+
 
         <button className="hamburger" onClick={() => setOpen(!open)} aria-label="Toggle navigation">
-          <span/><span/><span/>
+          <span /><span /><span />
         </button>
       </div>
     </header>
