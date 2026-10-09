@@ -61,12 +61,12 @@ export default function GallerySection() {
       </div>
 
       {/* ROW 1 — sliding left (default) */}
-      <div className="gallery-big-marquee">
+      {/* <div className="gallery-big-marquee">
         <div className="gallery-big-track">
           {row1.map((item, i) => renderCard(item, `r1a-${i}`))}
           {row1.map((item, i) => renderCard(item, `r1b-${i}`))}
         </div>
-      </div>
+      </div> */}
 
       {/* ROW 2 — sliding right (reverse) */}
       <div className="gallery-big-marquee gallery-big-marquee-reverse">

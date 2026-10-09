@@ -1,12 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
-
 /* =========================================================
    Catering explore (Landing / Meal Box / Delivery Box / Full Catering)
    Plain CSS, everything is scoped under .ev so it never leaks into the rest of the site.
 ========================================================= */
 .ev{--cream:#fdf9f3;--peach:#fdece3;--maroon:#6b0a35;--deep:#5b0a2e;--pink:#d4005f;--orange:#c2500c;--gold:#c9a55c;--gold-soft:#f7f0e0;--plum:#8c0b4b;--green:#2e9a6b;
 --ink:#231a1d;--mute:#6f6366;--line:#eadfd8;--card:#fffdfa;--soft:#fdf3ef;--field:#fcf6f1;
-font-family:'DM Sans',system-ui,sans-serif;background:var(--cream);color:var(--ink);min-height:70vh}
+font-family:var(--font-family-base);background:var(--cream);color:var(--ink);min-height:70vh}
 .ev.is-booking{background:#f8f5f2}
 .ev *{box-sizing:border-box}
 .ev button{font:inherit;cursor:pointer}

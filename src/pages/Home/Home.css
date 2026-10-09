@@ -2259,7 +2259,7 @@
     .gallery-big-card {
         height: 220px;
     }
-    .gallery-big-card.size-small  { width: 120px; }
+    .gallery-big-card.size-small  { width: 150px; }
     .gallery-big-card.size-medium { width: 220px; }
     .gallery-big-card.size-large  { width: 340px; }
 }
@@ -2288,7 +2288,7 @@
         height: 180px;
         border-radius: 10px;
     }
-    .gallery-big-card.size-small  { width: 100px; }
+    .gallery-big-card.size-small  { width: 150px; }
     .gallery-big-card.size-medium { width: 180px; }
     .gallery-big-card.size-large  { width: 260px; }
 

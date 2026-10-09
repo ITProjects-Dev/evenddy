@@ -5,9 +5,10 @@ import { ArrowRight } from "lucide-react";
 export default function ServiceCard({ service }) {
   return (
     <article className="service-card">
-      <img src={service.image} alt={service.title} />
-      <div className="service-card-body">
-        <span className="mini-label">{service.number}</span>
+      <div className="service-card-image">
+        <img src={service.image} alt={service.title} />
+      </div>
+      <div className="service-card-content">
         <h3>{service.title}</h3>
         <p>{service.description}</p>
         <Link to={`/services/${service.slug}`}>
