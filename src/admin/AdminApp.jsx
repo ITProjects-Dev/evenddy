@@ -7,6 +7,7 @@ import AdminDashboard from "./AdminDashboard";
 import CateringAdmin from "./catering/CateringAdmin";
 import DecorAdmin from "./decor/DecorAdmin";
 import EventAdmin from "./event/EventAdmin";
+import ProfileAdmin from "./ProfileAdmin";
 import { isLoggedIn, setLoggedIn } from "./store";
 import "./admin.css";
 import { Construction } from "lucide-react";
@@ -50,6 +51,7 @@ export default function AdminApp() {
         <Route path="catering" element={<CateringAdmin />} />
         <Route path="decor" element={<DecorAdmin />} />
         <Route path="event" element={<EventAdmin />} />
+        <Route path="profile" element={<ProfileAdmin />} />
         <Route path="login" element={<Navigate to="/admin/dashboard" replace />} />
         {/* <Route path="enquiries" element={<Soon title="Enquiries" text="Connect this page to your enquiry API." />} />
         <Route path="settings" element={<Soon title="Settings" text="Workspace preferences go here." />} /> */}

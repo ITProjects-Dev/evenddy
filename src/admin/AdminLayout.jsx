@@ -7,6 +7,7 @@ import {
     LogOut,
     Menu,
     Utensils,
+    UserRound,
     X,
 } from "lucide-react";
 import logoImage from "../assets/evenddy-logo.svg";
@@ -22,6 +23,7 @@ const NAV = [
             { to: "/admin/catering", icon: Utensils, label: "Catering" },
             { to: "/admin/decor", icon: Flower2, label: "Decor" },
             { to: "/admin/event", icon: CalendarDays, label: "Event Management" },
+            { to: "/admin/profile", icon: UserRound, label: "Profile & Settings" },
         ]
     },
     //   { group: "Other", items: [
@@ -35,6 +37,7 @@ const TITLES = {
     "/admin/catering": ["Catering", "Manage Meal Box, Delivery Box and Full Catering"],
     "/admin/decor": ["Decor", "Manage DIY kits, themes and custom decor"],
     "/admin/event": ["Event Management", "Manage event types, priorities and landing"],
+    "/admin/profile": ["Profile & Settings", "Manage business contacts and enquiry options"],
     //   "/admin/enquiries": ["Enquiries", "Customer enquiries and quote requests"],
     //   "/admin/settings":  ["Settings", "Workspace preferences"],
 };

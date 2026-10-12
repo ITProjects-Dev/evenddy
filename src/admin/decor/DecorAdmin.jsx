@@ -124,17 +124,15 @@ function Kits({ data, patch, saveSection }) {
       </Section>
 
       <Section title={`DIY Kits (${kits.length})`} sub="Selling price, MRP, images and shipping details."
-        right={
-          <div className="adm-row">
-            <div className="adm-seg">
-              <button className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>All</button>
-              {cats.filter((c) => c !== "All Kits").map((c) => (
-                <button key={c} className={filter === c ? "on" : ""} onClick={() => setFilter(c)}>{c}</button>
-              ))}
-            </div>
-            <SaveSection path="decor.kits" value={kits} label="kits" onSave={saveSection} />
+        right={<SaveSection path="decor.kits" value={kits} label="kits" onSave={saveSection} />}>
+        <div className="adm-toolbar adm-kit-filter">
+          <div className="adm-seg">
+            <button className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>All</button>
+            {cats.filter((c) => c !== "All Kits").map((c) => (
+              <button key={c} className={filter === c ? "on" : ""} onClick={() => setFilter(c)}>{c}</button>
+            ))}
           </div>
-        }>
+        </div>
         <Repeater
           items={visible}
           onChange={(next) => {
@@ -288,15 +286,14 @@ function Custom({ data, patch, saveSection }) {
   );
 }
 
-/* ---------- ENQUIRY OPTIONS ---------- */
 function EnquiryOpts({ data, patch, saveSection }) {
   return (
     <>
-      <Section title="Occasions" sub="Options in the enquiry form's occasion dropdown."
+      <Section title="Occasions" sub="Options in the Decor enquiry form's occasion dropdown."
         right={<SaveSection path="decor.occasions" value={data.decor.occasions} label="occasions" onSave={saveSection} />}>
         <TagsInput label="" value={data.decor.occasions} onChange={(v) => patch("occasions", v)} placeholder="Add an occasion…" />
       </Section>
-      <Section title="Budgets" sub="Options in the enquiry form's budget dropdown."
+      <Section title="Budgets" sub="Options in the Decor enquiry form's budget dropdown."
         right={<SaveSection path="decor.budgets" value={data.decor.budgets} label="budgets" onSave={saveSection} />}>
         <TagsInput label="" value={data.decor.budgets} onChange={(v) => patch("budgets", v)} placeholder="e.g. ₹3L - ₹6L" />
       </Section>

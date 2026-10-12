@@ -69,7 +69,7 @@ export default function AdminDashboard() {
           <StatusRow on label="Decor page"           detail="Reads kits, themes, custom decor & enquiry options" />
           <StatusRow on label="Event page"           detail="Reads intro, event types, venue options & priorities" />
           <StatusRow on label="Enquiry capture"      detail={`${enquiries.length} total · ${newEnq} new`} />
-          <StatusRow on={!!d.global.whatsapp} label="WhatsApp / Phone" detail={d.global.whatsapp ? `${d.global.phone} (${d.global.whatsapp})` : "Not set — open Settings"} />
+          <StatusRow on={!!d.global.whatsapp} label="WhatsApp / Phone" detail={d.global.whatsapp ? `${d.global.phone} (${d.global.whatsapp})` : "Not set — open Profile & Settings"} />
         </div>
       </div>
     </>

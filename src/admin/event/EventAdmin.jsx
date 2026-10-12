@@ -14,7 +14,6 @@ const TABS = [
   { id: "intro",     label: "Intro & banner" },
   { id: "types",     label: "Event types" },
   { id: "options",   label: "Venue & Priorities" },
-  { id: "global",    label: "Contact" },
 ];
 
 export default function EventAdmin() {
@@ -89,14 +88,6 @@ export default function EventAdmin() {
             <TagsInput label="" value={data.event.priorities} onChange={(v) => patch("priorities", v)} placeholder="Add a priority…" />
           </Section>
         </>
-      )}
-
-      {tab === "global" && (
-        <Section title="Contact"
-          right={<SaveSection updates={[{ path: "global.whatsapp", value: data.global.whatsapp }]} label="contact details" onSave={saveSection} />}>
-          <Text label="WhatsApp number (country code + number, no +)" value={data.global.whatsapp}
-            onChange={(v) => setData({ ...data, global: { ...data.global, whatsapp: v } })} />
-        </Section>
       )}
 
       <Toast text={toast} />
