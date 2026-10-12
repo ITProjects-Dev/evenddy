@@ -16,7 +16,7 @@ export const DEFAULT_DATA = {
     landing: [
       {
         id: "mealbox", title: "Meal Box", eyebrow: "Individual & Packed Meals",
-        icon: "box", tone: "gold", image: "", price: "",
+        icon: "box", image: "", price: "",
         paras: [
           "Perfect for individual meals, small celebrations, office meals, birthdays, gatherings and functions.",
           "Choose from structured meal boxes with 3, 5 or 6 items and customize eligible items with same-price swaps.",
@@ -30,7 +30,7 @@ export const DEFAULT_DATA = {
       },
       {
         id: "delivery", title: "Delivery Box", eyebrow: "Party Food Delivered To You",
-        icon: "truck", tone: "maroon", image: "", price: "",
+        icon: "truck", image: "", price: "",
         paras: [
           "Perfect for house parties, get-togethers, farm-house parties and casual events, generally for 10+ people.",
           "Choose party food, select quantities based on people or servings, and get it delivered to your event location.",
@@ -44,7 +44,7 @@ export const DEFAULT_DATA = {
       },
       {
         id: "full", title: "Full Catering", eyebrow: "Complete Event Catering",
-        icon: "fork", tone: "orange", image: "", price: "Starting from ₹200 /plate",
+        icon: "fork", image: "", price: "Starting from ₹200 /plate",
         paras: [
           "Best for weddings, celebrations, corporate events and other occasions requiring complete food service.",
           "Build your menu, customize food selections, request items that are not listed and add live counters.",

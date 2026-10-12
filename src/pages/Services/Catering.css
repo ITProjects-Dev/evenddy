@@ -2,7 +2,7 @@
    Catering explore (Landing / Meal Box / Delivery Box / Full Catering)
    Plain CSS, everything is scoped under .ev so it never leaks into the rest of the site.
 ========================================================= */
-.ev{--cream:#fdf9f3;--peach:#fdece3;--maroon:#6b0a35;--deep:#5b0a2e;--pink:#d4005f;--orange:#c2500c;--gold:#c9a55c;--gold-soft:#f7f0e0;--plum:#8c0b4b;--green:#2e9a6b;
+.ev{--cream:#fdf9f3;--peach:#fdece3;--maroon:#750a3d;--deep:#750a3d;--pink:#d4005f;--orange:#c2500c;--gold:#c9a55c;--gold-soft:#f7f0e0;--plum:#8c0b4b;--green:#2e9a6b;
 --ink:#231a1d;--mute:#6f6366;--line:#eadfd8;--card:#fffdfa;--soft:#fdf3ef;--field:#fcf6f1;
 font-family:var(--font-family-base);background:var(--cream);color:var(--ink);min-height:70vh}
 .ev.is-booking{background:#f8f5f2}
@@ -34,11 +34,9 @@ font-family:var(--font-family-base);background:var(--cream);color:var(--ink);min
 
 /* cards: photo overhangs the card, thin coloured line on top, one colour per card (gold / maroon / orange) */
 .ev .opts{max-width:820px;margin:0 auto;display:grid;gap:64px;padding:26px 0 8px}
-.ev .opt{--tone:var(--gold);display:grid;grid-template-columns:300px 1fr;align-items:stretch;margin:0}
+.ev .opt{--tone:var(--maroon);display:grid;grid-template-columns:300px 1fr;align-items:stretch;margin:0}
 .ev .opt.flip{grid-template-columns:1fr 300px}
 .ev .opt.flip .media{order:2}
-.ev .opt.tone-maroon{--tone:#7b0a3c}
-.ev .opt.tone-orange{--tone:#c4510d}
 .ev .media{margin:-24px 0;border-radius:14px;background-size:cover;background-position:center;box-shadow:0 14px 30px rgba(60,30,20,.22);position:relative;z-index:1;min-height:300px}
 .ev .opt .body{position:relative;overflow:hidden;background:#fff;border-radius:0 16px 16px 0;box-shadow:0 6px 24px rgba(60,30,20,.08);padding:40px 40px 36px;display:flex;flex-direction:column;justify-content:center;gap:10px}
 .ev .opt.flip .body{border-radius:16px 0 0 16px}
@@ -56,10 +54,8 @@ font-family:var(--font-family-base);background:var(--cream);color:var(--ink);min
 /* "Choose the right catering experience" */
 .ev .choose{text-align:center;margin:96px 0 26px;font-size:22px;font-weight:500;color:#1f1819}
 .ev .three{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:820px;margin:0 auto}
-.ev .mini{--c:var(--green);--s:#e3f4ec;display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:6px;background:#fff;border:1px solid #ece3da;border-radius:14px;padding:22px 20px 24px;color:inherit;transition:transform .2s,box-shadow .2s}
+.ev .mini{--c:var(--maroon);--s:#f8e3e8;display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:6px;background:#fff;border:1px solid #ece3da;border-radius:14px;padding:22px 20px 24px;color:inherit;transition:transform .2s,box-shadow .2s}
 .ev .mini:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(60,30,20,.1)}
-.ev .mini.tone-gold{--c:#c9a55c;--s:#f7f0e0}
-.ev .mini.tone-orange{--c:#c4510d;--s:#fbe3d6}
 .ev .mini .mi{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:var(--s);color:var(--c);margin-bottom:8px}
 .ev .mini h4{margin:0;font-size:15px;font-weight:600;color:#1a1516}
 .ev .mini p{margin:0;color:var(--mute);font-size:12px;line-height:1.55}
@@ -194,7 +190,7 @@ font-family:var(--font-family-base);background:var(--cream);color:var(--ink);min
 .ev .sw.on{background:var(--maroon)}
 .ev .sw.on:after{left:21px}
 
-.ev .summary .btn.block{border-radius:10px;padding:14px;font-size:15px;font-weight:700;background:#6d0a38;color:#fff}
+.ev .summary .btn.block{border-radius:10px;padding:14px;font-size:15px;font-weight:700;background:var(--maroon);color:#fff}
 .ev .summary .btn.block.ghost{background:#fff;color:#1f1819;border:1px solid #d9d2cd;font-weight:600;font-size:13px;margin-top:10px}
 .ev .call{display:flex;align-items:center;justify-content:center;gap:8px}
 .ev .note{font-size:11px;line-height:1.5;color:#4b4547;text-align:center;margin:16px 0 0}

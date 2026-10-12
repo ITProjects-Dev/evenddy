@@ -296,13 +296,13 @@ const PIN_CITY = { "400": "Mumbai", "110": "Delhi", "560": "Bengaluru", "500": "
 /* ======================================================
    SHARED CLASS STRINGS
 ====================================================== */
-const WRAP = "mx-auto w-full max-w-[1040px] px-6";
+const WRAP = "container";
 const CARD_SHADOW = "shadow-[0_4px_18px_rgba(60,20,30,.07)]";
 const EYEBROW_SM = "block text-[10px] font-semibold uppercase tracking-[.1em] text-[#7a3b18]";
 const H2 = "mb-3.5 pt-1 text-[21px] font-semibold! tracking-[-.01em]! text-[#750a3d]";
 const BTN_BLOCK = "flex w-full items-center justify-center gap-2 rounded-full bg-[#750a3d] py-3.5 text-[13px] font-semibold text-white transition hover:brightness-110";
 const WA_BTN = "mt-2.5 flex items-center justify-center gap-2 rounded-full border border-[#a7e8bd] bg-[#effcf3] p-[13px] text-[13px] font-semibold text-[#1f9d55]!";
-const FIELD = "w-full rounded-lg border border-[#f1ddd2] bg-[#fbeee8] px-3 py-[11px] text-[11.5px] text-[#1a1516] placeholder:text-[#8f8487] focus:border-[#750a3d] focus:outline-none";
+const FIELD = "w-full rounded-lg border border-[#f1ddd2] bg-[#fbeee8] px-3.5 py-3 text-[13px] text-[#1a1516] placeholder:text-[#8f8487] focus:border-[#750a3d] focus:outline-none";
 const TITLE_FIXED = "tracking-[-.01em]!";
 
 /* ======================================================
@@ -406,8 +406,8 @@ function SuccessModal({ onClose }) {
 
 // Defined outside the form so inputs keep focus while typing.
 const Field = ({ id, label, error, children }) => (
-  <div className="mb-3">
-    <label htmlFor={`dc-${id}`} className="mb-1.5 block text-[10.5px] font-semibold text-[#1a1516]">{label}</label>
+  <div className="mb-4">
+    <label htmlFor={`dc-${id}`} className="mb-1.5 block text-xs font-semibold text-[#1a1516]">{label}</label>
     {children}
     {error && <small className="block pt-[3px] text-[11px] text-[#c0262d]" role="alert">{error}</small>}
   </div>
@@ -417,7 +417,7 @@ function EnquiryForm({ variant = "theme", subject = "", onSuccess }) {
   const [f, setF] = useState({ name: "", phone: "", email: "", date: "", occasion: "", budget: BUDGETS[1], city: "" });
   const [err, setErr] = useState({});
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
-  const row = "grid grid-cols-1 gap-x-3 min-[600px]:grid-cols-2";
+  const row = "grid grid-cols-1 gap-x-4";
 
   const submit = (e) => {
     e.preventDefault();
@@ -436,7 +436,7 @@ function EnquiryForm({ variant = "theme", subject = "", onSuccess }) {
   return (
     <form onSubmit={submit} noValidate>
       {/* compact notice (icon + two lines) */}
-      <div className="mb-4 flex items-center gap-2.5 rounded-[10px] border border-[#f3d6b8] bg-[#fff1e3] px-3 py-2.5 text-[10.5px] leading-snug">
+      <div className="mb-5 flex items-center gap-3 rounded-xl border border-[#f3d6b8] bg-[#fff1e3] px-4 py-3 text-xs leading-relaxed">
         <span className="text-[#9a4a1e]"><Icon name="lock" size={16} /></span>
         <div>
           <b className="block font-semibold text-[#9a4a1e]">Zero Login Friction</b>
@@ -451,7 +451,7 @@ function EnquiryForm({ variant = "theme", subject = "", onSuccess }) {
         <Field id="phone" label="Phone / WhatsApp *" error={err.phone}>
           <div className="flex items-center gap-2 rounded-lg border border-[#f1ddd2] bg-[#fbeee8] pl-3 text-[11.5px] focus-within:border-[#750a3d]">
             <span>+91</span>
-            <input id="dc-phone" className="w-full bg-transparent py-[11px] pr-3 text-[11.5px] placeholder:text-[#8f8487] focus:outline-none" value={f.phone} onChange={set("phone")} placeholder="Enter phone number" inputMode="numeric" maxLength={10} autoComplete="tel-national" />
+            <input id="dc-phone" className="w-full bg-transparent py-3 pr-3 text-[13px] placeholder:text-[#8f8487] focus:outline-none" value={f.phone} onChange={set("phone")} placeholder="Enter phone number" inputMode="numeric" maxLength={10} autoComplete="tel-national" />
           </div>
         </Field>
       </div>
@@ -510,20 +510,20 @@ function DecorLanding({ types, go }) {
     <section className="pb-2 pt-3.5 text-center">
       <h1 className="mb-3.5 text-[clamp(32px,5vw,40px)] font-bold! leading-[1.15] tracking-[-.02em]! text-[#750a3d]">Our Decor Service</h1>
       <p className="mx-auto mb-11 max-w-[440px] text-[14.5px] font-medium leading-[1.65] text-[#555]">Everything you need to create the perfect celebration, meticulously organized and beautifully presented.</p>
-      <div className="mx-auto grid max-w-[880px] grid-cols-1 gap-[22px] text-left min-[600px]:grid-cols-2 min-[900px]:grid-cols-3">
+      <div className="grid w-full grid-cols-1 gap-6 text-left min-[600px]:grid-cols-2 min-[900px]:grid-cols-3">
         {types.map((t) => (
-          <article key={t.page} className="flex flex-col overflow-hidden rounded-[22px] bg-white shadow-[0_8px_28px_rgba(60,20,30,.08)]">
+          <article key={t.page} className="group flex flex-col overflow-hidden rounded-3xl border border-[#f0e4dc] bg-white shadow-[0_8px_28px_rgba(60,20,30,.08)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_14px_36px_rgba(60,20,30,.13)]">
             {t.collage ? (
-              <div className="grid h-[208px] grid-cols-[1.45fr_1fr] grid-rows-2 gap-[3px] bg-white" role="img" aria-label={t.title}>
+              <div className="grid h-[220px] grid-cols-[1.45fr_1fr] grid-rows-2 gap-1 bg-white" role="img" aria-label={t.title}>
                 {[0, 1, 2].map((i) => <div key={i} className={cx("overflow-hidden", i === 0 && "row-span-2")}><Pic src={t.collage[i]} /></div>)}
               </div>
             ) : (
-              <div className="h-[208px] overflow-hidden"><Pic src={t.image} alt={t.title} /></div>
+              <div className="h-[220px] overflow-hidden"><Pic src={t.image} alt={t.title} /></div>
             )}
-            <div className="flex flex-1 flex-col px-[22px] pb-6 pt-[22px]">
-              <h2 className="mb-2.5 text-[17px] font-bold! tracking-[-.01em]! text-[#1a1516]">{t.title}</h2>
-              <p className="mb-[18px] flex-1 border-b border-[#eee7e2] pb-[18px] text-[11.5px] leading-[1.7] text-[#6b6567]">{t.text}</p>
-              <button className="group self-start text-xs font-semibold text-[#750a3d]" onClick={() => go(t.page)}>
+            <div className="flex flex-1 flex-col px-6 pb-6 pt-6">
+              <h2 className="mb-3 text-lg font-bold! tracking-[-.01em]! text-[#1a1516]">{t.title}</h2>
+              <p className="mb-5 flex-1 border-b border-[#eee7e2] pb-5 text-[13px] leading-[1.7] text-[#6b6567]">{t.text}</p>
+              <button className="group self-start text-[13px] font-semibold text-[#750a3d]" onClick={() => go(t.page)}>
                 {t.cta} <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transition-none" aria-hidden="true">→</span>
               </button>
             </div>
@@ -655,8 +655,8 @@ const RATING = (
     <span className="tracking-[1px] text-[#8a5a1f]" aria-hidden="true">★★★★★</span> <b className="font-semibold">4.9</b> <small className="text-[11px] text-[#6b6567]">(142 verified host reviews)</small>
   </p>
 );
-const DETAIL = "grid items-start gap-[30px] min-[900px]:grid-cols-[1.55fr_1fr]";
-const BUY = cx("min-w-0 rounded-2xl bg-white p-[22px]", CARD_SHADOW);
+const DETAIL = "grid items-start gap-7 min-[900px]:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]";
+const BUY = cx("min-w-0 rounded-2xl bg-white p-6 min-[600px]:p-7", CARD_SHADOW);
 const H1_BUY = "mb-2.5 mt-0 text-[26px] font-medium! leading-[1.2] tracking-[-.01em]! text-[#750a3d]";
 
 /* ======================================================
@@ -791,7 +791,7 @@ function CustomDecor() {
   ];
 
   return (
-    <div className="grid items-start gap-[22px] min-[900px]:grid-cols-[1fr_330px]">
+    <div className="grid items-start gap-6 min-[900px]:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
       <div className="min-w-0">
         {/* hero + title card (tabs now live in their own strip below, with a gap between) */}
         <div className={cx("mb-3 overflow-hidden rounded-2xl bg-white", CARD_SHADOW)}>
@@ -972,7 +972,7 @@ export default function DecorExplore() {
   return (
     <div className="min-h-[70vh] bg-[#f9f5f0] pb-16 text-[#1a1516]">
       <div className={WRAP}>
-        <nav className="pb-4 pt-[18px] text-xs text-[#6b6567]" aria-label="Breadcrumb">
+        <nav className="pb-[14px] pt-5 text-xs text-[#6b6567]" aria-label="Breadcrumb">
           {trail.map((c, i) => (
             <span key={c.label}>
               {c.to && i < trail.length - 1
