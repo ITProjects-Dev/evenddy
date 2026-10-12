@@ -958,29 +958,15 @@ export default function DecorExplore() {
   const kit = KITS.find((k) => k.id === view.id);
   const theme = THEMES.find((t) => t.id === view.id);
 
-  const trail = [
-    { label: "Home", to: () => navigate("/") },
-    { label: "Services", to: () => navigate("/services") },
-    { label: "Decor", to: () => go("landing") },
-  ];
-  if (["kits", "kit", "request"].includes(view.page)) trail.push({ label: "DIY Kits", to: () => go("kits") });
-  if ((view.page === "kit" || view.page === "request") && kit) trail.push({ label: kit.title });
-  if (view.page === "themes" || view.page === "theme") trail.push({ label: "Themes", to: () => go("themes") });
-  if (view.page === "theme" && theme) trail.push({ label: theme.title });
-  if (view.page === "custom") trail.push({ label: "Custom Decor" });
-
   return (
     <div className="min-h-[70vh] bg-[#f9f5f0] pb-16 text-[#1a1516]">
       <div className={WRAP}>
-        <nav className="pb-[14px] pt-5 text-xs text-[#6b6567]" aria-label="Breadcrumb">
-          {trail.map((c, i) => (
-            <span key={c.label}>
-              {c.to && i < trail.length - 1
-                ? <button className="p-0 text-xs hover:text-[#750a3d]" onClick={c.to}>{c.label}</button>
-                : <b className="font-semibold text-[#750a3d]" aria-current="page">{c.label}</b>}
-              {i < trail.length - 1 && <span className="whitespace-pre"> &gt; </span>}
-            </span>
-          ))}
+        <nav className="flex flex-wrap items-center py-5 pb-[14px] text-xs text-[#6f6366]" aria-label="Breadcrumb">
+          <button type="button" className="p-0 text-xs text-inherit hover:text-[#750a3d]" onClick={() => navigate("/")}>Home</button>
+          <span className="mx-1.5 text-[#a79a9e]">›</span>
+          <button type="button" className="p-0 text-xs text-inherit hover:text-[#750a3d]" onClick={() => navigate("/services")}>Services</button>
+          <span className="mx-1.5 text-[#a79a9e]">›</span>
+          <button type="button" className="p-0 text-xs font-semibold text-[#750a3d] hover:text-[#750a3d]" aria-current="page" onClick={() => go("landing")}>Decor</button>
         </nav>
 
         {view.page === "landing" && <DecorLanding types={DECOR_TYPES} go={go} />}

@@ -40,13 +40,13 @@ const cx = (...a) => a.filter(Boolean).join(" ");
 const inr = (n) => "₹" + Number(n || 0).toLocaleString("en-IN");
 
 /* ---------- Shared primitives (unchanged) ---------- */
-function Crumb({ go, current, embedded }) {
+function Crumb({ go }) {
   const sep = <i>›</i>;
   return (
     <nav className="crumb" aria-label="Breadcrumb">
-      {!embedded && <><Link to="/">Home</Link>{sep}</>}
-      {current ? <button onClick={() => go("landing")}>Catering</button> : <b aria-current="page">Catering</b>}
-      {current && <>{sep}<b aria-current="page">{current}</b></>}
+      <Link to="/">Home</Link>{sep}
+      <Link to="/services">Services</Link>{sep}
+      <button type="button" aria-current="page" onClick={() => go("landing")}>Catering</button>
     </nav>
   );
 }
@@ -91,23 +91,12 @@ function Radios({ name, value, onChange, labelId }) {
   );
 }
 
-function WhatsAppRow({ on, setOn }) {
-  return (
-    <div className="wa">
-      <span className="wa-ic"><Icon name="chat" size={16} /></span>
-      <span className="wa-t"><b>Notify me on WhatsApp</b><small>We'll send quote there</small></span>
-      <Switch on={on} onClick={() => setOn(!on)} label="Notify on WhatsApp" />
-    </div>
-  );
-}
-
 /* ---------- Order summary ---------- */
 function OrderSummary({ lines, submitLines, total, totalNote, onRemove, showGuests, showDelivery, header, bold }) {
   const data = useSiteData();
-  const WHATSAPP_NUMBER = data.global.whatsapp;
   const PHONE = data.global.phone;
 
-  const [form, setForm] = useState({ name: "", phone: "", guests: "", date: "", delivery: "yes", serving: "no", location: "", wa: true });
+  const [form, setForm] = useState({ name: "", phone: "", guests: "", date: "", delivery: "yes", serving: "no", location: "" });
   const [errors, setErrors] = useState({});
   const [sent, setSent] = useState(false);
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
@@ -135,18 +124,6 @@ function OrderSummary({ lines, submitLines, total, totalNote, onRemove, showGues
       fields: showDelivery ? { delivery: form.delivery, serving: form.serving } : {},
     });
 
-    const msg = [
-      `Catering enquiry – ${header}`,
-      ...items.flatMap((l) => [`• ${l.name} × ${l.qty}`, l.sub && `   (${l.sub})`]),
-      `Name: ${form.name}`,
-      `Phone: ${form.phone}`,
-      showGuests && `Guests: ${form.guests}`,
-      `Event date: ${form.date}`,
-      showDelivery && `Delivery: ${form.delivery === "yes" ? form.location || "Yes" : "Pickup"}`,
-      showDelivery && `Serving required: ${form.serving === "yes" ? "Yes" : "No"}`,
-      !showDelivery && `Location: ${form.location}`,
-    ].filter(Boolean).join("\n");
-    if (form.wa) window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
     setSent(true);
   };
 
@@ -191,10 +168,9 @@ function OrderSummary({ lines, submitLines, total, totalNote, onRemove, showGues
           <Radios name="serving" value={form.serving} onChange={(v) => setForm({ ...form, serving: v })} labelId="lab-serving" />
         </div>
       )}
-      <WhatsAppRow on={form.wa} setOn={(v) => setForm({ ...form, wa: v })} />
       {sent && <div className="toast" role="status">Enquiry sent. Our team will contact you to confirm details.</div>}
       <button className="btn block" onClick={send}>Send Enquiry</button>
-      <a className="btn block ghost call" href={`tel:${PHONE.replace(/\s/g, "")}`}><Icon name="phone" size={15} />Call Us</a>
+      <a className="btn block ghost call" href={`tel:${PHONE.replace(/\s/g, "")}`}>Call Us</a>
       <p className="note">No payment required now. Our team will contact you to confirm details.</p>
     </aside>
   );
@@ -625,13 +601,8 @@ function DeliveryBox({ go, embedded }) {
 /* ======================================================
    FULL CATERING
 ====================================================== */
-function buildMsg(title, rows) {
-  return [title, ...rows.filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`)].join("\n");
-}
-
 function QuoteModal({ onClose }) {
   const data = useSiteData();
-  const WHATSAPP_NUMBER = data.global.whatsapp;
   const CUISINES = data.catering.full.cuisines;
   const PLATE_PRICES = data.catering.full.platePrices;
   const FOOD_TYPES = data.catering.full.foodTypes;
@@ -658,16 +629,6 @@ function QuoteModal({ onClose }) {
     setErrors(e);
     return !Object.keys(e).length;
   };
-
-  const message = () =>
-    buildMsg("Full catering enquiry", [
-      ["Name", form.name], ["Phone", form.phone], ["Cuisine", form.cuisine], ["Plate price", form.plate],
-      ["Guests", form.guests], ["Event date", form.date], ["Food type", vegOnly ? "Veg only" : form.foodType],
-      ["Location", form.location], ["Live counter", form.counter === "yes" ? "Yes" : "No"],
-      ...Object.entries(menu).map(([k, v]) => [k, v]),
-    ]);
-
-  const whatsapp = () => validate() && window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message())}`, "_blank");
 
   const request = () => {
     if (!validate()) return;
@@ -738,7 +699,6 @@ function QuoteModal({ onClose }) {
 
         {sent && <div className="toast mt" role="status">Quote request sent. Our team will contact you shortly.</div>}
         <div className="modal-actions">
-          <button className="btn ghost" onClick={whatsapp}>Continue on WhatsApp</button>
           <button className="btn" onClick={request}>Request Quote</button>
         </div>
       </div>
@@ -748,10 +708,9 @@ function QuoteModal({ onClose }) {
 
 function QuoteSide({ onOpenDetailed }) {
   const data = useSiteData();
-  const WHATSAPP_NUMBER = data.global.whatsapp;
   const PHONE = data.global.phone;
 
-  const [form, setForm] = useState({ name: "", phone: "", guests: "", date: "", location: "", wa: true });
+  const [form, setForm] = useState({ name: "", phone: "", guests: "", date: "", location: "" });
   const [errors, setErrors] = useState({});
   const [sent, setSent] = useState(false);
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
@@ -774,11 +733,6 @@ function QuoteSide({ onOpenDetailed }) {
       location: form.location,
     });
 
-    const msg = buildMsg("Full catering enquiry", [
-      ["Name", form.name], ["Phone", form.phone], ["Guests", form.guests],
-      ["Event date", form.date], ["Location", form.location],
-    ]);
-    if (form.wa) window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
     setSent(true);
   };
 
@@ -790,10 +744,9 @@ function QuoteSide({ onOpenDetailed }) {
       <Field label="Number of Guests" type="number" min="1" placeholder="Enter guest count" value={form.guests} onChange={set("guests")} />
       <Field label="Event Date" type="date" icon="calendar" value={form.date} onChange={set("date")} error={errors.date} />
       <Field label="Event location/city" icon="pin" placeholder="Enter city or area" value={form.location} onChange={set("location")} />
-      <WhatsAppRow on={form.wa} setOn={(v) => setForm({ ...form, wa: v })} />
       {sent && <div className="toast" role="status">Enquiry sent. Our team will contact you to confirm details.</div>}
       <button className="btn block" onClick={send}>Send Enquiry</button>
-      <a className="btn block ghost call" href={`tel:${PHONE.replace(/\s/g, "")}`}><Icon name="phone" size={15} />Call Us</a>
+      <a className="btn block ghost call" href={`tel:${PHONE.replace(/\s/g, "")}`}>Call Us</a>
       <button className="link block" onClick={onOpenDetailed}>Customise menu &amp; get a detailed quote</button>
       <p className="note">No payment required now. Our team will contact you to confirm details.</p>
     </aside>

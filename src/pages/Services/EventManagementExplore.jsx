@@ -195,12 +195,14 @@ export default function EventManagementExplore() {
   return (
     <div className="min-h-[70vh] bg-[#faf5ee] pb-16 text-[#1a1516]">
       <div className="container">
-        <nav className="flex flex-wrap gap-2 pb-[14px] pt-5 text-[10.5px] font-medium uppercase tracking-[.07em] text-[#6b6567]" aria-label="Breadcrumb">
-          <Link className={cx("text-inherit no-underline hover:text-[#750a3d]!", FOCUS_RING)} to="/services">Our Services</Link>
-          <span>›</span>
-          <span>Event Planning</span>
-          <span>›</span>
-          <b className="font-bold text-[#1a1516]">Plan Your Event</b>
+        <nav className="flex flex-wrap items-center py-5 pb-[14px] text-xs text-[#6f6366]" aria-label="Breadcrumb">
+          <Link className="text-inherit no-underline hover:text-[#750a3d]" to="/">Home</Link>
+          <span className="mx-1.5 text-[#a79a9e]">›</span>
+          <Link className="text-inherit no-underline hover:text-[#750a3d]" to="/services">Services</Link>
+          <span className="mx-1.5 text-[#a79a9e]">›</span>
+          <button type="button" className="border-0 bg-transparent p-0 text-xs font-semibold text-[#750a3d] hover:text-[#750a3d]" aria-current="page" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+            Event Management
+          </button>
         </nav>
 
         <div className="grid items-start gap-7 min-[961px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.7fr)]">
@@ -231,7 +233,7 @@ export default function EventManagementExplore() {
           </aside>
 
           {/* ---------- RIGHT FORM CARD ---------- */}
-          <form className={cx(CARD, "px-5 pb-6 pt-5 min-[601px]:px-7 min-[601px]:pb-7 min-[601px]:pt-7")} onSubmit={submit} noValidate>
+          <form id="event-enquiry" className={cx(CARD, "scroll-mt-20 px-5 pb-6 pt-5 min-[601px]:px-7 min-[601px]:pb-7 min-[601px]:pt-7")} onSubmit={submit} noValidate>
             <h2 className="mb-1.5 text-xl font-bold! tracking-[-.01em]! text-[#1a1516]">Tell us about your celebration</h2>
             <p className="mb-4 text-xs leading-[1.6] text-[#6b6567]">
               Share your vision and event details so our senior event planning team can curate your custom proposal.
