@@ -102,7 +102,7 @@ function WhatsAppRow({ on, setOn }) {
 }
 
 /* ---------- Order summary ---------- */
-function OrderSummary({ lines, submitLines, total, onRemove, showGuests, showDelivery, header, bold }) {
+function OrderSummary({ lines, submitLines, total, totalNote, onRemove, showGuests, showDelivery, header, bold }) {
   const data = useSiteData();
   const WHATSAPP_NUMBER = data.global.whatsapp;
   const PHONE = data.global.phone;
@@ -168,7 +168,7 @@ function OrderSummary({ lines, submitLines, total, onRemove, showGuests, showDel
               {onRemove && !l.fixed && <button aria-label={`Remove ${l.name}`} onClick={() => onRemove(l.key)}>✕</button>}
             </div>
           ))}
-          {total ? <div className="est">Estimated <b>{inr(total)}</b> onwards</div> : null}
+          {total ? <div className="est">Estimated <b>{inr(total)}</b>{totalNote?.trim() ? ` ${totalNote.trim()}` : ""}</div> : null}
         </div>
       )}
 
@@ -411,7 +411,7 @@ function MealBox({ go, embedded }) {
                   <div className="sizes">
                     {BOX_SIZES.map((b, i) => (
                       <button key={i} className={cx("size", safeSize === i && "on")} aria-pressed={safeSize === i} onClick={() => pickSize(i)}>
-                        <small>{b.items} Items Box</small><b>{inr(b.price)}</b><em>{b.note}</em>
+                        <small>{b.items} Items Box</small><b>{inr(b.price)}</b>{b.note?.trim() && <em>{b.note.trim()}</em>}
                       </button>
                     ))}
                   </div>
@@ -474,6 +474,7 @@ function MealBox({ go, embedded }) {
           lines={lines}
           submitLines={allLines}
           total={touched ? total : 0}
+          totalNote={safeBox?.note}
           onRemove={(k) => setExtra((e) => { const n = { ...e }; delete n[k]; return n; })}
           header="Meal Box"
           showDelivery={false}

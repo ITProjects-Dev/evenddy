@@ -1,5 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { Eye, Pencil, Plus, Save, Trash2, X } from "lucide-react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { Eye, ImagePlus, Pencil, Plus, Save, Trash2, X } from "lucide-react";
 
 const SectionActionContext = createContext(null);
 
@@ -53,6 +53,144 @@ export const Area = ({ label, value, onChange, rows = 3, ...p }) => (
     <textarea rows={rows} value={value ?? ""} onChange={(e) => onChange(e.target.value)} {...p} />
   </F>
 );
+
+const MAX_IMAGE_BYTES = 300 * 1024;
+const MAX_IMAGE_INPUT_BYTES = 20 * 1024 * 1024;
+
+function readAsDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("Could not read the selected image."));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function optimizeImage(file) {
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    throw new Error("Choose a JPG, PNG, or WebP image.");
+  }
+  if (file.size > MAX_IMAGE_INPUT_BYTES) {
+    throw new Error("Image must be smaller than 20 MB.");
+  }
+
+  const source = URL.createObjectURL(file);
+  try {
+    const image = new Image();
+    image.src = source;
+    await new Promise((resolve, reject) => {
+      image.onload = resolve;
+      image.onerror = () => reject(new Error("Could not open the selected image."));
+    });
+
+    const scale = Math.min(1, 1600 / Math.max(image.naturalWidth, image.naturalHeight));
+    let width = Math.round(image.naturalWidth * scale);
+    let height = Math.round(image.naturalHeight * scale);
+    const canvas = document.createElement("canvas");
+
+    while (true) {
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("Image processing is not available in this browser.");
+      context.drawImage(image, 0, 0, width, height);
+
+      for (const quality of [0.82, 0.7, 0.58, 0.48]) {
+        const blob = await new Promise((resolve, reject) => {
+          canvas.toBlob(
+            (result) => result ? resolve(result) : reject(new Error("Could not optimize the selected image.")),
+            "image/webp",
+            quality,
+          );
+        });
+        if (blob.type !== "image/webp") {
+          throw new Error("This browser cannot optimize images for upload.");
+        }
+        if (blob.size <= MAX_IMAGE_BYTES) return readAsDataUrl(blob);
+      }
+
+      if (Math.max(width, height) <= 640) break;
+      width = Math.floor(width * 0.8);
+      height = Math.round(image.naturalHeight * (width / image.naturalWidth));
+    }
+
+    throw new Error("Could not reduce this image enough. Choose a smaller image.");
+  } finally {
+    URL.revokeObjectURL(source);
+  }
+}
+
+export function ImageUpload({ label, value, onChange, compact = false, hint, onRemove }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const inputRef = useRef(null);
+  const uploadLabel = label || "image";
+
+  const selectImage = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    setError("");
+    setBusy(true);
+    try {
+      onChange(await optimizeImage(file));
+    } catch (uploadError) {
+      setError(uploadError.message || "Image upload failed.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const content = (
+    <>
+      <div className="adm-image-preview">
+        {value
+          ? <img src={value} alt={`${uploadLabel} preview`} />
+          : <span><ImagePlus size={20} />{compact ? uploadLabel : "No image selected"}</span>}
+      </div>
+      <div className="adm-image-controls">
+        <button
+          className="adm-btn ghost sm"
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={busy}
+          aria-label={`${value ? "Replace" : "Choose"} ${uploadLabel}`}
+        >
+          <ImagePlus size={15} /> {busy ? "Processing…" : value ? "Replace image" : "Choose image"}
+        </button>
+        {value && (
+          <button
+            className={compact ? "adm-image-remove" : "adm-btn ghost sm"}
+            type="button"
+            onClick={() => {
+              if (onRemove) onRemove();
+              else onChange("");
+              setError("");
+            }}
+            aria-label={`Remove ${uploadLabel}`}
+          >
+            {compact ? <X size={14} /> : "Remove"}
+          </button>
+        )}
+        <input
+          ref={inputRef}
+          className="adm-image-file-input"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={selectImage}
+          tabIndex={-1}
+          aria-label={`Upload ${uploadLabel}`}
+        />
+      </div>
+      {error && <small className="adm-err" role="alert">{error}</small>}
+    </>
+  );
+
+  return compact
+    ? <div className={`adm-image-upload adm-image-upload-compact${value ? " has-image" : ""}`}>{content}</div>
+    : <F label={label} hint={hint || "Use an image you own or have permission to use. Images are optimized and saved in this browser."}>{content}</F>;
+}
 
 export const TagsInput = ({ label, value = [], onChange, placeholder, suggestions = [] }) => {
   const [draft, setDraft] = useState("");
@@ -108,7 +246,7 @@ function detailLabel(key) {
 }
 
 /* A list-first editor shared by the admin's repeatable content sections. */
-export function Repeater({ items, onChange, renderRow, empty, addLabel = "Add item", makeNew, itemTitle }) {
+export function Repeater({ items, onChange, renderRow, empty, addLabel = "", makeNew, itemTitle }) {
   const setSectionAddAction = useContext(SectionActionContext);
   const [active, setActive] = useState(null);
   const close = () => setActive(null);

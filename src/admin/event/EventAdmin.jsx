@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { loadData, saveData } from "../store";
-import { Section, F, Text, Area, TagsInput, Repeater, Tabs, Toast } from "../ui";
+import { Section, F, Text, Area, ImageUpload, TagsInput, Repeater, Tabs, Toast } from "../ui";
 
 const TABS = [
   { id: "intro",     label: "Intro & banner" },
@@ -14,7 +14,10 @@ export default function EventAdmin() {
   const [data, setData] = useState(() => loadData());
   const [toast, setToast] = useState("");
 
-  const save = () => { saveData(data); setToast("Event data saved"); setTimeout(() => setToast(""), 2200); };
+  const save = () => {
+    setToast(saveData(data) ? "Event data saved" : "Could not save. Browser storage may be full; remove some images and try again.");
+    setTimeout(() => setToast(""), 3500);
+  };
   const patch = (path, value) => setData((d) => ({ ...d, event: { ...d.event, [path]: value } }));
 
   return (
@@ -29,7 +32,7 @@ export default function EventAdmin() {
       {tab === "intro" && (
         <>
           <Section num="1" title="Left intro card">
-            <Text label="Banner image URL (blank = illustrated fallback)" value={data.event.sideImage} onChange={(v) => patch("sideImage", v)} />
+            <ImageUpload label="Banner image (blank = illustrated fallback)" value={data.event.sideImage} onChange={(v) => patch("sideImage", v)} />
             <Text label="Eyebrow" value={data.event.intro.eyebrow} onChange={(v) => patch("intro", { ...data.event.intro, eyebrow: v })} />
             <Text label="Heading" value={data.event.intro.heading} onChange={(v) => patch("intro", { ...data.event.intro, heading: v })} />
             <Area label="Lead paragraph" value={data.event.intro.lead} onChange={(v) => patch("intro", { ...data.event.intro, lead: v })} rows={4} />
