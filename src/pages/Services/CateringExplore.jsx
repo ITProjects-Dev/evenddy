@@ -215,11 +215,11 @@ function MenuList({ items, qtyById, toggle, cta = "Add", ctaOn = "Added", compac
   );
 }
 
-function VegToggle({ nonVeg, setNonVeg }) {
+function VegToggle({ includeNonVeg, setIncludeNonVeg }) {
   return (
     <div className="vegtoggle">
       <span className="vd">Pure Veg</span>
-      <Switch on={nonVeg} onClick={() => setNonVeg(!nonVeg)} label="Include non-veg" />
+      <Switch on={includeNonVeg} onClick={() => setIncludeNonVeg(!includeNonVeg)} label="Include non-veg" />
       <span className="vd r">Include Non-Veg</span>
     </div>
   );
@@ -332,7 +332,7 @@ function MealBox({ go, embedded }) {
   const TABS = ["Meal Box", ...menuCategories];
 
   const [tab, setTab] = useState("Meal Box");
-  const [nonVeg, setNonVeg] = useState(false);
+  const [includeNonVeg, setIncludeNonVeg] = useState(true);
   const [touched, setTouched] = useState(false);
   const [size, setSize] = useState(0);
   const [picks, setPicks] = useState(() => MEALBOX_SLOTS.map(() => 0));
@@ -353,7 +353,7 @@ function MealBox({ go, embedded }) {
     const o = slot.options || [];
     if (!o.length) return { n: "—", v: true };
     const c = o[picks[i] ?? 0] || o[0];
-    if (!nonVeg && !c.v) return o.find((x) => x.v) || c;
+    if (!includeNonVeg && !c.v) return o.find((x) => x.v) || c;
     return c;
   };
 
@@ -361,7 +361,7 @@ function MealBox({ go, embedded }) {
     const slot = MEALBOX_SLOTS[i];
     if (!slot) return;
     const o = slot.options || [];
-    const allowed = o.filter((x) => nonVeg || x.v);
+    const allowed = o.filter((x) => includeNonVeg || x.v);
     if (!allowed.length) return;
     const cur = current(i).n;
     const idx = allowed.findIndex((x) => x.n === cur);
@@ -385,8 +385,8 @@ function MealBox({ go, embedded }) {
   const lines = touched ? allLines : [];
   const total = safeBox ? safeBox.price * guests : 0;
   const menuItems = useMemo(
-    () => MENU.filter((m) => m.cat === tab && (nonVeg || m.veg)),
-    [MENU, tab, nonVeg]
+    () => MENU.filter((m) => m.cat === tab && (includeNonVeg || m.veg)),
+    [MENU, tab, includeNonVeg]
   );
 
   return (
@@ -396,7 +396,7 @@ function MealBox({ go, embedded }) {
         <div className="tabs">
           {TABS.map((t) => <Tab key={t} on={tab === t} onClick={() => setTab(t)}>{t}</Tab>)}
         </div>
-        <VegToggle nonVeg={nonVeg} setNonVeg={setNonVeg} />
+        <VegToggle includeNonVeg={includeNonVeg} setIncludeNonVeg={setIncludeNonVeg} />
       </div>
 
       <div className="layout">
@@ -494,7 +494,7 @@ function DeliveryBox({ go, embedded }) {
   const FILTERS = ["All", ...menuCategories];
 
   const [filter, setFilter] = useState("All");
-  const [nonVeg, setNonVeg] = useState(false);
+  const [includeNonVeg, setIncludeNonVeg] = useState(true);
   const [sel, setSel] = useState({});
 
   /* Reset filter if admin deletes the currently selected category */
@@ -504,7 +504,7 @@ function DeliveryBox({ go, embedded }) {
   }, [menuCategories.length]);
 
   const toggle = (m) => setSel((s) => { const n = { ...s }; n[m.id] ? delete n[m.id] : (n[m.id] = m); return n; });
-  const items = MENU.filter((m) => (filter === "All" || m.cat === filter) && (nonVeg || m.veg));
+  const items = MENU.filter((m) => (filter === "All" || m.cat === filter) && (includeNonVeg || m.veg));
   const lines = Object.values(sel).map((m) => ({ key: m.id, name: m.name, qty: 1 }));
 
   return (
@@ -514,7 +514,7 @@ function DeliveryBox({ go, embedded }) {
         <section className="panel dv-panel">
           <div className="dv-head">
             <h3>Available Menu</h3>
-            <VegToggle nonVeg={nonVeg} setNonVeg={setNonVeg} />
+            <VegToggle includeNonVeg={includeNonVeg} setIncludeNonVeg={setIncludeNonVeg} />
           </div>
           <div className="tabs">
             {FILTERS.map((f) => <Tab key={f} small on={filter === f} onClick={() => setFilter(f)}>{f}</Tab>)}

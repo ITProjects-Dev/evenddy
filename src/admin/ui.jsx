@@ -174,19 +174,6 @@ export function ImageUpload({ label, value, onChange, compact = false, hint, onR
         >
           <ImagePlus size={15} /> {busy ? "Processing…" : value ? "Replace image" : "Choose image"}
         </button>
-        {value && (
-          <button
-            className="adm-btn ghost sm"
-            type="button"
-            onClick={() => {
-              if (onRemove) onRemove();
-              else onChange("");
-              setError("");
-            }}
-          >
-            <X size={15} /> Remove image
-          </button>
-        )}
         <input
           ref={inputRef}
           className="adm-image-file-input"
