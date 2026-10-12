@@ -245,6 +245,26 @@ export function saveData(d) {
     return false;
   }
 }
+export function saveDataSections(updates) {
+  if (!updates.length) return false;
+  const updated = loadData();
+
+  for (const { path, value } of updates) {
+    const segments = Array.isArray(path) ? path : path.split(".");
+    if (!segments.length || segments.some((segment) => !segment)) return false;
+
+    let target = updated;
+    for (const segment of segments.slice(0, -1)) {
+      const current = target[segment];
+      target[segment] = current && typeof current === "object" && !Array.isArray(current)
+        ? { ...current }
+        : {};
+      target = target[segment];
+    }
+    target[segments[segments.length - 1]] = value;
+  }
+  return saveData(updated);
+}
 export function resetData() { try { localStorage.removeItem(KEY); } catch {} return DEFAULT_DATA; }
 
 /* =================== AUTH =================== */

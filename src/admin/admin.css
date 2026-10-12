@@ -68,6 +68,7 @@
 .adm-err{font-size:12.5px;color:var(--err)}
 
 .adm-image-preview{
+  position:relative;
   display:grid;
   min-height:100px;
   place-items:center;
@@ -78,6 +79,24 @@
 }
 .adm-image-preview img{display:block;max-width:100%;max-height:220px;object-fit:contain}
 .adm-image-preview span{display:flex;align-items:center;gap:7px;padding:12px;color:var(--mut);font-size:12px}
+.adm-image-remove{
+  position:absolute;
+  top:6px;
+  right:6px;
+  z-index:1;
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  padding:0;
+  border:0;
+  border-radius:8px;
+  background:rgba(20,16,31,.78);
+  color:#fff;
+  cursor:pointer;
+}
+.adm-image-remove:hover{background:var(--err)}
+.adm-image-remove:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .adm-image-controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .adm-image-file-input{display:none!important}
 .adm-image-upload-compact{position:relative;aspect-ratio:4/3;min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#f0eef7}
@@ -86,11 +105,6 @@
 .adm-image-upload-compact .adm-image-preview span{flex-direction:column;text-align:center}
 .adm-image-upload-compact .adm-image-controls{position:absolute;right:6px;bottom:6px;left:6px;margin:0}
 .adm-image-upload-compact .adm-image-controls > .adm-btn{width:100%;padding:6px 8px;font-size:11px}
-.adm-image-upload-compact .adm-image-controls > .adm-image-remove{
-  position:absolute;top:-9999px;right:0;width:25px;height:25px;display:grid;place-items:center;
-  border:0;border-radius:7px;background:rgba(20,16,31,.76);color:#fff;
-}
-.adm-image-upload-compact.has-image .adm-image-controls > .adm-image-remove{top:6px}
 .adm-image-upload-compact .adm-err{position:absolute;right:4px;bottom:40px;left:4px;padding:3px;background:#fff}
 
 .adm-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -439,6 +453,7 @@
 
 .adm-repeater{display:grid;gap:16px}
 .adm-repeater-list{display:grid;gap:10px}
+.adm-repeater-add{justify-self:start}
 .adm-repeater-item{
   display:flex;
   align-items:center;

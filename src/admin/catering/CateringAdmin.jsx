@@ -1,6 +1,14 @@
 import { useState } from "react";
-import { loadData, saveData, uid, inr } from "../store";
+import { loadData, saveDataSections, uid, inr } from "../store";
 import { Section, F, Text, Num, Area, ImageUpload, TagsInput, Repeater, Tabs, Toast } from "../ui";
+
+function SaveSection({ path, value, updates, label, onSave }) {
+    return (
+        <button className="adm-btn ghost sm" type="button" onClick={() => onSave(updates || [{ path, value }])}>
+            Save {label}
+        </button>
+    );
+}
 
 const TABS = [
     { id: "landing", label: "Landing" },
@@ -15,8 +23,8 @@ export default function CateringAdmin() {
     const [data, setData] = useState(() => loadData());
     const [toast, setToast] = useState("");
 
-    const save = () => {
-        setToast(saveData(data) ? "Catering data saved" : "Could not save. Browser storage may be full; remove some images and try again.");
+    const saveSection = (updates) => {
+        setToast(saveDataSections(updates) ? "Section saved" : "Could not save. Browser storage may be full; remove some images and try again.");
         setTimeout(() => setToast(""), 3500);
     };
     const patch = (path, value) => setData((d) => ({ ...d, catering: { ...d.catering, [path]: value } }));
@@ -24,17 +32,16 @@ export default function CateringAdmin() {
     return (
         <>
             <div className="adm-between" style={{ marginBottom: 14 }}>
-                <p className="adm-hint" style={{ margin: 0 }}>Changes are local until you click Save.</p>
-                <button className="adm-btn" onClick={save}>Save catering</button>
+                <p className="adm-hint" style={{ margin: 0 }}>Save each section separately after editing.</p>
             </div>
 
             <Tabs tabs={TABS} value={tab} onChange={setTab} />
 
-            {tab === "landing" && <LandingTab data={data} patch={patch} setData={setData} />}
-            {tab === "mealbox" && <MealBoxTab data={data} patch={patch} setData={setData} />}
-            {tab === "menu" && <MenuTab data={data} patch={patch} />}
-            {tab === "full" && <FullTab data={data} patch={patch} />}
-            {tab === "global" && <GlobalTab data={data} setData={setData} />}
+            {tab === "landing" && <LandingTab data={data} patch={patch} saveSection={saveSection} />}
+            {tab === "mealbox" && <MealBoxTab data={data} patch={patch} saveSection={saveSection} />}
+            {tab === "menu" && <MenuTab data={data} patch={patch} saveSection={saveSection} />}
+            {tab === "full" && <FullTab data={data} patch={patch} saveSection={saveSection} />}
+            {tab === "global" && <GlobalTab data={data} setData={setData} saveSection={saveSection} />}
 
             <Toast text={toast} />
         </>
@@ -42,14 +49,16 @@ export default function CateringAdmin() {
 }
 
 /* ---------------- LANDING ---------------- */
-function LandingTab({ data, patch }) {
+function LandingTab({ data, patch, saveSection }) {
     const cards = data.catering.landing;
     const setCard = (i, v) => patch("landing", cards.map((c, k) => (k === i ? v : c)));
     return (
-        <Section num="1" title="Landing cards" sub="The three big cards on the Catering landing page.">
+        <Section num="1" title="Landing cards" sub="The three big cards on the Catering landing page."
+            right={<SaveSection path="catering.landing" value={cards} label="landing cards" onSave={saveSection} />}>
             <Repeater
                 items={cards}
                 onChange={(v) => patch("landing", v)}
+                addLabel="Add service card"
                 itemTitle={(it) => it.title || "Untitled card"}
                 makeNew={() => ({
                     id: uid("card"), title: "New service", eyebrow: "", icon: "box", tone: "gold",
@@ -116,16 +125,18 @@ function LandingTab({ data, patch }) {
 }
 
 /* ---------------- MEAL BOX ---------------- */
-function MealBoxTab({ data, patch }) {
+function MealBoxTab({ data, patch, saveSection }) {
     const mb = data.catering.mealBox;
     const setMB = (v) => patch("mealBox", v);
 
     return (
         <>
-            <Section num="1" title="Box sizes" sub="e.g. 3 / 5 / 8 item boxes with prices.">
+            <Section num="1" title="Box sizes" sub="e.g. 3 / 5 / 8 item boxes with prices."
+                right={<SaveSection path="catering.mealBox.boxSizes" value={mb.boxSizes} label="box sizes" onSave={saveSection} />}>
                 <Repeater
                     items={mb.boxSizes}
                     onChange={(v) => setMB({ ...mb, boxSizes: v })}
+                    addLabel="Add box size"
                     itemTitle={(b) => `${b.items} items — ${inr(b.price)}`}
                     makeNew={() => ({ items: 3, price: 0, note: "onwards" })}
                     renderRow={(b, i, upd) => (
@@ -142,7 +153,14 @@ function MealBoxTab({ data, patch }) {
                 />
             </Section>
 
-            <Section num="2" title="Guest quantity defaults">
+            <Section num="2" title="Guest quantity defaults"
+                right={<SaveSection
+                    updates={[
+                        { path: "catering.mealBox.minGuests", value: mb.minGuests },
+                        { path: "catering.mealBox.guestStep", value: mb.guestStep },
+                        { path: "catering.mealBox.presets", value: mb.presets },
+                    ]}
+                    label="guest defaults" onSave={saveSection} />}>
                 <div className="adm-grid3">
                     <Num label="Minimum guests" value={mb.minGuests} onChange={(v) => setMB({ ...mb, minGuests: v })} />
                     <Num label="Step" value={mb.guestStep} onChange={(v) => setMB({ ...mb, guestStep: v })} />
@@ -152,10 +170,12 @@ function MealBoxTab({ data, patch }) {
                 </div>
             </Section>
 
-            <Section num="3" title="Box item slots" sub="Each slot has one icon and a set of swappable options. The first N slots are shown for an N-item box.">
+            <Section num="3" title="Box item slots" sub="Each slot has one icon and a set of swappable options. The first N slots are shown for an N-item box."
+                right={<SaveSection path="catering.mealBox.slots" value={mb.slots} label="item slots" onSave={saveSection} />}>
                 <Repeater
                     items={mb.slots}
                     onChange={(v) => setMB({ ...mb, slots: v })}
+                    addLabel="Add slot"
                     itemTitle={(s, i) => `Slot ${i + 1} · ${s.options?.[0]?.n || "—"}`}
                     makeNew={() => ({ icon: "bowl", options: [{ n: "", v: true }] })}
                     renderRow={(s, i, upd) => (
@@ -170,6 +190,7 @@ function MealBoxTab({ data, patch }) {
                                 <Repeater
                                     items={s.options}
                                     onChange={(v) => upd({ ...s, options: v })}
+                                    addLabel="Add option"
                                     itemTitle={(o) => `${o.n || "—"} ${o.v ? "· Veg" : "· Non-Veg"}`}
                                     makeNew={() => ({ n: "", v: true })}
                                     renderRow={(o, oi, ou) => (
@@ -194,7 +215,7 @@ function MealBoxTab({ data, patch }) {
 }
 
 /* ---------------- MENU ITEMS (shared by Meal Box extra tabs + Delivery Box) ---------------- */
-function MenuTab({ data, patch }) {
+function MenuTab({ data, patch, saveSection }) {
     const cats = data.catering.menuCategories;
     const items = data.catering.menuItems;
     const [filter, setFilter] = useState("all");
@@ -203,7 +224,8 @@ function MenuTab({ data, patch }) {
 
     return (
         <>
-            <Section num="1" title="Menu categories" sub="Tabs / filters used on Meal Box & Delivery Box.">
+            <Section num="1" title="Menu categories" sub="Tabs / filters used on Meal Box & Delivery Box."
+                right={<SaveSection path="catering.menuCategories" value={cats} label="menu categories" onSave={saveSection} />}>
                 <TagsInput label="Categories" value={cats}
                     onChange={(v) => patch("menuCategories", v)}
                     placeholder="Type a category and Enter"
@@ -212,15 +234,19 @@ function MenuTab({ data, patch }) {
 
             <Section num="2" title="Menu items" sub={`${items.length} items · used by both Meal Box (extra items) and Delivery Box.`}
                 right={
-                    <div className="adm-seg">
-                        <button className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>All</button>
-                        {cats.map((c) => (
-                            <button key={c} className={filter === c ? "on" : ""} onClick={() => setFilter(c)}>{c}</button>
-                        ))}
+                    <div className="adm-row">
+                        <div className="adm-seg">
+                            <button className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>All</button>
+                            {cats.map((c) => (
+                                <button key={c} className={filter === c ? "on" : ""} onClick={() => setFilter(c)}>{c}</button>
+                            ))}
+                        </div>
+                        <SaveSection path="catering.menuItems" value={items} label="menu items" onSave={saveSection} />
                     </div>
                 }>
                 <Repeater
                     items={visible}
+                    addLabel="Add menu item"
                     onChange={(next) => {
                         if (filter === "all") return patch("menuItems", next);
                         /* merge back when filtered */
@@ -252,14 +278,15 @@ function MenuTab({ data, patch }) {
 }
 
 /* ---------------- FULL CATERING ---------------- */
-function FullTab({ data, patch }) {
+function FullTab({ data, patch, saveSection }) {
     const full = data.catering.full;
     const setFull = (v) => patch("full", v);
     const menuCats = Object.keys(full.menu || {});
 
     return (
         <>
-            <Section num="1" title="Gallery" sub="Portfolio images on the Full Catering page.">
+            <Section num="1" title="Gallery" sub="Portfolio images on the Full Catering page."
+                right={<SaveSection path="catering.full.gallery" value={full.gallery || []} label="gallery" onSave={saveSection} />}>
                 <div className="adm-gal">
                     {(full.gallery || []).map((image, i) => (
                         <ImageUpload key={i} label={`Gallery image ${i + 1}`} value={image} compact
@@ -273,7 +300,8 @@ function FullTab({ data, patch }) {
                 </div>
             </Section>
 
-            <Section num="2" title="Cuisines, Plate prices, Food types & Service tags">
+            <Section num="2" title="Cuisines, Plate prices, Food types & Service tags"
+                right={<SaveSection path="catering.full.serviceTags" value={full.serviceTags} label="service tags" onSave={saveSection} />}>
                 {/* <TagsInput label="Cuisines" value={full.cuisines} onChange={(v) => setFull({ ...full, cuisines: v })} placeholder="Add cuisine…" />
                 <TagsInput label="Plate price ranges" value={full.platePrices} onChange={(v) => setFull({ ...full, platePrices: v })} placeholder="e.g. ₹500 – ₹800" />
                 <TagsInput label="Food types" value={full.foodTypes} onChange={(v) => setFull({ ...full, foodTypes: v })} placeholder="e.g. Veg" /> */}
@@ -328,10 +356,12 @@ function FullTab({ data, patch }) {
                 />
             </Section> */}
 
-            <Section num="3" title="Reviews">
+            <Section num="3" title="Reviews"
+                right={<SaveSection path="catering.full.reviews" value={full.reviews || []} label="reviews" onSave={saveSection} />}>
                 <Repeater
                     items={full.reviews || []}
                     onChange={(v) => setFull({ ...full, reviews: v })}
+                    addLabel="Add review"
                     itemTitle={(r) => r.who || "Review"}
                     makeNew={() => ({ who: "", text: "" })}
                     renderRow={(r, i, upd) => (
@@ -347,11 +377,12 @@ function FullTab({ data, patch }) {
 }
 
 /* ---------------- GLOBAL ---------------- */
-function GlobalTab({ data, setData }) {
+function GlobalTab({ data, setData, saveSection }) {
     const g = data.global;
     const setG = (v) => setData({ ...data, global: v });
     return (
-        <Section num="1" title="Contact & WhatsApp" sub="Used across every catering WhatsApp button.">
+        <Section num="1" title="Contact & WhatsApp" sub="Used across every catering WhatsApp button."
+            right={<SaveSection path="global" value={g} label="contact details" onSave={saveSection} />}>
             <div className="adm-grid2">
                 <Text label="WhatsApp number (country code + number, no +)" value={g.whatsapp} onChange={(v) => setG({ ...g, whatsapp: v })} />
                 <Text label="Display phone" value={g.phone} onChange={(v) => setG({ ...g, phone: v })} />
