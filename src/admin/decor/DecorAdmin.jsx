@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { loadData, saveData, uid, inr } from "../store";
-import { Section, F, Text, Num, Area, TagsInput, Repeater, Tabs, Toast } from "../ui";
+import { Section, F, Text, Num, Area, ImageUpload, TagsInput, Repeater, Tabs, Toast } from "../ui";
 
 const TABS = [
   { id: "landing",  label: "Landing" },
@@ -17,7 +17,10 @@ export default function DecorAdmin() {
   const [data, setData] = useState(() => loadData());
   const [toast, setToast] = useState("");
 
-  const save = () => { saveData(data); setToast("Decor data saved"); setTimeout(() => setToast(""), 2200); };
+  const save = () => {
+    setToast(saveData(data) ? "Decor data saved" : "Could not save. Browser storage may be full; remove some images and try again.");
+    setTimeout(() => setToast(""), 3500);
+  };
   const patch = (path, value) => setData((d) => ({ ...d, decor: { ...d.decor, [path]: value } }));
 
   return (
@@ -46,13 +49,9 @@ function ImageSlots({ images = [], onChange }) {
   return (
     <F label={`Images (${IMG_SLOTS} slots · blank = illustrated fallback)`}>
       <div className="adm-gal">
-        {five.map((url, i) => (
-          <div key={i} className="adm-gal-i" style={url ? { backgroundImage: `url(${url})` } : undefined}>
-            <span style={{ fontSize: 11, opacity: url ? 0 : .7 }}>{url ? "" : `Slot ${i + 1}`}</span>
-            <input value={url} onChange={(e) => onChange(five.map((g, k) => (k === i ? e.target.value : g)))}
-              placeholder="Image URL"
-              style={{ position: "absolute", left: 6, right: 6, bottom: 6, fontSize: 11, padding: "5px 7px", borderRadius: 7, border: "1px solid var(--line)", background: "rgba(255,255,255,.94)" }} />
-          </div>
+        {five.map((image, i) => (
+          <ImageUpload key={i} label={`Image slot ${i + 1}`} value={image} compact
+            onChange={(value) => onChange(five.map((current, k) => (k === i ? value : current)))} />
         ))}
       </div>
     </F>
@@ -77,16 +76,14 @@ function Landing({ data, patch }) {
             </div>
             <Area label="Text" value={c.text} onChange={(v) => upd({ ...c, text: v })} rows={3} />
             {c.id === "themes" ? (
-              <F label="Collage (3 images)">
-                <div className="adm-grid3">
-                  {[0, 1, 2].map((k) => (
-                    <Text key={k} label={`Image ${k + 1}`} value={(c.collage || [])[k] || ""}
-                      onChange={(v) => upd({ ...c, collage: [0, 1, 2].map((x) => (x === k ? v : (c.collage || [])[x] || "")) })} />
-                  ))}
-                </div>
-              </F>
+              <div className="adm-grid3">
+                {[0, 1, 2].map((k) => (
+                  <ImageUpload key={k} label={`Collage image ${k + 1}`} value={(c.collage || [])[k] || ""}
+                    onChange={(v) => upd({ ...c, collage: [0, 1, 2].map((x) => (x === k ? v : (c.collage || [])[x] || "")) })} />
+                ))}
+              </div>
             ) : (
-              <Text label="Image URL" value={c.image} onChange={(v) => upd({ ...c, image: v })} />
+              <ImageUpload label="Card image" value={c.image} onChange={(v) => upd({ ...c, image: v })} />
             )}
           </>
         )}
@@ -208,19 +205,14 @@ function Custom({ data, patch }) {
           <Text label="Title" value={c.title} onChange={(v) => set({ ...c, title: v })} />
           <Num label="Starting price (₹)" value={c.price} onChange={(v) => set({ ...c, price: v })} />
         </div>
-        <Text label="Hero image URL" value={c.hero} onChange={(v) => set({ ...c, hero: v })} />
+        <ImageUpload label="Hero image" value={c.hero} onChange={(v) => set({ ...c, hero: v })} />
         <F label="Gallery (4 slots)">
           <div className="adm-gal">
             {Array.from({ length: 4 }).map((_, i) => {
-              const url = (c.gallery || [])[i] || "";
+              const image = (c.gallery || [])[i] || "";
               return (
-                <div key={i} className="adm-gal-i" style={url ? { backgroundImage: `url(${url})` } : undefined}>
-                  <span style={{ fontSize: 11 }}>{url ? "" : `Slot ${i + 1}`}</span>
-                  <input value={url} onChange={(e) =>
-                    set({ ...c, gallery: [0,1,2,3].map((x) => (x === i ? e.target.value : (c.gallery || [])[x] || "")) })}
-                    placeholder="Image URL"
-                    style={{ position: "absolute", left: 6, right: 6, bottom: 6, fontSize: 11, padding: "5px 7px", borderRadius: 7, border: "1px solid var(--line)", background: "rgba(255,255,255,.94)" }} />
-                </div>
+                <ImageUpload key={i} label={`Gallery image ${i + 1}`} value={image} compact
+                  onChange={(v) => set({ ...c, gallery: [0,1,2,3].map((x) => (x === i ? v : (c.gallery || [])[x] || "")) })} />
               );
             })}
           </div>

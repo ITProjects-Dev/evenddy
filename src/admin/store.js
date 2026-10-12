@@ -237,7 +237,14 @@ export function loadData() {
     return { ...DEFAULT_DATA, ...parsed };
   } catch { return DEFAULT_DATA; }
 }
-export function saveData(d) { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch {} }
+export function saveData(d) {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(d));
+    return true;
+  } catch {
+    return false;
+  }
+}
 export function resetData() { try { localStorage.removeItem(KEY); } catch {} return DEFAULT_DATA; }
 
 /* =================== AUTH =================== */

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { loadData, saveData, uid, inr } from "../store";
-import { Section, F, Text, Num, Area, TagsInput, Repeater, Tabs, Toast } from "../ui";
-import { X } from "lucide-react";
+import { Section, F, Text, Num, Area, ImageUpload, TagsInput, Repeater, Tabs, Toast } from "../ui";
 
 const TABS = [
     { id: "landing", label: "Landing" },
@@ -16,7 +15,10 @@ export default function CateringAdmin() {
     const [data, setData] = useState(() => loadData());
     const [toast, setToast] = useState("");
 
-    const save = () => { saveData(data); setToast("Catering data saved"); setTimeout(() => setToast(""), 2200); };
+    const save = () => {
+        setToast(saveData(data) ? "Catering data saved" : "Could not save. Browser storage may be full; remove some images and try again.");
+        setTimeout(() => setToast(""), 3500);
+    };
     const patch = (path, value) => setData((d) => ({ ...d, catering: { ...d.catering, [path]: value } }));
 
     return (
@@ -72,7 +74,7 @@ function LandingTab({ data, patch }) {
                             </F>
                             <Text label="Price badge (optional)" value={it.price} onChange={(v) => upd({ ...it, price: v })} placeholder="Starting from ₹200 /plate" />
                         </div>
-                        <Text label="Card image URL" value={it.image} onChange={(v) => upd({ ...it, image: v })} placeholder="https://…" />
+                        <ImageUpload label="Card image" value={it.image} onChange={(v) => upd({ ...it, image: v })} />
                         <Text label="CTA button label" value={it.cta} onChange={(v) => upd({ ...it, cta: v })} />
 
                         <F label="Paragraphs">
@@ -130,7 +132,11 @@ function MealBoxTab({ data, patch }) {
                         <div className="adm-grid3">
                             <Num label="Item count" value={b.items} onChange={(v) => upd({ ...b, items: v })} />
                             <Num label="Price (₹)" value={b.price} onChange={(v) => upd({ ...b, price: v })} />
-                            <Text label="Note" value={b.note} onChange={(v) => upd({ ...b, note: v })} placeholder="onwards" />
+                            <F label="Price note">
+                                <input value={b.note ?? ""} onChange={(e) => upd({ ...b, note: e.target.value })}
+                                    placeholder="e.g. onwards" />
+                                <small className="adm-hint">Shown beside this box price and the order estimate. Leave blank to hide it.</small>
+                            </F>
                         </div>
                     )}
                 />
@@ -255,15 +261,10 @@ function FullTab({ data, patch }) {
         <>
             <Section num="1" title="Gallery" sub="Portfolio images on the Full Catering page.">
                 <div className="adm-gal">
-                    {(full.gallery || []).map((url, i) => (
-                        <div key={i} className="adm-gal-i" style={url ? { backgroundImage: `url(${url})` } : undefined}>
-                            {!url && <span style={{ fontSize: 11 }}>No image</span>}
-                            <button type="button" onClick={() => setFull({ ...full, gallery: full.gallery.filter((_, k) => k !== i) })} aria-label={`Remove image ${i + 1}`}><X size={14} /></button>
-                            <input value={url} onChange={(e) =>
-                                setFull({ ...full, gallery: full.gallery.map((g, k) => (k === i ? e.target.value : g)) })}
-                                placeholder="Image URL"
-                                style={{ position: "absolute", left: 6, right: 6, bottom: 6, fontSize: 11, padding: "5px 7px", borderRadius: 7, border: "1px solid var(--line)", background: "rgba(255,255,255,.94)" }} />
-                        </div>
+                    {(full.gallery || []).map((image, i) => (
+                        <ImageUpload key={i} label={`Gallery image ${i + 1}`} value={image} compact
+                            onChange={(v) => setFull({ ...full, gallery: full.gallery.map((g, k) => (k === i ? v : g)) })}
+                            onRemove={() => setFull({ ...full, gallery: full.gallery.filter((_, k) => k !== i) })} />
                     ))}
                     <button type="button" className="adm-gal-add"
                         onClick={() => setFull({ ...full, gallery: [...(full.gallery || []), ""] })}>
