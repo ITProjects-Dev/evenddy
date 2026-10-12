@@ -14,11 +14,13 @@ import FAQPage from "../pages/FAQPage/FAQPage";
 import PlanEvent from "../pages/PlanEvent/PlanEvent";
 import NotFound from "../pages/NotFound/NotFound";
 import VendorOnboarding from "../pages/Vendor/VendorOnboarding";
+import AdminApp from "../admin/AdminApp";
 
 export default function AppRoutes() {
   return (
     <BrowserRouter basename="/demo">
       <Routes>
+        <Route path="/admin/*" element={<AdminApp />} />
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/services" element={<Services />} />
