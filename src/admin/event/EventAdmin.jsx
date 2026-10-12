@@ -1,6 +1,14 @@
 import { useState } from "react";
-import { loadData, saveData } from "../store";
+import { loadData, saveDataSections } from "../store";
 import { Section, F, Text, Area, ImageUpload, TagsInput, Repeater, Tabs, Toast } from "../ui";
+
+function SaveSection({ updates, label, onSave }) {
+  return (
+    <button className="adm-btn ghost sm" type="button" onClick={() => onSave(updates)}>
+      Save {label}
+    </button>
+  );
+}
 
 const TABS = [
   { id: "intro",     label: "Intro & banner" },
@@ -14,8 +22,8 @@ export default function EventAdmin() {
   const [data, setData] = useState(() => loadData());
   const [toast, setToast] = useState("");
 
-  const save = () => {
-    setToast(saveData(data) ? "Event data saved" : "Could not save. Browser storage may be full; remove some images and try again.");
+  const saveSection = (updates) => {
+    setToast(saveDataSections(updates) ? "Section saved" : "Could not save. Browser storage may be full; remove some images and try again.");
     setTimeout(() => setToast(""), 3500);
   };
   const patch = (path, value) => setData((d) => ({ ...d, event: { ...d.event, [path]: value } }));
@@ -23,15 +31,20 @@ export default function EventAdmin() {
   return (
     <>
       <div className="adm-between" style={{ marginBottom: 14 }}>
-        <p className="adm-hint" style={{ margin: 0 }}>Manage the left intro card, event types & form options.</p>
-        <button className="adm-btn" onClick={save}>Save event</button>
+        <p className="adm-hint" style={{ margin: 0 }}>Manage the left intro card, event types & form options. Save each section separately.</p>
       </div>
 
       <Tabs tabs={TABS} value={tab} onChange={setTab} />
 
       {tab === "intro" && (
         <>
-          <Section num="1" title="Left intro card">
+          <Section num="1" title="Left intro card"
+            right={<SaveSection
+              updates={[
+                { path: "event.sideImage", value: data.event.sideImage },
+                { path: "event.intro", value: data.event.intro },
+              ]}
+              label="intro card" onSave={saveSection} />}>
             <ImageUpload label="Banner image (blank = illustrated fallback)" value={data.event.sideImage} onChange={(v) => patch("sideImage", v)} />
             <Text label="Eyebrow" value={data.event.intro.eyebrow} onChange={(v) => patch("intro", { ...data.event.intro, eyebrow: v })} />
             <Text label="Heading" value={data.event.intro.heading} onChange={(v) => patch("intro", { ...data.event.intro, heading: v })} />
@@ -41,7 +54,8 @@ export default function EventAdmin() {
       )}
 
       {tab === "types" && (
-        <Section title="Event types & subtypes" sub="The Type dropdown, and the Subtype dropdown that depends on it.">
+        <Section title="Event types & subtypes" sub="The Type dropdown, and the Subtype dropdown that depends on it."
+          right={<SaveSection updates={[{ path: "event.eventTypes", value: data.event.eventTypes }]} label="event types" onSave={saveSection} />}>
           <Repeater
             items={Object.entries(data.event.eventTypes).map(([k, v]) => ({ type: k, subtypes: v }))}
             onChange={(list) => {
@@ -66,17 +80,20 @@ export default function EventAdmin() {
 
       {tab === "options" && (
         <>
-          <Section title="Venue status options">
+          <Section title="Venue status options"
+            right={<SaveSection updates={[{ path: "event.venueStatus", value: data.event.venueStatus }]} label="venue options" onSave={saveSection} />}>
             <TagsInput label="" value={data.event.venueStatus} onChange={(v) => patch("venueStatus", v)} placeholder="Add an option…" />
           </Section>
-          <Section title="Priority chips">
+          <Section title="Priority chips"
+            right={<SaveSection updates={[{ path: "event.priorities", value: data.event.priorities }]} label="priorities" onSave={saveSection} />}>
             <TagsInput label="" value={data.event.priorities} onChange={(v) => patch("priorities", v)} placeholder="Add a priority…" />
           </Section>
         </>
       )}
 
       {tab === "global" && (
-        <Section title="Contact">
+        <Section title="Contact"
+          right={<SaveSection updates={[{ path: "global.whatsapp", value: data.global.whatsapp }]} label="contact details" onSave={saveSection} />}>
           <Text label="WhatsApp number (country code + number, no +)" value={data.global.whatsapp}
             onChange={(v) => setData({ ...data, global: { ...data.global, whatsapp: v } })} />
         </Section>

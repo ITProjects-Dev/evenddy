@@ -1,6 +1,14 @@
 import { useState } from "react";
-import { loadData, saveData, uid, inr } from "../store";
+import { loadData, saveDataSections, uid, inr } from "../store";
 import { Section, F, Text, Num, Area, ImageUpload, TagsInput, Repeater, Tabs, Toast } from "../ui";
+
+function SaveSection({ path, value, updates, label, onSave }) {
+  return (
+    <button className="adm-btn ghost sm" type="button" onClick={() => onSave(updates || [{ path, value }])}>
+      Save {label}
+    </button>
+  );
+}
 
 const TABS = [
   { id: "landing",  label: "Landing" },
@@ -17,8 +25,8 @@ export default function DecorAdmin() {
   const [data, setData] = useState(() => loadData());
   const [toast, setToast] = useState("");
 
-  const save = () => {
-    setToast(saveData(data) ? "Decor data saved" : "Could not save. Browser storage may be full; remove some images and try again.");
+  const saveSection = (updates) => {
+    setToast(saveDataSections(updates) ? "Section saved" : "Could not save. Browser storage may be full; remove some images and try again.");
     setTimeout(() => setToast(""), 3500);
   };
   const patch = (path, value) => setData((d) => ({ ...d, decor: { ...d.decor, [path]: value } }));
@@ -26,17 +34,16 @@ export default function DecorAdmin() {
   return (
     <>
       <div className="adm-between" style={{ marginBottom: 14 }}>
-        <p className="adm-hint" style={{ margin: 0 }}>Prices, MRP and images are all editable below.</p>
-        <button className="adm-btn" onClick={save}>Save decor</button>
+        <p className="adm-hint" style={{ margin: 0 }}>Save each section separately after editing. Prices, MRP and images are all editable below.</p>
       </div>
 
       <Tabs tabs={TABS} value={tab} onChange={setTab} />
 
-      {tab === "landing" && <Landing data={data} patch={patch} />}
-      {tab === "kits"    && <Kits    data={data} patch={patch} />}
-      {tab === "themes"  && <Themes  data={data} patch={patch} />}
-      {tab === "custom"  && <Custom  data={data} patch={patch} />}
-      {tab === "enquiry" && <EnquiryOpts data={data} patch={patch} />}
+      {tab === "landing" && <Landing data={data} patch={patch} saveSection={saveSection} />}
+      {tab === "kits"    && <Kits    data={data} patch={patch} saveSection={saveSection} />}
+      {tab === "themes"  && <Themes  data={data} patch={patch} saveSection={saveSection} />}
+      {tab === "custom"  && <Custom  data={data} patch={patch} saveSection={saveSection} />}
+      {tab === "enquiry" && <EnquiryOpts data={data} patch={patch} saveSection={saveSection} />}
 
       <Toast text={toast} />
     </>
@@ -59,10 +66,11 @@ function ImageSlots({ images = [], onChange }) {
 }
 
 /* ---------- landing cards ---------- */
-function Landing({ data, patch }) {
+function Landing({ data, patch, saveSection }) {
   const cards = data.decor.landing;
   return (
-    <Section title="Landing cards" sub="The 3 cards on the Decor landing page.">
+    <Section title="Landing cards" sub="The 3 cards on the Decor landing page."
+      right={<SaveSection path="decor.landing" value={cards} label="landing cards" onSave={saveSection} />}>
       <Repeater
         items={cards}
         onChange={(v) => patch("landing", v)}
@@ -93,7 +101,7 @@ function Landing({ data, patch }) {
 }
 
 /* ---------- KITS ---------- */
-function Kits({ data, patch }) {
+function Kits({ data, patch, saveSection }) {
   const cats = data.decor.kitCategories;
   const kits = data.decor.kits;
   const [filter, setFilter] = useState("all");
@@ -101,7 +109,8 @@ function Kits({ data, patch }) {
 
   return (
     <>
-      <Section title="Kit categories" sub="Filter tabs on the DIY kits listing page.">
+      <Section title="Kit categories" sub="Filter tabs on the DIY kits listing page."
+        right={<SaveSection path="decor.kitCategories" value={cats} label="kit categories" onSave={saveSection} />}>
         <TagsInput label="Categories" value={cats} onChange={(v) => patch("kitCategories", v)}
           placeholder="Add a category…"
           suggestions={["Haldi & Mehendi", "Birthdays & Milestones", "Baby Shower & Welcome", "Anniversary & Dates", "Festive & Pooja"]} />
@@ -109,11 +118,14 @@ function Kits({ data, patch }) {
 
       <Section title={`DIY Kits (${kits.length})`} sub="Selling price, MRP, images and shipping details."
         right={
-          <div className="adm-seg">
-            <button className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>All</button>
-            {cats.filter((c) => c !== "All Kits").map((c) => (
-              <button key={c} className={filter === c ? "on" : ""} onClick={() => setFilter(c)}>{c}</button>
-            ))}
+          <div className="adm-row">
+            <div className="adm-seg">
+              <button className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>All</button>
+              {cats.filter((c) => c !== "All Kits").map((c) => (
+                <button key={c} className={filter === c ? "on" : ""} onClick={() => setFilter(c)}>{c}</button>
+              ))}
+            </div>
+            <SaveSection path="decor.kits" value={kits} label="kits" onSave={saveSection} />
           </div>
         }>
         <Repeater
@@ -166,10 +178,11 @@ function Kits({ data, patch }) {
 }
 
 /* ---------- THEMES ---------- */
-function Themes({ data, patch }) {
+function Themes({ data, patch, saveSection }) {
   const themes = data.decor.themes;
   return (
-    <Section title={`Themes (${themes.length})`} sub="Professional setup by event artists. Only starting price is required.">
+    <Section title={`Themes (${themes.length})`} sub="Professional setup by event artists. Only starting price is required."
+      right={<SaveSection path="decor.themes" value={themes} label="themes" onSave={saveSection} />}>
       <Repeater
         items={themes}
         onChange={(v) => patch("themes", v)}
@@ -195,12 +208,20 @@ function Themes({ data, patch }) {
 }
 
 /* ---------- CUSTOM ---------- */
-function Custom({ data, patch }) {
+function Custom({ data, patch, saveSection }) {
   const c = data.decor.custom;
   const set = (v) => patch("custom", v);
   return (
     <>
-      <Section title="Custom decor — hero & price">
+      <Section title="Custom decor — hero & price"
+        right={<SaveSection
+          updates={[
+            { path: "decor.custom.title", value: c.title },
+            { path: "decor.custom.price", value: c.price },
+            { path: "decor.custom.hero", value: c.hero },
+            { path: "decor.custom.gallery", value: c.gallery || [] },
+          ]}
+          label="custom decor" onSave={saveSection} />}>
         <div className="adm-grid2">
           <Text label="Title" value={c.title} onChange={(v) => set({ ...c, title: v })} />
           <Num label="Starting price (₹)" value={c.price} onChange={(v) => set({ ...c, price: v })} />
@@ -219,7 +240,8 @@ function Custom({ data, patch }) {
         </F>
       </Section>
 
-      <Section title="About paragraphs">
+      <Section title="About paragraphs"
+        right={<SaveSection path="decor.custom.about" value={c.about || []} label="about paragraphs" onSave={saveSection} />}>
         <Repeater
           items={c.about || []}
           onChange={(v) => set({ ...c, about: v })}
@@ -229,11 +251,13 @@ function Custom({ data, patch }) {
         />
       </Section>
 
-      <Section title="Specialisations">
+      <Section title="Specialisations"
+        right={<SaveSection path="decor.custom.specialisations" value={c.specialisations || []} label="specialisations" onSave={saveSection} />}>
         <TagsInput label="" value={c.specialisations || []} onChange={(v) => set({ ...c, specialisations: v })} placeholder="Add a specialisation…" />
       </Section>
 
-      <Section title="Stats">
+      <Section title="Stats"
+        right={<SaveSection path="decor.custom.stats" value={c.stats || []} label="stats" onSave={saveSection} />}>
         <Repeater
           items={c.stats || []}
           onChange={(v) => set({ ...c, stats: v })}
@@ -253,13 +277,15 @@ function Custom({ data, patch }) {
 }
 
 /* ---------- ENQUIRY OPTIONS ---------- */
-function EnquiryOpts({ data, patch }) {
+function EnquiryOpts({ data, patch, saveSection }) {
   return (
     <>
-      <Section title="Occasions" sub="Options in the enquiry form's occasion dropdown.">
+      <Section title="Occasions" sub="Options in the enquiry form's occasion dropdown."
+        right={<SaveSection path="decor.occasions" value={data.decor.occasions} label="occasions" onSave={saveSection} />}>
         <TagsInput label="" value={data.decor.occasions} onChange={(v) => patch("occasions", v)} placeholder="Add an occasion…" />
       </Section>
-      <Section title="Budgets" sub="Options in the enquiry form's budget dropdown.">
+      <Section title="Budgets" sub="Options in the enquiry form's budget dropdown."
+        right={<SaveSection path="decor.budgets" value={data.decor.budgets} label="budgets" onSave={saveSection} />}>
         <TagsInput label="" value={data.decor.budgets} onChange={(v) => patch("budgets", v)} placeholder="e.g. ₹3L - ₹6L" />
       </Section>
     </>
