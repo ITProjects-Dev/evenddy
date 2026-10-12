@@ -59,7 +59,7 @@ function LandingTab({ data, patch, saveSection }) {
                 addLabel="Add service card"
                 itemTitle={(it) => it.title || "Untitled card"}
                 makeNew={() => ({
-                    id: uid("card"), title: "New service", eyebrow: "", icon: "box", tone: "gold",
+                    id: uid("card"), title: "New service", eyebrow: "", icon: "box",
                     image: "", price: "", paras: [""], chips: [], cta: "Explore",
                 })}
                 renderRow={(it, i, upd) => (
@@ -68,19 +68,7 @@ function LandingTab({ data, patch, saveSection }) {
                             <Text label="Title" value={it.title} onChange={(v) => upd({ ...it, title: v })} />
                             <Text label="Eyebrow / tagline" value={it.eyebrow} onChange={(v) => upd({ ...it, eyebrow: v })} />
                         </div>
-                        <div className="adm-grid3">
-                            <F label="Icon key">
-                                <select value={it.icon} onChange={(e) => upd({ ...it, icon: e.target.value })}>
-                                    {["box", "truck", "fork", "leaf", "grid", "swap", "people", "delivery", "dish", "menu", "chef", "calendar", "pin", "chat", "phone"].map((k) => <option key={k}>{k}</option>)}
-                                </select>
-                            </F>
-                            <F label="Tone">
-                                <select value={it.tone} onChange={(e) => upd({ ...it, tone: e.target.value })}>
-                                    {["gold", "maroon", "orange", "green"].map((k) => <option key={k}>{k}</option>)}
-                                </select>
-                            </F>
-                            <Text label="Price badge (optional)" value={it.price} onChange={(v) => upd({ ...it, price: v })} placeholder="Starting from ₹200 /plate" />
-                        </div>
+                        <Text label="Price badge (optional)" value={it.price} onChange={(v) => upd({ ...it, price: v })} placeholder="Starting from ₹200 /plate" />
                         <ImageUpload label="Card image" value={it.image} onChange={(v) => upd({ ...it, image: v })} />
                         <Text label="CTA button label" value={it.cta} onChange={(v) => upd({ ...it, cta: v })} />
 
@@ -97,21 +85,14 @@ function LandingTab({ data, patch, saveSection }) {
                             />
                         </F>
 
-                        <F label="Chips (icon + text)">
+                        <F label="Chips">
                             <Repeater
                                 items={it.chips || []}
                                 onChange={(v) => upd({ ...it, chips: v })}
                                 makeNew={() => ({ icon: "leaf", text: "" })}
                                 itemTitle={(c) => c.text || "Chip"}
-                                renderRow={(c, ci, cu) => (
-                                    <div className="adm-grid2">
-                                        <F label="Icon">
-                                            <select value={c.icon} onChange={(e) => cu({ ...c, icon: e.target.value })}>
-                                                {["leaf", "grid", "swap", "people", "delivery", "dish", "menu", "chef", "box", "truck", "fork"].map((k) => <option key={k}>{k}</option>)}
-                                            </select>
-                                        </F>
-                                        <Text label="Text" value={c.text} onChange={(v) => cu({ ...c, text: v })} />
-                                    </div>
+                                renderRow={(c, _ci, cu) => (
+                                    <Text label="Text" value={c.text} onChange={(v) => cu({ ...c, text: v })} />
                                 )}
                             />
                         </F>
@@ -168,7 +149,7 @@ function MealBoxTab({ data, patch, saveSection }) {
                 </div>
             </Section>
 
-            <Section num="3" title="Box item slots" sub="Each slot has one icon and a set of swappable options. The first N slots are shown for an N-item box."
+            <Section num="3" title="Box item slots" sub="Each slot has a set of swappable options. The first N slots are shown for an N-item box."
                 right={<SaveSection path="catering.mealBox.slots" value={mb.slots} label="item slots" onSave={saveSection} />}>
                 <Repeater
                     items={mb.slots}
@@ -176,14 +157,8 @@ function MealBoxTab({ data, patch, saveSection }) {
                     addLabel="Add slot"
                     itemTitle={(s, i) => `Slot ${i + 1} · ${s.options?.[0]?.n || "—"}`}
                     makeNew={() => ({ icon: "bowl", options: [{ n: "", v: true }] })}
-                    renderRow={(s, i, upd) => (
+                    renderRow={(s, i) => (
                         <>
-                            <F label="Slot icon">
-                                <select value={s.icon} onChange={(e) => upd({ ...s, icon: e.target.value })}>
-                                    {["bowl", "rice", "cup"].map((k) => <option key={k}>{k}</option>)}
-                                </select>
-                            </F>
-
                             <F label="Options (swappable items)">
                                 <Repeater
                                     items={s.options}

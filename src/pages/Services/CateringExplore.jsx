@@ -246,7 +246,6 @@ function Landing({ go, embedded }) {
     title: c.title,
     eyebrow: c.eyebrow,
     icon: c.icon,
-    tone: c.tone,
     image: c.image || FALLBACK[c.id] || FALLBACK.full,
     price: c.price,
     paras: c.paras || [],
@@ -256,9 +255,9 @@ function Landing({ go, embedded }) {
   }));
 
   const picks = [
-    ["box", "Meal Box", "Individual portions, perfect for structured meals.", "mealbox", "green"],
-    ["truck", "Delivery Box", "Bulk food delivered hot to your venue or home.", "delivery", "gold"],
-    ["fork", "Full Catering", "Complete service with custom menu and live counters.", "full", "orange"],
+    ["box", "Meal Box", "Individual portions, perfect for structured meals.", "mealbox"],
+    ["truck", "Delivery Box", "Bulk food delivered hot to your venue or home.", "delivery"],
+    ["fork", "Full Catering", "Complete service with custom menu and live counters.", "full"],
   ];
 
   return (
@@ -273,7 +272,7 @@ function Landing({ go, embedded }) {
 
         <div className="opts">
           {options.map((o) => (
-            <article key={o.id} className={cx("opt", `tone-${o.tone}`, o.flip && "flip")}>
+            <article key={o.id} className={cx("opt", o.flip && "flip")}>
               <div className="media" role="img" aria-label={o.title} style={{ backgroundImage: `url(${o.image})` }} />
               <div className="body">
                 <span className="tag"><Icon name={o.icon} size={15} />{o.eyebrow}</span>
@@ -293,8 +292,8 @@ function Landing({ go, embedded }) {
 
         <h2 className="choose">Choose the right catering experience</h2>
         <div className="three">
-          {picks.map(([ic, t, d, id, tone]) => (
-            <button key={id} className={cx("mini", `tone-${tone}`)} onClick={() => go(id)}>
+          {picks.map(([ic, t, d, id]) => (
+            <button key={id} className="mini" onClick={() => go(id)}>
               <span className="mi"><Icon name={ic} size={20} /></span>
               <h4>{t}</h4>
               <p>{d}</p>
