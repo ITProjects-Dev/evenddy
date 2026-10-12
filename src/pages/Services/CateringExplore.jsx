@@ -335,6 +335,8 @@ function MealBox({ go, embedded }) {
   const [touched, setTouched] = useState(false);
   const [size, setSize] = useState(0);
   const [picks, setPicks] = useState(() => MEALBOX_SLOTS.map(() => 0));
+  const [changeTarget, setChangeTarget] = useState(null);
+  const [pendingOption, setPendingOption] = useState(null);
   const [guests, setGuests] = useState(MIN_G);
   const [extra, setExtra] = useState({});
 
@@ -356,18 +358,46 @@ function MealBox({ go, embedded }) {
     return c;
   };
 
-  const cycle = (i) => {
-    const slot = MEALBOX_SLOTS[i];
-    if (!slot) return;
-    const o = slot.options || [];
-    const allowed = o.filter((x) => includeNonVeg || x.v);
-    if (!allowed.length) return;
-    const cur = current(i).n;
-    const idx = allowed.findIndex((x) => x.n === cur);
-    const next = allowed[(idx + 1) % allowed.length];
-    setPicks((p) => p.map((v, k) => (k === i ? o.findIndex((x) => x.n === next.n) : v)));
-    setTouched(true);
+  const availableOptions = (i) => (MEALBOX_SLOTS[i]?.options || [])
+    .map((item, index) => ({ item, index }))
+    .filter(({ item }) => includeNonVeg || item.v);
+
+  const openChange = (i) => {
+    const options = availableOptions(i);
+    if (!options.length) return;
+    const selected = options.find(({ item }) => item === current(i)) || options[0];
+    setChangeTarget(i);
+    setPendingOption(selected.index);
   };
+
+  const closeChange = () => {
+    setChangeTarget(null);
+    setPendingOption(null);
+  };
+
+  const confirmChange = () => {
+    if (changeTarget === null || pendingOption === null) return;
+    setPicks((previous) => previous.map((value, index) => index === changeTarget ? pendingOption : value));
+    setTouched(true);
+    closeChange();
+  };
+
+  useEffect(() => {
+    if (changeTarget === null) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setChangeTarget(null);
+        setPendingOption(null);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [changeTarget]);
 
   const toggle = (m) => {
     setTouched(true);
@@ -429,7 +459,7 @@ function MealBox({ go, embedded }) {
                       <span role="img" aria-label={c.v ? "Veg" : "Non-veg"} className={cx("vdot", !c.v && "nv")} />
                       <div className="ic"><Icon name={s.icon} size={18} /></div>
                       <span className="n">{c.n}</span>
-                      <button className="link" onClick={() => cycle(i)}><Icon name="swap" size={13} />Change</button>
+                      <button className="link" onClick={() => openChange(i)}><Icon name="swap" size={13} />Change</button>
                     </div>
                   );
                 })}
@@ -479,6 +509,65 @@ function MealBox({ go, embedded }) {
           showDelivery={false}
         />
       </div>
+
+      {changeTarget !== null && (
+        <div className="item-change-backdrop" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) closeChange();
+        }}>
+          <section className="item-change-dialog" role="dialog" aria-modal="true" aria-labelledby="item-change-title">
+            <header className="item-change-header">
+              <div>
+                <h3 id="item-change-title">Change Item</h3>
+                <p>Replacing {current(changeTarget).n}</p>
+              </div>
+              <button className="item-change-close" type="button" onClick={closeChange} aria-label="Close item selector">×</button>
+            </header>
+            <div className="item-change-body">
+              <p className="item-change-hint">ⓘ Choose an alternative item for your Meal Box.</p>
+              {availableOptions(changeTarget).length ? (
+                <div className="item-change-options" role="radiogroup" aria-label="Available meal choices">
+                  {availableOptions(changeTarget).map(({ item, index }) => {
+                    const selected = pendingOption === index;
+                    const isCurrent = current(changeTarget) === item;
+                    return (
+                      <button
+                        key={`${item.n}-${index}`}
+                        type="button"
+                        className={`item-change-option${selected ? " selected" : ""}`}
+                        role="radio"
+                        aria-checked={selected}
+                        onClick={() => setPendingOption(index)}
+                      >
+                        <span className={`vdot${item.v ? "" : " nv"}`} aria-hidden="true" />
+                        <span className="item-change-copy">
+                          <span className="item-change-name">{item.n}</span>
+                          {isCurrent && <small className="item-change-current">Current selection</small>}
+                        </span>
+                        {selected
+                          ? <span className="item-change-selected" aria-hidden="true">✓</span>
+                          : ""}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="item-change-empty">No alternative items are available for this category.</p>
+              )}
+            </div>
+            <footer className="item-change-actions">
+              <button type="button" className="item-change-cancel" onClick={closeChange}>Cancel</button>
+              <button
+                type="button"
+                className="item-change-confirm"
+                disabled={pendingOption === null}
+                onClick={confirmChange}
+              >
+                Confirm Change
+              </button>
+            </footer>
+          </section>
+        </div>
+      )}
     </div>
   );
 }
