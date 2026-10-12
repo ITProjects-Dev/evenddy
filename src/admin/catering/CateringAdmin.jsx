@@ -59,7 +59,7 @@ function LandingTab({ data, patch, saveSection }) {
                 addLabel="Add service card"
                 itemTitle={(it) => it.title || "Untitled card"}
                 makeNew={() => ({
-                    id: uid("card"), title: "New service", eyebrow: "", icon: "box",
+                    id: uid("card"), title: "New service", eyebrow: "",
                     image: "", price: "", paras: [""], chips: [], cta: "Explore",
                 })}
                 renderRow={(it, i, upd) => (
@@ -89,7 +89,7 @@ function LandingTab({ data, patch, saveSection }) {
                             <Repeater
                                 items={it.chips || []}
                                 onChange={(v) => upd({ ...it, chips: v })}
-                                makeNew={() => ({ icon: "leaf", text: "" })}
+                                makeNew={() => ({ text: "" })}
                                 itemTitle={(c) => c.text || "Chip"}
                                 renderRow={(c, _ci, cu) => (
                                     <Text label="Text" value={c.text} onChange={(v) => cu({ ...c, text: v })} />
@@ -156,7 +156,7 @@ function MealBoxTab({ data, patch, saveSection }) {
                     onChange={(v) => setMB({ ...mb, slots: v })}
                     addLabel="Add slot"
                     itemTitle={(s, i) => `Slot ${i + 1} · ${s.options?.[0]?.n || "—"}`}
-                    makeNew={() => ({ icon: "bowl", options: [{ n: "", v: true }] })}
+                    makeNew={() => ({ options: [{ n: "", v: true }] })}
                     renderRow={(s, i) => (
                         <>
                             <F label="Options (swappable items)">
