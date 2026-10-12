@@ -1,16 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import "./Decor.css";
 
-/* Decor explore flow (single file, like CateringExplore).
+/* Decor explore flow (single file, like CateringExplore), styled with Tailwind only.
+   You can delete Decor.css and its import. Font comes from your global Sora setup.
    Rendered by ServiceDetails when the slug contains "decor".
-   Pages: landing → DIY kits → kit detail → request form | themes → theme detail (form) | custom decor. */
+   Pages: landing → DIY kits → kit detail → request form | themes → theme detail (form) | custom decor.
+
+   NOTE: your global CSS has unlayered rules (a{color:inherit}, button{border:0},
+   h1,h2{font-weight/letter-spacing}, h1-h4,p{margin-top:0}). They beat Tailwind v4 utilities, so:
+   - I use the "!" suffix where needed (text-white!, font-normal!, tracking-[-.02em]!)
+   - button outlines use inset box-shadows instead of borders
+   - top spacing on headings/paragraphs uses padding, not margin. Keep these as they are. */
 
 /* ======================================================
    BUILT-IN IMAGES (no files needed)
-   Each image is an illustrated SVG generated in code and used as a data URI.
-   To use real photos, replace any entry in PHOTOS below with your own URL
-   or import, e.g.  diy: "https://your-cdn.com/diy.jpg"
+   Illustrated SVGs generated in code are kept ONLY as a fallback.
+   The page loads real photos from /images/decor/ first (see PHOTOS below).
 ====================================================== */
 const PAL = {
   diy:               ["#fde7d8", "#f6c9b5", "#d4005f", "#f4a259", "balloons"],
@@ -152,7 +157,19 @@ function art(key, v = 0) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><defs>${defs}</defs>${s}</svg>`;
   return (artCache[ck] = "data:image/svg+xml;utf8," + encodeURIComponent(svg));
 }
-const set5 = (key) => [0, 1, 2, 3, 4].map((v) => art(key, v));
+/* Real photos live in  public/images/decor/  (served at /images/decor/...).
+   If a photo file is missing or fails to load, the illustrated SVG above is shown instead,
+   so nothing ever looks broken while you add images one by one.
+   To use a CDN instead of local files, change IMG_BASE to e.g. "https://your-cdn.com/decor/". */
+const IMG_BASE = "/images/decor/";
+const FALLBACK = {}; // photo url → () => illustrated fallback (generated lazily, only if needed)
+const photo = (file, key, v = 0) => {
+  const url = IMG_BASE + file;
+  FALLBACK[url] = () => art(key, v);
+  return url;
+};
+// 5 photos per kit / theme: <slug>-1.jpg … <slug>-5.jpg  (the first one is the card cover)
+const set5 = (key) => [1, 2, 3, 4, 5].map((n, i) => photo(`${key}-${n}.jpg`, key, i));
 
 /* ======================================================
    PHOTOS: replace any entry with your own image URL / import.
@@ -160,9 +177,9 @@ const set5 = (key) => [0, 1, 2, 3, 4].map((v) => art(key, v));
    Kits / themes: up to 5 photos each, the first one is the card cover.
 ====================================================== */
 const PHOTOS = {
-  diy: art("diy", 0),                                  // landing card: DIY Decoration
-  themes: [art("t1", 0), art("t2", 0), art("t3", 0)],  // landing card: Theme collage (1 large + 2 small)
-  custom: art("custom", 0),                            // landing card: Customized Decoration
+  diy: photo("diy.jpg", "diy"),                                                  // landing card: DIY Decoration
+  themes: [photo("themes-1.jpg", "t1"), photo("themes-2.jpg", "t2"), photo("themes-3.jpg", "t3")], // landing card: collage (1 large + 2 small)
+  custom: photo("custom.jpg", "custom"),                                          // landing card: Customized Decoration
   kits: {
     "marigold-haldi": set5("marigold-haldi"),
     "boho-pampas": set5("boho-pampas"),
@@ -177,12 +194,13 @@ const PHOTOS = {
     "pastel-baby": set5("pastel-baby"),
     "ivory-reception": set5("ivory-reception"),
   },
-  customHero: art("custom", 1),
-  customGallery: [art("custom", 2), art("custom", 3), art("custom", 4), art("custom", 0)], // 4 photos
+  customHero: photo("custom-hero.jpg", "custom", 1),
+  customGallery: [1, 2, 3, 4].map((n) => photo(`custom-gallery-${n}.jpg`, "custom", n + 1)), // 4 photos
 };
 
 const inr = (n) => "₹" + n.toLocaleString("en-IN");
 const five = (a = []) => Array.from({ length: Math.max(5, a.length) }, (_, i) => a[i] || "");
+const cx = (...a) => a.filter(Boolean).join(" ");
 
 const WHATSAPP_NUMBER = "+91 9XXXX XXXXX"; // country code + number, no "+"
 const waLink = (text) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
@@ -221,9 +239,9 @@ const KITS = [
     title: "Traditional Lotus Urli Pooja & Housewarming",
     desc: "14-inch heavy spun polished brass urli bowl, 12 floating metal diya cups, banana leaf printed backdrop and toran set.",
     images: PHOTOS.kits["lotus-urli"] },
-  { id: "neon-party", cat: "Birthdays & Milestones", tag: "Heritage & Devotion", price: 6299, mrp: 9400, popularity: 85, weight: "7 kg Total Box", footprint: "Fits 6x8 ft",
+  { id: "neon-party", cat: "Birthdays & Milestones", tag: "Bold & Playful", price: 6299, mrp: 9400, popularity: 85, weight: "7 kg Total Box", footprint: "Fits 6x8 ft",
     title: "Neon Glow Retro Party Kit",
-    desc: "14-inch heavy spun polished brass urli bowl, 12 floating metal diya cups, banana leaf printed backdrop and toran set.",
+    desc: "Black foil fringe curtain, neon-style party sign, metallic disco balls, balloon clusters and a cake-table runner.",
     images: PHOTOS.kits["neon-party"] },
 ];
 
@@ -252,11 +270,40 @@ const CUSTOM = {
   specialisations: ["Monolithic Mandap Architecture", "Sun-kissed Bohemian Haldi & Mehendi", "High-Octane Concert Sangeet Trussing", "Curated Banquet Tablescapes", "Intelligent Kinetic Lighting", "Heritage Palace Restoration Styling"],
   stats: [{ n: "120+", l: "Grand Events Styled", s: "Across 14 luxury destination cities" }, { n: "12+", l: "Years of operation", s: "" }],
 };
-const rich = (t) => t.split("**").map((x, i) => (i % 2 ? <b key={i}>{x}</b> : x));
+
+/* ---------- Reviews (replace with data from your backend) ---------- */
+const REVIEW_SUMMARY = {
+  rating: 4.9,
+  total: 184,
+  // star → number of reviews (sums to total)
+  dist: { 5: 168, 4: 13, 3: 2, 2: 1, 1: 0 },
+};
+const REVIEWS = [
+  { id: 1, name: "Radhika Roy", event: "Wedding • Vizag", date: "Sep 2026", rating: 5,
+    text: "The mandap looked exactly like the 3D render. The team was set up two hours before the first guest arrived and every detail was spot on." },
+  { id: 2, name: "Sandeep Varma", event: "Sangeet • Hyderabad", date: "Aug 2026", rating: 5,
+    text: "Lighting and truss work for our sangeet were outstanding. Very responsive team, and they handled last-minute changes calmly." },
+  { id: 3, name: "Anitha Reddy", event: "Haldi • Vijayawada", date: "Jul 2026", rating: 4,
+    text: "Beautiful marigold setup and very professional crew. Takedown took slightly longer than planned, but the decor itself was lovely." },
+];
+
+const rich = (t) => t.split("**").map((x, i) => (i % 2 ? <b key={i} className="font-semibold text-[#1a1516]">{x}</b> : x));
 const OCCASIONS = ["Wedding", "Engagement", "Reception", "Sangeet / Mehendi", "Haldi", "Birthday", "Baby Shower", "Corporate Event", "Other"];
 const BUDGETS = ["₹1L - ₹3L", "₹3L - ₹6L", "₹6L - ₹10L", "₹10L+"];
 // first 3 digits of a pincode → city (used in the delivery check message)
 const PIN_CITY = { "400": "Mumbai", "110": "Delhi", "560": "Bengaluru", "500": "Hyderabad", "530": "Visakhapatnam", "520": "Vijayawada", "600": "Chennai", "700": "Kolkata", "411": "Pune" };
+
+/* ======================================================
+   SHARED CLASS STRINGS
+====================================================== */
+const WRAP = "mx-auto w-full max-w-[1040px] px-6";
+const CARD_SHADOW = "shadow-[0_4px_18px_rgba(60,20,30,.07)]";
+const EYEBROW_SM = "block text-[10px] font-semibold uppercase tracking-[.1em] text-[#7a3b18]";
+const H2 = "mb-3.5 pt-1 text-[21px] font-semibold! tracking-[-.01em]! text-[#750a3d]";
+const BTN_BLOCK = "flex w-full items-center justify-center gap-2 rounded-full bg-[#750a3d] py-3.5 text-[13px] font-semibold text-white transition hover:brightness-110";
+const WA_BTN = "mt-2.5 flex items-center justify-center gap-2 rounded-full border border-[#a7e8bd] bg-[#effcf3] p-[13px] text-[13px] font-semibold text-[#1f9d55]!";
+const FIELD = "w-full rounded-lg border border-[#f1ddd2] bg-[#fbeee8] px-3 py-[11px] text-[11.5px] text-[#1a1516] placeholder:text-[#8f8487] focus:border-[#750a3d] focus:outline-none";
+const TITLE_FIXED = "tracking-[-.01em]!";
 
 /* ======================================================
    SMALL SHARED PIECES: icons, photo with placeholder
@@ -280,23 +327,49 @@ const ICONS = {
   bolt: <path d="M13 2L4 14h7l-1 8 9-12h-7z" />,
   edit: <><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></>,
   search: <><circle cx="11" cy="11" r="6" /><path d="M20 20l-4.5-4.5" /></>,
+  chevron: <path d="M6 9l6 6 6-6" />,
 };
 function Icon({ name, size = 14 }) {
   const filled = name === "wa"; // brand glyph is a solid shape, not an outline
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke={filled ? "none" : "currentColor"} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="dc-ic">
+    <svg className="shrink-0" width={size} height={size} viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke={filled ? "none" : "currentColor"} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       {ICONS[name]}
     </svg>
   );
 }
 
-// Photo with a soft placeholder when the URL is empty or fails to load
+// Real photo → (if it fails) illustrated fallback → (if that fails) soft placeholder. Always fills its parent.
 function Pic({ src, alt = "" }) {
+  const [cur, setCur] = useState(src);
   const [bad, setBad] = useState(!src);
-  useEffect(() => setBad(!src), [src]);
+  useEffect(() => { setCur(src); setBad(!src); }, [src]);
+  const onError = () => {
+    const fb = FALLBACK[cur]?.();
+    if (fb && fb !== cur) setCur(fb);
+    else setBad(true);
+  };
   return bad
-    ? <div className="dc-ph" role="img" aria-label={alt || "Photo placeholder"} />
-    : <img src={src} alt={alt} loading="lazy" onError={() => setBad(true)} />;
+    ? <div className="size-full bg-gradient-to-br from-[#f6e4da] to-[#efd3c7]" role="img" aria-label={alt || "Photo placeholder"} />
+    : <img className="size-full object-cover" src={cur} alt={alt} loading="lazy" decoding="async" onError={onError} />;
+}
+
+// Select with a chevron (native arrow removed so it looks the same everywhere)
+function SelectBox({ className, children, ...p }) {
+  return (
+    <div className="relative">
+      <select className={cx("appearance-none pr-8", className)} {...p}>{children}</select>
+      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#6f6366]"><Icon name="chevron" size={11} /></span>
+    </div>
+  );
+}
+
+// Row of 5 text stars (filled up to `value`)
+function Stars({ value, size = 13 }) {
+  return (
+    <span className="inline-flex tracking-[1px] text-[#8a5a1f]" style={{ fontSize: size }} role="img" aria-label={`${value} out of 5 stars`}>
+      {[1, 2, 3, 4, 5].map((n) => <span key={n} aria-hidden="true" className={n <= value ? "" : "opacity-25"}>★</span>)}
+    </span>
+  );
 }
 
 /* ======================================================
@@ -311,8 +384,8 @@ function Modal({ label, onClose, children }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
   return (
-    <div className="dc-overlay" onClick={onClose}>
-      <div className="dc-modal" role="dialog" aria-modal="true" aria-label={label} tabIndex={-1} ref={ref} onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[1000] grid place-items-center overflow-auto bg-[rgba(20,10,14,.55)] p-5 backdrop-blur-[3px]" onClick={onClose}>
+      <div className="max-h-[92vh] w-full max-w-[420px] overflow-auto rounded-[18px] bg-white p-7 text-center outline-none" role="dialog" aria-modal="true" aria-label={label} tabIndex={-1} ref={ref} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
     </div>
@@ -322,21 +395,21 @@ function Modal({ label, onClose, children }) {
 function SuccessModal({ onClose }) {
   return (
     <Modal label="Quote request submitted" onClose={onClose}>
-      <div className="dc-success-icon" aria-hidden="true">✓</div>
-      <h3>Quote Request Submitted Successfully!</h3>
-      <p>Thank you for choosing <b>Evenddy</b>. We've received your request and our team will review your requirements.</p>
-      <p>Our team will get in touch with you shortly to discuss your requirements and provide the quote.</p>
-      <button className="dc-btn dc-btn-block" onClick={onClose}>Continue Browsing →</button>
+      <div className="mx-auto mb-3.5 grid size-[54px] place-items-center rounded-full text-2xl text-[#750a3d] shadow-[inset_0_0_0_2px_#750a3d]" aria-hidden="true">✓</div>
+      <h3 className="mb-2.5 text-xl font-semibold">Quote Request Submitted Successfully!</h3>
+      <p className="mb-2.5 text-xs leading-relaxed text-[#6b6567]">Thank you for choosing <b>Evenddy</b>. We've received your request and our team will review your requirements.</p>
+      <p className="mb-2.5 text-xs leading-relaxed text-[#6b6567]">Our team will get in touch with you shortly to discuss your requirements and provide the quote.</p>
+      <button className={cx(BTN_BLOCK, "mt-2")} onClick={onClose}>Continue Browsing →</button>
     </Modal>
   );
 }
 
 // Defined outside the form so inputs keep focus while typing.
 const Field = ({ id, label, error, children }) => (
-  <div className="dc-field">
-    <label htmlFor={`dc-${id}`}>{label}</label>
+  <div className="mb-3">
+    <label htmlFor={`dc-${id}`} className="mb-1.5 block text-[10.5px] font-semibold text-[#1a1516]">{label}</label>
     {children}
-    {error && <small className="dc-error" role="alert">{error}</small>}
+    {error && <small className="block pt-[3px] text-[11px] text-[#c0262d]" role="alert">{error}</small>}
   </div>
 );
 
@@ -344,6 +417,7 @@ function EnquiryForm({ variant = "theme", subject = "", onSuccess }) {
   const [f, setF] = useState({ name: "", phone: "", email: "", date: "", occasion: "", budget: BUDGETS[1], city: "" });
   const [err, setErr] = useState({});
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const row = "grid grid-cols-1 gap-x-3 min-[600px]:grid-cols-2";
 
   const submit = (e) => {
     e.preventDefault();
@@ -360,64 +434,69 @@ function EnquiryForm({ variant = "theme", subject = "", onSuccess }) {
   };
 
   return (
-    <form className="dc-form" onSubmit={submit} noValidate>
-      <div className="dc-notice">
-        <span className="dc-notice-ic"><Icon name="lock" size={14} /></span>
-        <div><b>Zero Login Friction</b><span>Enquire immediately as guest. We respect privacy.</span></div>
+    <form onSubmit={submit} noValidate>
+      {/* compact notice (icon + two lines) */}
+      <div className="mb-4 flex items-center gap-2.5 rounded-[10px] border border-[#f3d6b8] bg-[#fff1e3] px-3 py-2.5 text-[10.5px] leading-snug">
+        <span className="text-[#9a4a1e]"><Icon name="lock" size={16} /></span>
+        <div>
+          <b className="block font-semibold text-[#9a4a1e]">Zero Login Friction</b>
+          <span className="text-[#6b6567]">Enquire immediately as guest. We respect privacy.</span>
+        </div>
       </div>
 
-      <div className="dc-row">
+      <div className={row}>
         <Field id="name" label="Full Name *" error={err.name}>
-          <input id="dc-name" value={f.name} onChange={set("name")} placeholder="e.g. Radhika Roy" autoComplete="name" />
+          <input id="dc-name" className={FIELD} value={f.name} onChange={set("name")} placeholder="e.g. Radhika Roy" autoComplete="name" />
         </Field>
         <Field id="phone" label="Phone / WhatsApp *" error={err.phone}>
-          <div className="dc-phone"><span>+91</span>
-            <input id="dc-phone" value={f.phone} onChange={set("phone")} placeholder="Enter phone number" inputMode="numeric" maxLength={10} autoComplete="tel-national" />
+          <div className="flex items-center gap-2 rounded-lg border border-[#f1ddd2] bg-[#fbeee8] pl-3 text-[11.5px] focus-within:border-[#750a3d]">
+            <span>+91</span>
+            <input id="dc-phone" className="w-full bg-transparent py-[11px] pr-3 text-[11.5px] placeholder:text-[#8f8487] focus:outline-none" value={f.phone} onChange={set("phone")} placeholder="Enter phone number" inputMode="numeric" maxLength={10} autoComplete="tel-national" />
           </div>
         </Field>
       </div>
 
-      <div className="dc-row">
+      <div className={row}>
         <Field id="email" label="Email (Optional)">
-          <input id="dc-email" type="email" value={f.email} onChange={set("email")} placeholder="name@domain.com" autoComplete="email" />
+          <input id="dc-email" className={FIELD} type="email" value={f.email} onChange={set("email")} placeholder="name@domain.com" autoComplete="email" />
         </Field>
         <Field id="date" label="Event Date *" error={err.date}>
-          <input id="dc-date" type="date" value={f.date} onChange={set("date")} />
+          <input id="dc-date" className={FIELD} type="date" value={f.date} onChange={set("date")} />
         </Field>
       </div>
 
       {variant === "custom" && (
         <Field id="occasion" label="Select Occasion Type" error={err.occasion}>
-          <select id="dc-occasion" value={f.occasion} onChange={set("occasion")}>
+          <SelectBox id="dc-occasion" className={FIELD} value={f.occasion} onChange={set("occasion")}>
             <option value="">Select occasion/event</option>
             {OCCASIONS.map((o) => <option key={o}>{o}</option>)}
-          </select>
+          </SelectBox>
         </Field>
       )}
 
-      <div className={variant === "custom" ? "dc-row" : ""}>
+      <div className={variant === "custom" ? row : ""}>
         {variant === "custom" && (
           <Field id="budget" label="Estimated Decor Budget">
-            <select id="dc-budget" value={f.budget} onChange={set("budget")}>
+            <SelectBox id="dc-budget" className={FIELD} value={f.budget} onChange={set("budget")}>
               {BUDGETS.map((b) => <option key={b}>{b}</option>)}
-            </select>
+            </SelectBox>
           </Field>
         )}
         <Field id="city" label="Venue / City">
-          <input id="dc-city" value={f.city} onChange={set("city")} placeholder="e.g. Vizag" autoComplete="address-level2" />
+          <input id="dc-city" className={FIELD} value={f.city} onChange={set("city")} placeholder="e.g. Vizag" autoComplete="address-level2" />
         </Field>
       </div>
 
-      <button type="submit" className="dc-btn dc-btn-block dc-btn-icon">Send Enquiry <Icon name="send" size={16} /></button>
-      <a className="dc-wa" target="_blank" rel="noreferrer"
+      <button type="submit" className={BTN_BLOCK}>Send Enquiry <Icon name="send" size={16} /></button>
+      <a className={WA_BTN} target="_blank" rel="noreferrer"
          href={waLink(`Hi Evenddy, I'd like a decor quote${subject ? ` for: ${subject}` : ""}.${f.name ? ` Name: ${f.name}.` : ""}`)}>
-        <Icon name="wa" size={20} />Chat Directly on WhatsApp
+        <span className="text-[#25d366]"><Icon name="wa" size={20} /></span>Chat Directly on WhatsApp
       </a>
 
-      <ul className="dc-trust">
-        <li><Icon name="shieldcheck" size={13} />Zero Commission • Direct Studio Relationship</li>
-        <li><Icon name="clock" size={13} />Guaranteed Response within 15 mins during 9am–10pm</li>
-        <li><Icon name="shield" size={13} />No Spam Guarantee • Your details are never sold to vendors</li>
+      <ul className="mt-[18px] grid gap-2.5 border-t border-[#eadfd8] pt-4 text-[10.5px] text-[#6b6567]">
+        {[["shieldcheck", "Zero Commission • Direct Studio Relationship"], ["clock", "Guaranteed Response within 15 mins during 9am–10pm"], ["shield", "No Spam Guarantee • Your details are never sold to vendors"]].map(([ic, t]) => (
+          <li key={t} className="flex items-center gap-2"><span className="text-[#7a3b18]"><Icon name={ic} size={13} /></span>{t}</li>
+        ))}
       </ul>
     </form>
   );
@@ -428,23 +507,25 @@ function EnquiryForm({ variant = "theme", subject = "", onSuccess }) {
 ====================================================== */
 function DecorLanding({ types, go }) {
   return (
-    <section className="dc-landing">
-      <h1 className="dc-title">Our Decor Service</h1>
-      <p className="dc-sub">Everything you need to create the perfect celebration, meticulously organized and beautifully presented.</p>
-      <div className="dc-grid3">
+    <section className="pb-2 pt-3.5 text-center">
+      <h1 className="mb-3.5 text-[clamp(32px,5vw,40px)] font-bold! leading-[1.15] tracking-[-.02em]! text-[#750a3d]">Our Decor Service</h1>
+      <p className="mx-auto mb-11 max-w-[440px] text-[14.5px] font-medium leading-[1.65] text-[#555]">Everything you need to create the perfect celebration, meticulously organized and beautifully presented.</p>
+      <div className="mx-auto grid max-w-[880px] grid-cols-1 gap-[22px] text-left min-[600px]:grid-cols-2 min-[900px]:grid-cols-3">
         {types.map((t) => (
-          <article key={t.page} className="dc-type-card">
+          <article key={t.page} className="flex flex-col overflow-hidden rounded-[22px] bg-white shadow-[0_8px_28px_rgba(60,20,30,.08)]">
             {t.collage ? (
-              <div className="dc-collage" role="img" aria-label={t.title}>
-                {[0, 1, 2].map((i) => <Pic key={i} src={t.collage[i]} />)}
+              <div className="grid h-[208px] grid-cols-[1.45fr_1fr] grid-rows-2 gap-[3px] bg-white" role="img" aria-label={t.title}>
+                {[0, 1, 2].map((i) => <div key={i} className={cx("overflow-hidden", i === 0 && "row-span-2")}><Pic src={t.collage[i]} /></div>)}
               </div>
             ) : (
-              <div className="dc-type-media"><Pic src={t.image} alt={t.title} /></div>
+              <div className="h-[208px] overflow-hidden"><Pic src={t.image} alt={t.title} /></div>
             )}
-            <div className="dc-type-body">
-              <h2>{t.title}</h2>
-              <p>{t.text}</p>
-              <button className="dc-link" onClick={() => go(t.page)}>{t.cta} <span aria-hidden="true">→</span></button>
+            <div className="flex flex-1 flex-col px-[22px] pb-6 pt-[22px]">
+              <h2 className="mb-2.5 text-[17px] font-bold! tracking-[-.01em]! text-[#1a1516]">{t.title}</h2>
+              <p className="mb-[18px] flex-1 border-b border-[#eee7e2] pb-[18px] text-[11.5px] leading-[1.7] text-[#6b6567]">{t.text}</p>
+              <button className="group self-start text-xs font-semibold text-[#750a3d]" onClick={() => go(t.page)}>
+                {t.cta} <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transition-none" aria-hidden="true">→</span>
+              </button>
             </div>
           </article>
         ))}
@@ -477,55 +558,67 @@ function DecorListing({ mode, go }) {
 
   return (
     <section>
-      <p className="dc-eyebrow">{isKits ? "Buy & keep forever • No returns needed" : "Professional setup by our event artists"}</p>
-      <h1 className="dc-h1">
-        {isKits ? <><span>Curated DIY Event Kits</span> for Sale.</> : <><span>Curated Decoration Themes</span> by Evenddy.</>}
+      <p className="mb-2 text-[9.5px] font-bold uppercase tracking-[.12em] text-[#1a1516]">{isKits ? "Buy & keep forever • No returns needed" : "Professional setup by our event artists"}</p>
+      <h1 className="mb-3 text-[clamp(28px,4.4vw,36px)] font-normal! leading-[1.15] tracking-[-.02em]! text-[#1a1516]">
+        {isKits ? <><span className="text-[#750a3d]">Curated DIY Event Kits</span> for Sale.</> : <><span className="text-[#750a3d]">Curated Decoration Themes</span> by Evenddy.</>}
       </h1>
-      <p className="dc-lead">
+      <p className="mb-6 max-w-[620px] text-[12.5px] leading-[1.7] text-[#4b4547]">
         {isKits
           ? "All-in-one celebration boxes delivered straight to your doorstep. Complete with everything you need to style your event like an editorial designer — 100% yours to keep, repurpose, or gift."
           : "Pick a theme, personalise the details and let our event artists handle the setup, styling and takedown."}
       </p>
 
-      <div className="dc-filter">
-        <div className="dc-filter-top">
-          <label className="dc-search">
+      <div className="mb-[26px] rounded-2xl bg-[#fbeee8] p-4">
+        <div className={cx("flex flex-col gap-3.5 min-[600px]:flex-row min-[600px]:items-center", isKits && "mb-3")}>
+          <label className="flex flex-1 items-center gap-2 rounded-[10px] bg-white px-3 text-[#4b4547]">
             <Icon name="search" size={14} />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={isKits ? "Search components, props or themes..." : "Search themes..."} aria-label="Search" />
+            <input className="flex-1 bg-transparent py-[11px] text-xs focus:outline-none" value={q} onChange={(e) => setQ(e.target.value)} placeholder={isKits ? "Search components, props or themes..." : "Search themes..."} aria-label="Search" />
           </label>
           {isKits && (
-            <label className="dc-sort">Sort by:
-              <select value={sort} onChange={(e) => setSort(e.target.value)}>
+            <label className="flex items-center gap-2 text-[11px] text-[#6b6567]">Sort by:
+              <SelectBox className="rounded-full bg-white py-[9px] pl-3.5 text-[11px] font-semibold text-[#1a1516] focus:outline-none" value={sort} onChange={(e) => setSort(e.target.value)}>
                 <option value="popularity">popularity</option>
                 <option value="low">price: low to high</option>
                 <option value="high">price: high to low</option>
-              </select>
+              </SelectBox>
             </label>
           )}
         </div>
         {isKits && (
-          <div className="dc-chips" role="tablist" aria-label="Kit categories">
+          <div className="flex flex-wrap gap-2" role="tablist" aria-label="Kit categories">
             {KIT_CATEGORIES.map((c) => (
-              <button key={c} role="tab" aria-selected={cat === c} className={`dc-chip ${cat === c ? "on" : ""}`} onClick={() => setCat(c)}>{c}</button>
+              <button
+                key={c}
+                role="tab"
+                aria-selected={cat === c}
+                onClick={() => setCat(c)}
+                className={cx("rounded-full px-[15px] py-[7px] text-[11px]", cat === c ? "bg-[#750a3d] font-semibold text-white" : "bg-white font-medium text-[#1a1516] shadow-[inset_0_0_0_1px_#ecdcd3]")}
+              >
+                {c}
+              </button>
             ))}
           </div>
         )}
       </div>
 
       {items.length === 0 ? (
-        <p className="dc-empty">Nothing matches your search. Try a different word or category.</p>
+        <p className="py-10 text-center text-[#6b6567]">Nothing matches your search. Try a different word or category.</p>
       ) : (
-        <div className="dc-grid3 dc-list">
+        <div className="grid grid-cols-1 gap-[22px] min-[600px]:grid-cols-2 min-[900px]:grid-cols-3">
           {items.map((x) => (
-            <button key={x.id} className="dc-card" onClick={() => go(isKits ? "kit" : "theme", x.id)}>
-              <div className="dc-card-img">
+            <button
+              key={x.id}
+              onClick={() => go(isKits ? "kit" : "theme", x.id)}
+              className="flex w-full flex-col items-stretch justify-start overflow-hidden rounded-[14px] bg-white p-0 text-left shadow-[0_4px_16px_rgba(60,20,30,.06)] transition hover:-translate-y-[3px] hover:shadow-[0_10px_26px_rgba(60,20,30,.12)] motion-reduce:transition-none"
+            >
+              <div className="relative aspect-[4/3] shrink-0 overflow-hidden">
                 <Pic src={x.images[0]} alt={x.title} />
-                <span className="dc-pill">{isKits ? `Own for ${inr(x.price)}` : `From ${inr(x.startsAt)}`}</span>
+                <span className="absolute right-2.5 top-2.5 rounded-full bg-white px-2.5 py-[5px] text-[9.5px] font-bold text-[#750a3d]">{isKits ? `Own for ${inr(x.price)}` : `From ${inr(x.startsAt)}`}</span>
               </div>
-              <div className="dc-card-body">
-                <small className="dc-tag">{x.tag}</small>
-                <h3>{x.title}</h3>
-                <p>{x.desc}</p>
+              <div className="px-[18px] pb-5 pt-4">
+                <small className="mb-2 block text-[8.5px] font-bold uppercase tracking-[.1em] text-[#7a3b18]">{x.tag}</small>
+                <h3 className="mb-2 text-[15px] font-medium leading-[1.3] text-[#750a3d]">{x.title}</h3>
+                <p className="mb-0 line-clamp-2 text-[11px] leading-[1.6] text-[#5b5557]">{x.desc}</p>
               </div>
             </button>
           ))}
@@ -534,6 +627,37 @@ function DecorListing({ mode, go }) {
     </section>
   );
 }
+
+/* ======================================================
+   Gallery with thumbnails (kit detail + request form)
+====================================================== */
+function Gallery({ title, images, active, setActive, children }) {
+  return (
+    <div className="min-w-0">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-[14px] shadow-[0_4px_18px_rgba(60,20,30,.1)]">
+        <Pic src={images[active]} alt={`${title} view ${active + 1}`} />
+        {children}
+      </div>
+      <div className="mt-2.5 grid grid-cols-5 gap-2">
+        {images.map((src, i) => (
+          <button key={i} className="relative aspect-square overflow-hidden rounded-lg p-0" onClick={() => setActive(i)} aria-label={`Show image ${i + 1}`}>
+            <Pic src={src} />
+            {i === active && <span className="pointer-events-none absolute inset-0 rounded-lg ring-2 ring-inset ring-[#750a3d]" />}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const RATING = (
+  <p className="mb-4 flex items-center gap-2 text-xs">
+    <span className="tracking-[1px] text-[#8a5a1f]" aria-hidden="true">★★★★★</span> <b className="font-semibold">4.9</b> <small className="text-[11px] text-[#6b6567]">(142 verified host reviews)</small>
+  </p>
+);
+const DETAIL = "grid items-start gap-[30px] min-[900px]:grid-cols-[1.55fr_1fr]";
+const BUY = cx("min-w-0 rounded-2xl bg-white p-[22px]", CARD_SHADOW);
+const H1_BUY = "mb-2.5 mt-0 text-[26px] font-medium! leading-[1.2] tracking-[-.01em]! text-[#750a3d]";
 
 /* ======================================================
    PAGE: KIT DETAIL ("Request kit" opens the request page, not a popup)
@@ -553,57 +677,67 @@ function KitDetail({ kit, go }) {
   };
 
   return (
-    <div className="dc-detail">
-      <div>
-        <div className="dc-gallery-main">
-          <Pic src={imgs[active]} alt={`${kit.title} view ${active + 1}`} />
-          <div className="dc-badges">
-            <span className="dc-badge"><Icon name="bag" size={11} />Best Seller</span>
-            <span className="dc-badge dc-badge-light"><Icon name="lock" size={11} />100% Yours to Keep</span>
+    <div className={DETAIL}>
+      <div className="min-w-0">
+        <Gallery title={kit.title} images={imgs} active={active} setActive={setActive}>
+          <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+            <span className="inline-flex items-center gap-[5px] rounded-full bg-[#750a3d] px-[11px] py-1.5 text-[10px] font-semibold text-white"><Icon name="bag" size={11} />Best Seller</span>
+            <span className="inline-flex items-center gap-[5px] rounded-full bg-white px-[11px] py-1.5 text-[10px] font-semibold text-[#1a1516]"><Icon name="lock" size={11} />100% Yours to Keep</span>
           </div>
-        </div>
-        <div className="dc-thumbs">
-          {imgs.map((src, i) => (
-            <button key={i} className={i === active ? "on" : ""} onClick={() => setActive(i)} aria-label={`Show image ${i + 1}`}><Pic src={src} /></button>
-          ))}
-        </div>
-        <div className="dc-ship-note">
-          <span className="dc-ship-ic"><Icon name="truck" size={16} /></span>
-          <div><b>Delivered in 2-3 business days in heavy-duty reusable tote</b><small>Carefully sealed, moisture-proofed, and ready for immediate ceremony assembly.</small></div>
+        </Gallery>
+        <div className="mt-3.5 flex items-center gap-3 rounded-xl bg-[#fbeee8] p-3.5 text-xs">
+          <span className="grid size-[34px] shrink-0 place-items-center rounded-full bg-[#fcd9b8] text-[#8a4a12]"><Icon name="truck" size={16} /></span>
+          <div><b className="block text-[12.5px] font-semibold">Delivered in 2-3 business days in heavy-duty reusable tote</b><small className="mt-0.5 block text-[11px] text-[#6b6567]">Carefully sealed, moisture-proofed, and ready for immediate ceremony assembly.</small></div>
         </div>
       </div>
 
-      <aside className="dc-buy">
-        <small className="dc-eyebrow-sm">Festive celebration atelier</small>
-        <h1>{kit.title}</h1>
-        <p className="dc-rating"><span aria-hidden="true">★★★★★</span> <b>4.9</b> <small>(142 verified host reviews)</small></p>
+      <aside className={BUY}>
+        <small className={cx(EYEBROW_SM, "mb-2")}>Festive celebration atelier</small>
+        <h1 className={H1_BUY}>{kit.title}</h1>
+        {RATING}
 
-        <div className="dc-price-box">
-          <div className="dc-price"><strong>{inr(kit.price)}</strong><s>{inr(kit.mrp)}</s><span className="dc-off">{off}% OFF</span></div>
-          <p className="dc-own"><Icon name="checkc" size={14} /><span>Complete Box to Own Forever • No returns, zero rental deposit</span></p>
-          <small>All taxes included. Free insured door delivery across India.</small>
-        </div>
-
-        <div className="dc-specs">
-          <div><small><Icon name="archive" size={13} />Shipping weight</small><b>{kit.weight}</b></div>
-          <div><small><Icon name="image" size={13} />Footprint</small><b>{kit.footprint}</b></div>
-        </div>
-
-        <button className="dc-btn dc-btn-block" onClick={() => go("request", kit.id)}>Request kit</button>
-        <a className="dc-wa" target="_blank" rel="noreferrer" href={waLink(`Hi Evenddy, I'd like to order: ${kit.title} (${inr(kit.price)}).`)}><Icon name="wa" size={20} />Book on WhatsApp</a>
-
-        <div className="dc-pin">
-          <b>Check Delivery &amp; Setup Window</b>
-          <div className="dc-pin-row">
-            <input value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))} maxLength={6} inputMode="numeric" placeholder="Enter pincode" aria-label="Pincode" />
-            <button onClick={verify}>Verify</button>
+        <div className="mb-3.5 rounded-[14px] bg-[#fbeee8] p-[18px]">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <strong className="text-4xl font-bold leading-none text-[#750a3d]">{inr(kit.price)}</strong>
+            <s className="text-sm text-[#6b6567]">{inr(kit.mrp)}</s>
+            <span className="rounded-full bg-[#7a5a2c] px-2.5 py-1 text-[11px] font-bold text-white">{off}% OFF</span>
           </div>
-          {pinMsg && <small className={pinMsg.ok ? "dc-ok" : "dc-error"} role="status">{pinMsg.ok && <Icon name="checkc" size={13} />}{pinMsg.text}</small>}
+          <p className="mb-1.5 flex items-start gap-1.5 pt-2.5 text-xs font-medium leading-snug text-[#750a3d]"><span className="mt-px"><Icon name="checkc" size={14} /></span><span>Complete Box to Own Forever • No returns, zero rental deposit</span></p>
+          <small className="block text-[10.5px] text-[#6b6567]">All taxes included. Free insured door delivery across India.</small>
         </div>
 
-        <div className="dc-assure">
-          <div><Icon name="infinity" size={16} /><div><b>100% Buy-to-Own</b><small>Zero rental return coordination</small></div></div>
-          <div><Icon name="shield" size={16} /><div><b>Free Insured Transit</b><small>Replacements covered for transit wear</small></div></div>
+        <div className="mb-4 grid grid-cols-1 gap-2.5 min-[600px]:grid-cols-2">
+          {[["archive", "Shipping weight", kit.weight], ["image", "Footprint", kit.footprint]].map(([ic, l, v]) => (
+            <div key={l} className="rounded-[10px] bg-[#f4e9e5] px-3.5 py-3">
+              <small className="mb-1.5 flex items-center gap-1.5 text-[9px] uppercase tracking-[.04em] text-[#7a3b18]"><Icon name={ic} size={13} />{l}</small>
+              <b className="text-xs font-semibold">{v}</b>
+            </div>
+          ))}
+        </div>
+
+        <button className={BTN_BLOCK} onClick={() => go("request", kit.id)}>Request kit</button>
+        <a className={WA_BTN} target="_blank" rel="noreferrer" href={waLink(`Hi Evenddy, I'd like to order: ${kit.title} (${inr(kit.price)}).`)}><span className="text-[#25d366]"><Icon name="wa" size={20} /></span>Book on WhatsApp</a>
+
+        <div className="mt-4 rounded-xl bg-[#f4e9e5] p-3.5 text-xs">
+          <b className="font-semibold">Check Delivery &amp; Setup Window</b>
+          <div className="my-2.5 flex gap-2">
+            <input className="min-w-0 flex-1 rounded-lg bg-white px-3 py-[11px] text-xs placeholder:text-[#8f8487] focus:outline-none" value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))} maxLength={6} inputMode="numeric" placeholder="Enter pincode" aria-label="Pincode" />
+            <button className="rounded-lg bg-[#f0dcd7] px-[18px] text-xs font-semibold text-[#750a3d]" onClick={verify}>Verify</button>
+          </div>
+          {pinMsg && (
+            <small className={cx("text-[11px]", pinMsg.ok ? "flex items-center gap-1.5 text-[#8a5a1f]" : "block text-[#c0262d]")} role="status">
+              {pinMsg.ok && <Icon name="checkc" size={13} />}{pinMsg.text}
+            </small>
+          )}
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 text-[11.5px] min-[600px]:grid-cols-2">
+          {[["infinity", "100% Buy-to-Own", "Zero rental return coordination"], ["shield", "Free Insured Transit", "Replacements covered for transit wear"]].map(([ic, t, s]) => (
+            <div key={t} className="flex items-start gap-2 text-[#750a3d]">
+              <Icon name={ic} size={16} />
+              <div><b className="block text-[11.5px] font-semibold text-[#1a1516]">{t}</b><small className="mt-[3px] block text-[10px] leading-normal text-[#6b6567]">{s}</small></div>
+            </div>
+          ))}
         </div>
       </aside>
     </div>
@@ -618,19 +752,12 @@ function FormDetail({ item, tag }) {
   const [active, setActive] = useState(0);
   const [done, setDone] = useState(false);
   return (
-    <div className="dc-detail dc-detail-form">
-      <div>
-        <div className="dc-gallery-main"><Pic src={imgs[active]} alt={`${item.title} view ${active + 1}`} /></div>
-        <div className="dc-thumbs">
-          {imgs.map((src, i) => (
-            <button key={i} className={i === active ? "on" : ""} onClick={() => setActive(i)} aria-label={`Show image ${i + 1}`}><Pic src={src} /></button>
-          ))}
-        </div>
-      </div>
-      <aside className="dc-buy">
-        <small className="dc-eyebrow-sm">{tag}</small>
-        <h1>{item.title}</h1>
-        <p className="dc-rating"><span aria-hidden="true">★★★★★</span> <b>4.9</b> <small>(142 verified host reviews)</small></p>
+    <div className={DETAIL}>
+      <Gallery title={item.title} images={imgs} active={active} setActive={setActive} />
+      <aside className={BUY}>
+        <small className={cx(EYEBROW_SM, "mb-2")}>{tag}</small>
+        <h1 className={H1_BUY}>{item.title}</h1>
+        {RATING}
         <EnquiryForm variant="theme" subject={item.title} onSuccess={() => setDone(true)} />
       </aside>
       {done && <SuccessModal onClose={() => setDone(false)} />}
@@ -641,69 +768,169 @@ function FormDetail({ item, tag }) {
 /* ======================================================
    PAGE: CUSTOMIZED DECOR
 ====================================================== */
+const PANEL = cx("mb-[18px] rounded-2xl bg-white p-[22px]", CARD_SHADOW);
+
 function CustomDecor() {
   const [tab, setTab] = useState("portfolio");
   const [done, setDone] = useState(false);
-  const refs = { portfolio: useRef(null), about: useRef(null) };
+  const refs = { portfolio: useRef(null), about: useRef(null), reviews: useRef(null) };
   const jump = (k) => { setTab(k); refs[k].current?.scrollIntoView({ behavior: "smooth", block: "start" }); };
   const share = async () => {
     try { await navigator.share?.({ title: CUSTOM.title, url: window.location.href }); } catch { /* cancelled */ }
   };
   const review = () => window.open(waLink(`Hi Evenddy, I'd like to share a review for ${CUSTOM.title}.`), "_blank", "noreferrer");
 
+  const metaRow = "flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#6b6567]";
+  const metaItem = "inline-flex items-center gap-[5px]";
+  const sep = <i className="h-3 w-px bg-[#eadfd8]" />;
+
+  const TABS = [
+    ["portfolio", "Portfolio (140)"],
+    ["about", "About"],
+    ["reviews", `Reviews (${REVIEW_SUMMARY.total})`],
+  ];
+
   return (
-    <div className="dc-custom">
-      <div>
-        <div className="dc-panel dc-panel-flush">
-          <div className="dc-hero-img"><Pic src={CUSTOM.hero} alt="Grand floral mandap stage" /></div>
-          <div className="dc-custom-head">
-            <div>
-              <h1>{CUSTOM.title} <span className="dc-chip-sm">In-House Production</span></h1>
-              <p className="dc-meta">
-                <span><b>★ 4.9</b> (184 Verified Reviews)</span><i className="dc-sep" />
-                <span><Icon name="pin" size={13} />Vizag, Andhra Pradesh, India</span>
+    <div className="grid items-start gap-[22px] min-[900px]:grid-cols-[1fr_330px]">
+      <div className="min-w-0">
+        {/* hero + title card (tabs now live in their own strip below, with a gap between) */}
+        <div className={cx("mb-3 overflow-hidden rounded-2xl bg-white", CARD_SHADOW)}>
+          <div className="h-[300px] overflow-hidden"><Pic src={CUSTOM.hero} alt="Grand floral mandap stage" /></div>
+
+          {/* title row: details on the left, share + review buttons on the right */}
+          <div className="flex flex-col gap-3 px-[22px] pb-[22px] pt-5 min-[600px]:flex-row min-[600px]:items-start min-[600px]:justify-between">
+            <div className="min-w-0">
+              <div className="mb-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                <h1 className="mb-0 text-2xl font-medium! tracking-[-.01em]! text-[#5b0a2e]">{CUSTOM.title}</h1>
+                <span className="rounded-full bg-[#f0e6e3] px-2.5 py-1 text-[10px] font-medium text-[#4b4547]">In-House Production</span>
+              </div>
+              <p className={cx(metaRow, "mb-1.5")}>
+                <span className={metaItem}><b className="font-semibold text-[#1a1516]">★ {REVIEW_SUMMARY.rating}</b> ({REVIEW_SUMMARY.total} Verified Reviews)</span>{sep}
+                <span className={metaItem}><span className="text-[#7a3b18]"><Icon name="pin" size={13} /></span>Vizag, Andhra Pradesh, India</span>
               </p>
-              <p className="dc-meta">
-                <span><Icon name="award" size={13} />120+ Grand Celebrations Styled</span><i className="dc-sep" />
-                <span><Icon name="bolt" size={13} /><b>Avg. Response: 12 Mins</b></span>
+              <p className={cx(metaRow, "mb-0")}>
+                <span className={metaItem}><span className="text-[#7a3b18]"><Icon name="award" size={13} /></span>120+ Grand Celebrations Styled</span>{sep}
+                <span className={metaItem}><span className="text-[#7a3b18]"><Icon name="bolt" size={13} /></span><b className="font-semibold text-[#1a1516]">Avg. Response: 12 Mins</b></span>
               </p>
             </div>
-            <div className="dc-actions">
-              <button className="dc-round" onClick={share} aria-label="Share"><Icon name="share" size={16} /></button>
-              <button className="dc-round dc-round-wide dc-write" onClick={review}><Icon name="edit" size={15} /><span>Write<br />Review</span></button>
+            <div className="flex shrink-0 items-center gap-2">
+              <button className="grid size-10 place-items-center rounded-full bg-[#fbeee8] text-[#5b0a2e] transition-colors hover:bg-[#f6e0d6]" onClick={share} aria-label="Share"><Icon name="share" size={16} /></button>
+              <button className="inline-flex h-10 items-center gap-2 rounded-full bg-[#fbeee8] px-4 text-left text-xs font-medium leading-[1.15] text-[#5b0a2e] transition-colors hover:bg-[#f6e0d6]" onClick={review}>
+                <Icon name="edit" size={15} /><span>Write<br />Review</span>
+              </button>
             </div>
-          </div>
-          <div className="dc-tabs" role="tablist">
-            {[["portfolio", "Portfolio (140)"], ["about", "About"]].map(([k, l]) => (
-              <button key={k} role="tab" aria-selected={tab === k} className={tab === k ? "on" : ""} onClick={() => jump(k)}>{l}</button>
-            ))}
           </div>
         </div>
 
-        <section className="dc-panel" ref={refs.portfolio}>
-          <small className="dc-eyebrow-sm">Real celebrations</small>
-          <h2 className="dc-h2">Portfolio Gallery (140)</h2>
-          <div className="dc-gal">{CUSTOM.gallery.map((s, i) => <div key={i} className="dc-gal-i"><Pic src={s} alt="Past celebration" /></div>)}</div>
-          <button className="dc-btn dc-btn-ghost dc-center dc-btn-icon">Explore Entire Gallery (140 Projects) <span aria-hidden="true">→</span></button>
+        {/* tab strip: separate bar, evenly spaced tabs, dark underline on the active one */}
+        <div className="mb-[22px] flex flex-wrap gap-x-[38px] gap-y-0 rounded-[4px] bg-[#fdf5f2] px-[38px]" role="tablist" aria-label="Sections">
+          {TABS.map(([k, l]) => (
+            <button
+              key={k}
+              role="tab"
+              aria-selected={tab === k}
+              onClick={() => jump(k)}
+              className={cx(
+                "whitespace-nowrap py-3.5 text-[13px] transition-colors",
+                tab === k ? "font-semibold text-[#4a0a24] shadow-[inset_0_-2px_0_#4a0a24]" : "font-medium text-[#5b4a4f] hover:text-[#4a0a24]"
+              )}
+            >
+              {l}
+            </button>
+          ))}
+        </div>
+
+        <section className={PANEL} ref={refs.portfolio}>
+          <small className={EYEBROW_SM}>Real celebrations</small>
+          <h2 className={H2}>Portfolio Gallery (140)</h2>
+          <div className="grid grid-cols-1 gap-2.5 min-[600px]:grid-cols-2">
+            {CUSTOM.gallery.map((s, i) => <div key={i} className="h-[170px] overflow-hidden rounded-[10px]"><Pic src={s} alt="Past celebration" /></div>)}
+          </div>
+          <button className="mx-auto mt-4 flex w-max max-w-full items-center gap-2 rounded-full bg-[#f6e9e4] px-6 py-3 text-[13px] font-semibold text-[#5b0a2e] transition-colors hover:bg-[#f1ddd6]">
+            Explore Entire Gallery (140 Projects) <span aria-hidden="true">→</span>
+          </button>
         </section>
 
-        <section className="dc-panel" ref={refs.about}>
-          <small className="dc-eyebrow-sm">About</small>
-          <h2 className="dc-h2">Evenddy Custom decor</h2>
-          {CUSTOM.about.map((p) => <p key={p} className="dc-body">{rich(p)}</p>)}
-          <small className="dc-eyebrow-sm">Events handled &amp; specialisations</small>
-          <div className="dc-tags">{CUSTOM.specialisations.map((s) => <span key={s}>{s}</span>)}</div>
-          <div className="dc-stats">
-            {CUSTOM.stats.map((s) => <div key={s.l}><strong>{s.n}</strong><b>{s.l}</b>{s.s && <small>{s.s}</small>}</div>)}
+        <section className={PANEL} ref={refs.about}>
+          <small className={EYEBROW_SM}>About</small>
+          <h2 className={H2}>Evenddy Custom decor</h2>
+          {CUSTOM.about.map((p) => <p key={p} className="mb-3.5 text-[13px] leading-[1.75] text-[#6b6567]">{rich(p)}</p>)}
+          <small className={EYEBROW_SM}>Events handled &amp; specialisations</small>
+          <div className="mb-[18px] mt-2.5 flex flex-wrap gap-2">
+            {CUSTOM.specialisations.map((s) => <span key={s} className="rounded-full bg-[#fbeee8] px-3 py-1.5 text-[11px]">{s}</span>)}
           </div>
+          <div className="grid grid-cols-1 gap-3 min-[600px]:grid-cols-2">
+            {CUSTOM.stats.map((s) => (
+              <div key={s.l} className="rounded-xl bg-[#fbeee8] p-4">
+                <strong className="block text-[26px] text-[#750a3d]">{s.n}</strong>
+                <b className="text-xs font-semibold">{s.l}</b>
+                {s.s && <small className="block text-[11px] text-[#6b6567]">{s.s}</small>}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* reviews: rating summary + breakdown, then individual reviews */}
+        <section className={PANEL} ref={refs.reviews}>
+          <small className={EYEBROW_SM}>Host feedback</small>
+          <h2 className={H2}>Reviews ({REVIEW_SUMMARY.total})</h2>
+
+          <div className="mb-[18px] grid grid-cols-1 items-center gap-5 rounded-xl bg-[#fbeee8] p-4 min-[600px]:grid-cols-[150px_1fr]">
+            <div className="text-center">
+              <strong className="block text-[38px] font-bold leading-none text-[#750a3d]">{REVIEW_SUMMARY.rating}</strong>
+              <div className="mt-1.5"><Stars value={5} size={14} /></div>
+              <small className="mt-1 block text-[11px] text-[#6b6567]">{REVIEW_SUMMARY.total} verified reviews</small>
+            </div>
+            <ul className="grid gap-1.5">
+              {[5, 4, 3, 2, 1].map((n) => {
+                const c = REVIEW_SUMMARY.dist[n] || 0;
+                const pct = Math.round((c / REVIEW_SUMMARY.total) * 100);
+                return (
+                  <li key={n} className="flex items-center gap-2.5 text-[11px] text-[#6b6567]">
+                    <span className="w-6 shrink-0 font-medium text-[#1a1516]">{n} ★</span>
+                    <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-white">
+                      <span className="block h-full rounded-full bg-[#750a3d]" style={{ width: `${pct}%` }} />
+                    </span>
+                    <span className="w-8 shrink-0 text-right">{c}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <ul className="grid gap-3">
+            {REVIEWS.map((r) => (
+              <li key={r.id} className="rounded-xl bg-[#fdf8f5] p-4 shadow-[inset_0_0_0_1px_#f1e4dc]">
+                <div className="mb-2 flex items-center gap-3">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#f6e0d6] text-[13px] font-semibold text-[#750a3d]" aria-hidden="true">{r.name[0]}</span>
+                  <div className="min-w-0 flex-1">
+                    <b className="block text-[12.5px] font-semibold text-[#1a1516]">{r.name}</b>
+                    <small className="block text-[10.5px] text-[#6b6567]">{r.event}</small>
+                  </div>
+                  <div className="text-right">
+                    <Stars value={r.rating} size={12} />
+                    <small className="block text-[10px] text-[#6b6567]">{r.date}</small>
+                  </div>
+                </div>
+                <p className="mb-0 text-[12.5px] leading-[1.7] text-[#4b4547]">{r.text}</p>
+              </li>
+            ))}
+          </ul>
+
+          <button className="mx-auto mt-4 flex w-max max-w-full items-center gap-2 rounded-full bg-[#f6e9e4] px-6 py-3 text-[13px] font-semibold text-[#5b0a2e] transition-colors hover:bg-[#f1ddd6]" onClick={review}>
+            <Icon name="edit" size={15} />Write a Review
+          </button>
         </section>
       </div>
 
-      <aside className="dc-quote">
-        <div className="dc-quote-top">
-          <strong>₹{CUSTOM.price.toLocaleString("en-IN")}</strong>
-          <span>Direct Atelier Rates</span>
-          <small>Starting Base Package</small><small>0% Portal Fee</small>
+      {/* quote card: price + base-package line, no "Direct Atelier Rates" */}
+      <aside className={cx("min-w-0 rounded-2xl bg-white p-5 min-[900px]:sticky min-[900px]:top-4", CARD_SHADOW)}>
+        <div className="mb-3.5 border-b border-[#eadfd8] pb-3.5">
+          <strong className="block text-[26px] font-bold leading-tight text-[#750a3d]">₹{CUSTOM.price.toLocaleString("en-IN")}</strong>
+          <div className="mt-1 flex items-center justify-between gap-3 text-[10px] text-[#6b6567]">
+            <small>Starting Base Package</small>
+            <small>0% Portal Fee</small>
+          </div>
         </div>
         <EnquiryForm variant="custom" subject={CUSTOM.title} onSuccess={() => setDone(true)} />
       </aside>
@@ -743,13 +970,15 @@ export default function DecorExplore() {
   if (view.page === "custom") trail.push({ label: "Custom Decor" });
 
   return (
-    <div className="dc">
-      <div className="dc-wrap">
-        <nav className="dc-crumb" aria-label="Breadcrumb">
+    <div className="min-h-[70vh] bg-[#f9f5f0] pb-16 text-[#1a1516]">
+      <div className={WRAP}>
+        <nav className="pb-4 pt-[18px] text-xs text-[#6b6567]" aria-label="Breadcrumb">
           {trail.map((c, i) => (
             <span key={c.label}>
-              {c.to && i < trail.length - 1 ? <button onClick={c.to}>{c.label}</button> : <b aria-current="page">{c.label}</b>}
-              {i < trail.length - 1 && <i> &gt; </i>}
+              {c.to && i < trail.length - 1
+                ? <button className="p-0 text-xs hover:text-[#750a3d]" onClick={c.to}>{c.label}</button>
+                : <b className="font-semibold text-[#750a3d]" aria-current="page">{c.label}</b>}
+              {i < trail.length - 1 && <span className="whitespace-pre"> &gt; </span>}
             </span>
           ))}
         </nav>

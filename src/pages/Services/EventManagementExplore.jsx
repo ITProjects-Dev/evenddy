@@ -1,10 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import "./Eventmanagement.css";
 
 /* Event Management / Plan Your Event page (single file, like CateringExplore / DecorExplore).
    Rendered by ServiceDetails when the slug contains "event".
-   Layout: intro card on the left, "Tell us about your celebration" brief form on the right. */
+   Layout: intro card on the left, "Tell us about your celebration" brief form on the right.
+
+   Styled with Tailwind utility classes only: delete Eventmanagement.css and its import.
+   Font comes from your global setup, so no font-family anywhere here.
+
+   NOTE: your global CSS has unlayered rules (a{color:inherit}, button{border:0},
+   h1,h2{font-weight/letter-spacing}, h1-h4,p{margin-top:0}). Tailwind v4 utilities live in a
+   layer, so those global rules win. Where that matters I use the "!" suffix (e.g. font-bold!)
+   and inset box-shadows instead of borders on buttons. Don't remove them. */
 
 /* ======================================================
    DATA (replace image URL, WhatsApp number and options with your own)
@@ -87,6 +94,49 @@ const WaIcon = () => (
 );
 
 /* ======================================================
+   SHARED CLASS STRINGS + SMALL HELPERS
+====================================================== */
+const cx = (...a) => a.filter(Boolean).join(" ");
+
+const LABEL = "mb-1.5 block text-[11px] font-medium text-[#1a1516]";
+const CONTROL =
+  "min-h-[42px] w-full rounded-[10px] border border-[#d9d3df] bg-white px-[13px] py-[11px] text-xs text-[#1a1516] placeholder:text-[#a9a3ad] focus:border-[#750a3d] focus:outline-none";
+const SELECT =
+  "appearance-none pr-[34px] disabled:cursor-not-allowed disabled:bg-[#f6f1ec] disabled:text-[#a9a3ad]";
+const SELECT_ARROW = {
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6567' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")",
+  backgroundRepeat: "no-repeat",
+  backgroundPosition: "right 13px center",
+};
+const FOCUS_RING = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4005f]";
+const BTN =
+  "inline-flex min-h-[56px] items-center justify-center gap-3.5 rounded-[10px] px-5 text-[15px] font-bold tracking-[.01em] transition " +
+  FOCUS_RING;
+const BTN_SOLID = BTN + " bg-[#750a3d] text-white shadow-[inset_0_0_0_1.5px_#750a3d] hover:brightness-110";
+const BTN_WA = BTN + " bg-white text-[#1ebe5d] shadow-[inset_0_0_0_2px_#25d366] hover:bg-[#f1fbf5]";
+const CARD = "rounded-3xl bg-[#fffdfa] shadow-[0_6px_24px_rgba(60,20,30,.06)]";
+
+/* Responsive grids: 1 col on phones, 2 from 601px, full layout from 961px (same breakpoints as the old CSS) */
+const G2 = "grid grid-cols-1 gap-x-4 min-[601px]:grid-cols-2";
+const G3 = "grid grid-cols-1 gap-x-4 min-[601px]:grid-cols-2 min-[961px]:grid-cols-[1fr_1fr_1.25fr]";
+const G4 = "grid grid-cols-1 gap-x-4 min-[601px]:grid-cols-2 min-[961px]:grid-cols-4";
+
+/* Label + control + error message wrapper */
+function F({ id, label, req, error, children }) {
+  return (
+    <div className="mb-4">
+      <label htmlFor={id} className={LABEL}>
+        {label}
+        {req && <>{" "}<i className="not-italic text-[#750a3d]">*</i></>}
+      </label>
+      {children}
+      {error && <small className="mt-1 block text-[11px] text-[#c0262d]" role="alert">{error}</small>}
+    </div>
+  );
+}
+
+/* ======================================================
    MAIN
 ====================================================== */
 export default function EventManagementExplore() {
@@ -140,27 +190,40 @@ export default function EventManagementExplore() {
   const whatsapp = () =>
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(summary())}`, "_blank");
 
-  const err = (k) => (errors[k] ? "err" : "");
-  const Msg = ({ k }) => (errors[k] ? <small className="em-msg" role="alert">{errors[k]}</small> : null);
+  const ctl = (k, extra) => cx(CONTROL, extra, errors[k] && "border-red-600!");
 
   return (
-    <div className="em">
-      <div className="em-wrap">
-        <nav className="em-crumb" aria-label="Breadcrumb">
-          <Link to="/services">Our Services</Link> <span>›</span> <span>Event Planning</span> <span>›</span> <b>Plan Your Event</b>
+    <div className="min-h-[70vh] bg-[#faf5ee] pb-16 text-[#1a1516]">
+      <div className="mx-auto w-full max-w-[1120px] px-6">
+        <nav className="flex flex-wrap gap-2 pb-[22px] pt-[34px] text-[10.5px] font-medium uppercase tracking-[.07em] text-[#6b6567]" aria-label="Breadcrumb">
+          <Link className={cx("text-inherit no-underline hover:text-[#750a3d]!", FOCUS_RING)} to="/services">Our Services</Link>
+          <span>›</span>
+          <span>Event Planning</span>
+          <span>›</span>
+          <b className="font-bold text-[#1a1516]">Plan Your Event</b>
         </nav>
 
-        <div className="em-layout">
+        <div className="grid items-start gap-7 min-[961px]:grid-cols-[340px_1fr]">
           {/* ---------- LEFT INTRO CARD ---------- */}
-          <aside className="em-intro">
+          <aside
+            className={cx(
+              CARD,
+              "px-3.5 pb-6 pt-3.5",
+              "min-[601px]:grid min-[601px]:grid-cols-2 min-[601px]:items-center min-[601px]:gap-x-5",
+              "min-[961px]:sticky min-[961px]:top-4 min-[961px]:block"
+            )}
+          >
             <img
+              className="mb-4 block h-[220px] w-full rounded-2xl object-cover min-[601px]:row-[1/4] min-[601px]:mb-0 min-[601px]:h-[260px] min-[961px]:row-auto min-[961px]:mb-5 min-[961px]:h-[290px]"
               src={SIDE_IMAGE || BANNER}
               alt="Beautifully styled banquet hall"
               onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = BANNER; }}
             />
-            <p className="em-eyebrow">EVENT PLANNING &amp; MANAGEMENT</p>
-            <h1>Your entire celebration, seamlessly planned.</h1>
-            <p className="em-lead">
+            <p className="mb-2.5 px-1.5 text-[10px] font-bold tracking-[.1em] text-[#750a3d]">EVENT PLANNING &amp; MANAGEMENT</p>
+            <h1 className="mb-3.5 px-1.5 text-[28px] font-bold! leading-[1.1] tracking-[-.025em]! text-[#1a1516]">
+              Your entire celebration, seamlessly planned.
+            </h1>
+            <p className="mb-0 px-1.5 text-[11.5px] leading-[1.75] text-[#6b6567]">
               Tell us what you're planning, your budget, and what you need. From curated decor and
               artisanal catering to venue scouting and on-ground coordination, our captains bring
               your vision to life.
@@ -168,125 +231,131 @@ export default function EventManagementExplore() {
           </aside>
 
           {/* ---------- RIGHT FORM CARD ---------- */}
-          <form className="em-form" onSubmit={submit} noValidate>
-            <h2>Tell us about your celebration</h2>
-            <p className="em-sub">Share your vision and event details so our senior event planning team can curate your custom proposal.</p>
+          <form className={cx(CARD, "px-[18px] pb-7 pt-[22px] min-[601px]:px-8 min-[601px]:pt-[30px]")} onSubmit={submit} noValidate>
+            <h2 className="mb-1.5 text-xl font-bold! tracking-[-.01em]! text-[#1a1516]">Tell us about your celebration</h2>
+            <p className="mb-[22px] max-w-[480px] text-xs leading-[1.6] text-[#6b6567]">
+              Share your vision and event details so our senior event planning team can curate your custom proposal.
+            </p>
 
-            <div className="em-grid em-g2">
-              <div className="em-f">
-                <label htmlFor="em-name">Name <i>*</i></label>
-                <input id="em-name" className={err("name")} value={form.name} onChange={set("name")} placeholder="Enter your name" autoComplete="name" aria-invalid={!!errors.name} />
-                <Msg k="name" />
-              </div>
-              <div className="em-f">
-                <label htmlFor="em-phone">Phone Number <i>*</i></label>
-                <input id="em-phone" className={err("phone")} value={form.phone} onChange={set("phone")} placeholder="Enter phone number" inputMode="numeric" maxLength={10} autoComplete="tel-national" aria-invalid={!!errors.phone} />
-                <Msg k="phone" />
-              </div>
+            <div className={G2}>
+              <F id="em-name" label="Name" req error={errors.name}>
+                <input id="em-name" className={ctl("name")} value={form.name} onChange={set("name")} placeholder="Enter your name" autoComplete="name" aria-invalid={!!errors.name} />
+              </F>
+              <F id="em-phone" label="Phone Number" req error={errors.phone}>
+                <input id="em-phone" className={ctl("phone")} value={form.phone} onChange={set("phone")} placeholder="Enter phone number" inputMode="numeric" maxLength={10} autoComplete="tel-national" aria-invalid={!!errors.phone} />
+              </F>
             </div>
 
-            <div className="em-grid em-g3">
-              <div className="em-f">
-                <label htmlFor="em-eventType">Event Type <i>*</i></label>
-                <select id="em-eventType" className={err("eventType")} value={form.eventType} onChange={setType} aria-invalid={!!errors.eventType}>
+            <div className={G3}>
+              <F id="em-eventType" label="Event Type" req error={errors.eventType}>
+                <select id="em-eventType" className={ctl("eventType", SELECT)} style={SELECT_ARROW} value={form.eventType} onChange={setType} aria-invalid={!!errors.eventType}>
                   <option value="">Select</option>
                   {Object.keys(EVENT_TYPES).map((t) => <option key={t}>{t}</option>)}
                 </select>
-                <Msg k="eventType" />
-              </div>
-              <div className="em-f">
-                <label htmlFor="em-subtype">Event Subtype <i>*</i></label>
-                <select id="em-subtype" className={err("subtype")} value={form.subtype} onChange={set("subtype")} disabled={!form.eventType} aria-invalid={!!errors.subtype}>
+              </F>
+              <F id="em-subtype" label="Event Subtype" req error={errors.subtype}>
+                <select id="em-subtype" className={ctl("subtype", SELECT)} style={SELECT_ARROW} value={form.subtype} onChange={set("subtype")} disabled={!form.eventType} aria-invalid={!!errors.subtype}>
                   <option value="">{form.eventType ? "Select" : "Pick type first"}</option>
                   {(EVENT_TYPES[form.eventType] || []).map((s) => <option key={s}>{s}</option>)}
                 </select>
-                <Msg k="subtype" />
-              </div>
-              <div className="em-f">
-                <label htmlFor="em-city">Location / City <i>*</i></label>
-                <input id="em-city" className={err("city")} value={form.city} onChange={set("city")} placeholder="e.g. Visakhapatnam, Andhra Pradesh" autoComplete="address-level2" aria-invalid={!!errors.city} />
-                <Msg k="city" />
-              </div>
+              </F>
+              <F id="em-city" label="Location / City" req error={errors.city}>
+                <input id="em-city" className={ctl("city")} value={form.city} onChange={set("city")} placeholder="e.g. Visakhapatnam, Andhra Pradesh" autoComplete="address-level2" aria-invalid={!!errors.city} />
+              </F>
             </div>
 
-            <div className="em-grid em-g4">
-              <div className="em-f">
-                <label htmlFor="em-date">Event Date <i>*</i></label>
-                <input id="em-date" type="date" className={err("date")} value={form.date} onChange={set("date")} aria-invalid={!!errors.date} />
-                <Msg k="date" />
-              </div>
-              <div className="em-f">
-                <label htmlFor="em-time">Preferred Time <i>*</i></label>
+            <div className={G4}>
+              <F id="em-date" label="Event Date" req error={errors.date}>
+                <input id="em-date" type="date" className={ctl("date")} value={form.date} onChange={set("date")} aria-invalid={!!errors.date} />
+              </F>
+              <F id="em-time" label="Preferred Time" req error={errors.time}>
                 {/* shows "Enter Time" placeholder, turns into a time picker on focus */}
                 <input
-                  id="em-time" type={form.time ? "time" : "text"} className={err("time")} value={form.time}
+                  id="em-time" type={form.time ? "time" : "text"} className={ctl("time")} value={form.time}
                   placeholder="Enter Time" aria-invalid={!!errors.time}
                   onFocus={(e) => { e.target.type = "time"; try { e.target.showPicker?.(); } catch { /* not supported */ } }}
                   onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }}
                   onChange={set("time")}
                 />
-                <Msg k="time" />
-              </div>
-              <div className="em-f">
-                <label htmlFor="em-guests">Guest Count</label>
-                <input id="em-guests" type="number" min="1" value={form.guests} onChange={set("guests")} placeholder="Enter Count" />
-              </div>
-              <div className="em-f">
-                <label htmlFor="em-budget">Event Budget</label>
-                <input id="em-budget" type="number" min="0" value={form.budget} onChange={set("budget")} placeholder="Enter Budget" />
-              </div>
+              </F>
+              <F id="em-guests" label="Guest Count">
+                <input id="em-guests" type="number" min="1" className={CONTROL} value={form.guests} onChange={set("guests")} placeholder="Enter Count" />
+              </F>
+              <F id="em-budget" label="Event Budget">
+                <input id="em-budget" type="number" min="0" className={CONTROL} value={form.budget} onChange={set("budget")} placeholder="Enter Budget" />
+              </F>
             </div>
 
-            <div className="em-grid em-g2">
-              <div className="em-f">
-                <label htmlFor="em-venueStatus">Venue Status</label>
-                <select id="em-venueStatus" value={form.venueStatus} onChange={set("venueStatus")}>
+            <div className={G2}>
+              <F id="em-venueStatus" label="Venue Status">
+                <select id="em-venueStatus" className={cx(CONTROL, SELECT)} style={SELECT_ARROW} value={form.venueStatus} onChange={set("venueStatus")}>
                   {VENUE_STATUS.map((s) => <option key={s}>{s}</option>)}
                 </select>
-              </div>
-              <div className="em-f">
-                <label htmlFor="em-venueName">{form.venueStatus === VENUE_STATUS[0] ? "Confirmed Venue Name" : "Preferred Venue / Area"}</label>
-                <input id="em-venueName" value={form.venueName} onChange={set("venueName")} placeholder="e.g. Sea Pearl Banquet Hall, Beach Rd" />
-              </div>
+              </F>
+              <F id="em-venueName" label={form.venueStatus === VENUE_STATUS[0] ? "Confirmed Venue Name" : "Preferred Venue / Area"}>
+                <input id="em-venueName" className={CONTROL} value={form.venueName} onChange={set("venueName")} placeholder="e.g. Sea Pearl Banquet Hall, Beach Rd" />
+              </F>
             </div>
 
-            <div className="em-f">
-              <span className="em-lab" id="em-prio-label">Key Priorities for this Celebration</span>
-              <div className="em-chips" role="group" aria-labelledby="em-prio-label">
+            <div className="mb-4">
+              <span className={LABEL} id="em-prio-label">Key Priorities for this Celebration</span>
+              <div className="flex flex-wrap gap-2" role="group" aria-labelledby="em-prio-label">
                 {PRIORITIES.map((p) => {
                   const on = form.priorities.includes(p);
                   return (
-                    <button key={p} type="button" className={`em-chip ${on ? "on" : ""}`} aria-pressed={on} onClick={() => togglePriority(p)}>{p}</button>
+                    <button
+                      key={p}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => togglePriority(p)}
+                      className={cx(
+                        "rounded-full px-[15px] py-[7px] text-[11px] leading-[1.2] transition-colors",
+                        FOCUS_RING,
+                        on
+                          ? "bg-[#f8e3e8] font-bold text-[#750a3d] shadow-[inset_0_0_0_1px_#c97a8f]"
+                          : "bg-white font-medium text-[#1a1516] shadow-[inset_0_0_0_1px_#e0d9dc] hover:shadow-[inset_0_0_0_1px_#750a3d]"
+                      )}
+                    >
+                      {p}
+                    </button>
                   );
                 })}
               </div>
             </div>
 
-            <div className="em-f">
-              <label htmlFor="em-story">Special Requirements / Story</label>
-              <textarea id="em-story" rows="3" value={form.story} onChange={set("story")} placeholder="Tell us about your event theme, inspirations, dietary preferences, or any special requests..." />
-            </div>
+            <F id="em-story" label="Special Requirements / Story">
+              <textarea
+                id="em-story" rows="3" className={cx(CONTROL, "min-h-[84px] resize-y")} value={form.story} onChange={set("story")}
+                placeholder="Tell us about your event theme, inspirations, dietary preferences, or any special requests..."
+              />
+            </F>
 
-            <div className="em-actions">
-              <button type="button" className="em-btn em-wa" onClick={whatsapp}>
+            <div className="mt-6 grid grid-cols-1 gap-5 border-t border-[#ddd6d2] pt-3.5 min-[601px]:grid-cols-2">
+              <button type="button" className={BTN_WA} onClick={whatsapp}>
                 <WaIcon />
                 Continue WhatsApp
               </button>
-              <button type="submit" className="em-btn">Request Quote</button>
+              <button type="submit" className={BTN_SOLID}>Request Quote</button>
             </div>
-            <p className="em-note">A dedicated Evenddy planner will review your brief and connect within 24 hours.</p>
+            <p className="mb-0 mt-12! text-center text-[11px] text-[#a8a2a6]">
+              A dedicated Evenddy planner will review your brief and connect within 24 hours.
+            </p>
           </form>
         </div>
       </div>
 
       {/* ---------- SUCCESS POPUP ---------- */}
       {sent && (
-        <div className="em-overlay" onClick={() => setSent(false)}>
-          <div className="em-modal" role="dialog" aria-modal="true" aria-label="Quote request submitted" onClick={(e) => e.stopPropagation()}>
-            <div className="em-tick" aria-hidden="true">✓</div>
-            <h3>Quote Request Submitted Successfully!</h3>
-            <p>Thank you for choosing <b>Evenddy</b>. Our planning team will review your brief and get in touch within 24 hours.</p>
-            <button className="em-btn em-block" autoFocus onClick={() => { setSent(false); setForm(EMPTY); }}>Continue Browsing →</button>
+        <div className="fixed inset-0 z-[1000] grid place-items-center bg-[rgba(20,10,14,.55)] p-5 backdrop-blur-[3px]" onClick={() => setSent(false)}>
+          <div className="w-full max-w-[400px] rounded-[18px] bg-white p-[30px] text-center" role="dialog" aria-modal="true" aria-label="Quote request submitted" onClick={(e) => e.stopPropagation()}>
+            <div className="mx-auto mb-3.5 grid size-[54px] place-items-center rounded-full border-2 border-[#750a3d] text-2xl text-[#750a3d]" aria-hidden="true">✓</div>
+            <h3 className="mb-2.5 text-xl font-bold text-[#1a1516]">Quote Request Submitted Successfully!</h3>
+            <p className="mb-3.5 text-xs leading-[1.6] text-[#6b6567]">
+              Thank you for choosing <b>Evenddy</b>. Our planning team will review your brief and get in touch within 24 hours.
+            </p>
+            <button className={cx(BTN_SOLID, "mt-1.5 w-full")} autoFocus onClick={() => { setSent(false); setForm(EMPTY); }}>
+              Continue Browsing →
+            </button>
           </div>
         </div>
       )}
