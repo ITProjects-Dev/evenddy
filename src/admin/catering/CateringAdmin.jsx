@@ -15,7 +15,6 @@ const TABS = [
     { id: "mealbox", label: "Meal Box" },
     { id: "menu", label: "Delivery Box" },
     { id: "full", label: "Full Catering" },
-    { id: "global", label: "Global" },
 ];
 
 export default function CateringAdmin() {
@@ -41,7 +40,6 @@ export default function CateringAdmin() {
             {tab === "mealbox" && <MealBoxTab data={data} patch={patch} saveSection={saveSection} />}
             {tab === "menu" && <MenuTab data={data} patch={patch} saveSection={saveSection} />}
             {tab === "full" && <FullTab data={data} patch={patch} saveSection={saveSection} />}
-            {tab === "global" && <GlobalTab data={data} setData={setData} saveSection={saveSection} />}
 
             <Toast text={toast} />
         </>
@@ -373,20 +371,5 @@ function FullTab({ data, patch, saveSection }) {
                 />
             </Section>
         </>
-    );
-}
-
-/* ---------------- GLOBAL ---------------- */
-function GlobalTab({ data, setData, saveSection }) {
-    const g = data.global;
-    const setG = (v) => setData({ ...data, global: v });
-    return (
-        <Section num="1" title="Contact & WhatsApp" sub="Used across every catering WhatsApp button."
-            right={<SaveSection path="global" value={g} label="contact details" onSave={saveSection} />}>
-            <div className="adm-grid2">
-                <Text label="WhatsApp number (country code + number, no +)" value={g.whatsapp} onChange={(v) => setG({ ...g, whatsapp: v })} />
-                <Text label="Display phone" value={g.phone} onChange={(v) => setG({ ...g, phone: v })} />
-            </div>
-        </Section>
     );
 }
