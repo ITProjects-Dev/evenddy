@@ -148,6 +148,21 @@ export function ImageUpload({ label, value, onChange, compact = false, hint, onR
         {value
           ? <img src={value} alt={`${uploadLabel} preview`} />
           : <span><ImagePlus size={20} />{compact ? uploadLabel : "No image selected"}</span>}
+        {value && (
+          <button
+            className="adm-image-remove"
+            type="button"
+            onClick={() => {
+              if (onRemove) onRemove();
+              else onChange("");
+              setError("");
+            }}
+            aria-label={`Remove ${uploadLabel}`}
+            title={`Remove ${uploadLabel}`}
+          >
+            <X size={16} />
+          </button>
+        )}
       </div>
       <div className="adm-image-controls">
         <button
@@ -161,16 +176,15 @@ export function ImageUpload({ label, value, onChange, compact = false, hint, onR
         </button>
         {value && (
           <button
-            className={compact ? "adm-image-remove" : "adm-btn ghost sm"}
+            className="adm-btn ghost sm"
             type="button"
             onClick={() => {
               if (onRemove) onRemove();
               else onChange("");
               setError("");
             }}
-            aria-label={`Remove ${uploadLabel}`}
           >
-            {compact ? <X size={14} /> : "Remove"}
+            <X size={15} /> Remove image
           </button>
         )}
         <input
@@ -246,7 +260,7 @@ function detailLabel(key) {
 }
 
 /* A list-first editor shared by the admin's repeatable content sections. */
-export function Repeater({ items, onChange, renderRow, empty, addLabel = "", makeNew, itemTitle }) {
+export function Repeater({ items, onChange, renderRow, empty, addLabel = "Add item", makeNew, itemTitle }) {
   const setSectionAddAction = useContext(SectionActionContext);
   const [active, setActive] = useState(null);
   const close = () => setActive(null);
@@ -339,6 +353,11 @@ export function Repeater({ items, onChange, renderRow, empty, addLabel = "", mak
           </article>
         ))}
       </div>
+      {!setSectionAddAction && (
+        <button className="adm-btn ghost sm adm-repeater-add" type="button" onClick={add}>
+          <Plus size={15} /> {addLabel.replace(/^\+\s*/, "")}
+        </button>
+      )}
 
       {active && (
         <div className="adm-modal-backdrop" onMouseDown={(event) => {
