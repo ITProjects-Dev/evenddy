@@ -250,14 +250,13 @@ function Custom({ data, patch, saveSection }) {
         </F>
       </Section>
 
-      <Section title="About paragraphs"
-        right={<SaveSection path="decor.custom.about" value={c.about || []} label="about paragraphs" onSave={saveSection} />}>
-        <Repeater
-          items={c.about || []}
+      <Section title="About paragraphs" sub="Write multiple paragraphs in one field; separate them with a blank line."
+        right={<SaveSection path="decor.custom.about" value={Array.isArray(c.about) ? c.about.join("\n\n") : c.about || ""} label="about text" onSave={saveSection} />}>
+        <Area
+          value={Array.isArray(c.about) ? c.about.join("\n\n") : c.about || ""}
           onChange={(v) => set({ ...c, about: v })}
-          makeNew={() => ""}
-          itemTitle={(p) => p.slice(0, 60) || "Paragraph"}
-          renderRow={(p, i, upd) => <Area value={p} onChange={(v) => upd(v)} rows={4} />}
+          rows={6}
+          placeholder="Write about the service. Use a blank line between paragraphs."
         />
       </Section>
 
