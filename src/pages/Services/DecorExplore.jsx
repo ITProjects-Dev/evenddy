@@ -182,7 +182,7 @@ const PHOTOS = {
 };
 
 const inr = (n) => "₹" + n.toLocaleString("en-IN");
-const five = (a = []) => Array.from({ length: 5 }, (_, i) => a[i] || "");
+const five = (a = []) => Array.from({ length: Math.max(5, a.length) }, (_, i) => a[i] || "");
 
 const WHATSAPP_NUMBER = "919999999999"; // country code + number, no "+"
 const waLink = (text) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;

@@ -52,14 +52,21 @@ export default function DecorAdmin() {
 
 /* ---------- 5 image slot editor ---------- */
 function ImageSlots({ images = [], onChange }) {
-  const five = Array.from({ length: IMG_SLOTS }, (_, i) => images[i] || "");
+  const slots = Array.from({ length: Math.max(IMG_SLOTS, images.length) }, (_, i) => images[i] || "");
   return (
-    <F label={`Images (${IMG_SLOTS} slots · blank = illustrated fallback)`}>
+    <F label={`Images (at least ${IMG_SLOTS} slots · blank = illustrated fallback)`}>
       <div className="adm-gal">
-        {five.map((image, i) => (
+        {slots.map((image, i) => (
           <ImageUpload key={i} label={`Image slot ${i + 1}`} value={image} compact
-            onChange={(value) => onChange(five.map((current, k) => (k === i ? value : current)))} />
+            onChange={(value) => onChange(slots.map((current, k) => (k === i ? value : current)))}
+            onRemove={i >= IMG_SLOTS
+              ? () => onChange(slots.filter((_, k) => k !== i))
+              : undefined} />
         ))}
+        <button type="button" className="adm-gal-add"
+          onClick={() => onChange([...slots, ""])}>
+          <span style={{ fontSize: 18 }}>+</span>Add image
+        </button>
       </div>
     </F>
   );
@@ -210,6 +217,8 @@ function Themes({ data, patch, saveSection }) {
 /* ---------- CUSTOM ---------- */
 function Custom({ data, patch, saveSection }) {
   const c = data.decor.custom;
+  const gallery = c.gallery || [];
+  const gallerySlots = Array.from({ length: Math.max(4, gallery.length) }, (_, i) => gallery[i] || "");
   const set = (v) => patch("custom", v);
   return (
     <>
@@ -227,15 +236,18 @@ function Custom({ data, patch, saveSection }) {
           <Num label="Starting price (₹)" value={c.price} onChange={(v) => set({ ...c, price: v })} />
         </div>
         <ImageUpload label="Hero image" value={c.hero} onChange={(v) => set({ ...c, hero: v })} />
-        <F label="Gallery (4 slots)">
+        <F label="Gallery (4 or more images)">
           <div className="adm-gal">
-            {Array.from({ length: 4 }).map((_, i) => {
-              const image = (c.gallery || [])[i] || "";
+            {gallerySlots.map((image, i) => {
               return (
                 <ImageUpload key={i} label={`Gallery image ${i + 1}`} value={image} compact
-                  onChange={(v) => set({ ...c, gallery: [0,1,2,3].map((x) => (x === i ? v : (c.gallery || [])[x] || "")) })} />
+                  onChange={(v) => set({ ...c, gallery: gallerySlots.map((current, x) => (x === i ? v : current)) })} />
               );
             })}
+            <button type="button" className="adm-gal-add"
+              onClick={() => set({ ...c, gallery: [...gallerySlots, ""] })}>
+              <span style={{ fontSize: 18 }}>+</span>Add image
+            </button>
           </div>
         </F>
       </Section>
