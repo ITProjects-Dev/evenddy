@@ -107,7 +107,7 @@ export default function Footer() {
             <span>hello@evenddy.com</span>
           </a>
           
-          <a href="tel:+919999999999" className="footer-contact-item" onClick={scrollToTop}>
+          <a href="tel:++91 9XXXX XXXXX" className="footer-contact-item" onClick={scrollToTop}>
             <Phone size={14} className="footer-icon" />
             <span>+91 9XXXX XXXXX</span>
           </a>

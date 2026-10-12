@@ -7,7 +7,7 @@ const ENQ_KEY = "evenddy_enquiries_v1";
 /* =================== DEFAULT DATA =================== */
 export const DEFAULT_DATA = {
   global: {
-    whatsapp: "919999999999",
+    whatsapp: "+91 9XXXX XXXXX",
     phone: "+91 9XXXX XXXXX",
   },
 

@@ -9,7 +9,7 @@ import "./Eventmanagement.css";
 /* ======================================================
    DATA (replace image URL, WhatsApp number and options with your own)
 ====================================================== */
-const WHATSAPP_NUMBER = "919999999999"; // country code + number, no "+"
+const WHATSAPP_NUMBER = "+91 9XXXX XXXXX"; // country code + number, no "+"
 // Put your own banquet photo URL here. Leave "" to use the built-in banquet illustration below.
 const SIDE_IMAGE = "";
 
