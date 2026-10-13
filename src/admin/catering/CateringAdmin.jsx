@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { loadData, saveDataSections, uid, inr } from "../store";
+import { DEFAULT_DATA, loadData, saveDataSections, uid, inr } from "../store";
 import { Section, F, Text, Num, Area, ImageUpload, TagsInput, Repeater, Tabs, Toast } from "../ui";
 
 function SaveSection({ path, value, updates, label, onSave }) {
@@ -68,34 +68,37 @@ function LandingTab({ data, patch, saveSection }) {
                             <Text label="Title" value={it.title} onChange={(v) => upd({ ...it, title: v })} />
                             <Text label="Eyebrow / tagline" value={it.eyebrow} onChange={(v) => upd({ ...it, eyebrow: v })} />
                         </div>
-                        <Text label="Price badge (optional)" value={it.price} onChange={(v) => upd({ ...it, price: v })} placeholder="Starting from ₹200 /plate" />
+                        <Text label="Price badge " value={it.price} onChange={(v) => upd({ ...it, price: v })} placeholder="Starting from ₹200 /plate" />
                         <ImageUpload label="Card image" value={it.image} onChange={(v) => upd({ ...it, image: v })} />
                         <Text label="CTA button label" value={it.cta} onChange={(v) => upd({ ...it, cta: v })} />
 
-                        <F label="Paragraphs">
-                            <Repeater
-                                items={it.paras || []}
-                                onChange={(v) => upd({ ...it, paras: v })}
-                                makeNew={() => ""}
-                                addLabel="+ Add paragraph"
-                                itemTitle={(p) => p.slice(0, 60) || "Empty"}
-                                renderRow={(p, pi, pu) => (
-                                    <Area value={p} onChange={(v) => pu(v)} rows={2} />
-                                )}
-                            />
-                        </F>
+                        <Area
+                            label="Paragraphs"
+                            value={(it.paras || []).join("\n\n")}
+                            onChange={(v) => upd({
+                                ...it,
+                                paras: v.split(/\r?\n\s*\r?\n/).map((p) => p.trim()).filter(Boolean),
+                            })}
+                            rows={6}
+                            placeholder="Write the service description. Separate paragraphs with a blank line."
+                        />
 
-                        <F label="Chips">
-                            <Repeater
-                                items={it.chips || []}
-                                onChange={(v) => upd({ ...it, chips: v })}
-                                makeNew={() => ({ text: "" })}
-                                itemTitle={(c) => c.text || "Chip"}
-                                renderRow={(c, _ci, cu) => (
-                                    <Text label="Text" value={c.text} onChange={(v) => cu({ ...c, text: v })} />
-                                )}
-                            />
-                        </F>
+                        <TagsInput
+                            label="Chip options"
+                            value={(it.chips || []).map((chip) => (
+                                typeof chip === "string" ? chip : chip.text
+                            )).filter(Boolean)}
+                            onChange={(labels) => upd({
+                                ...it,
+                                chips: labels.map((text) => {
+                                    const existing = (it.chips || []).find((chip) =>
+                                        typeof chip !== "string" && chip.text === text
+                                    );
+                                    return existing || { icon: "bowl", text };
+                                }),
+                            })}
+                            placeholder="Type an option and press Enter or comma"
+                        />
                     </>
                 )}
             />
@@ -255,10 +258,27 @@ function FullTab({ data, patch, saveSection }) {
     const full = data.catering.full;
     const setFull = (v) => patch("full", v);
     const menuCats = Object.keys(full.menu || {});
+    const about = full.about ?? DEFAULT_DATA.catering.full.about;
 
     return (
         <>
-            <Section num="1" title="Gallery" sub="Portfolio images on the Full Catering page."
+            <Section num="1" title="Hero image" sub="The main banner image shown at the top of the Full Catering page."
+                right={<SaveSection path="catering.full.hero" value={full.hero || ""} label="hero image" onSave={saveSection} />}>
+                <ImageUpload label="Full Catering hero image" value={full.hero || ""} onChange={(v) => setFull({ ...full, hero: v })} />
+            </Section>
+
+            <Section num="2" title="About paragraph" sub="Describe the Full Catering service."
+                right={<SaveSection path="catering.full.about" value={about} label="about paragraph" onSave={saveSection} />}>
+                <Area
+                    label="About"
+                    value={about}
+                    onChange={(v) => setFull({ ...full, about: v })}
+                    rows={6}
+                    placeholder="Write about the Full Catering service."
+                />
+            </Section>
+
+            <Section num="3" title="Gallery" sub="Portfolio images on the Full Catering page."
                 right={<SaveSection path="catering.full.gallery" value={full.gallery || []} label="gallery" onSave={saveSection} />}>
                 <div className="adm-gal">
                     {(full.gallery || []).map((image, i) => (
@@ -273,12 +293,23 @@ function FullTab({ data, patch, saveSection }) {
                 </div>
             </Section>
 
-            <Section num="2" title="Cuisines, Plate prices, Food types & Service tags"
-                right={<SaveSection path="catering.full.serviceTags" value={full.serviceTags} label="service tags" onSave={saveSection} />}>
-                {/* <TagsInput label="Cuisines" value={full.cuisines} onChange={(v) => setFull({ ...full, cuisines: v })} placeholder="Add cuisine…" />
-                <TagsInput label="Plate price ranges" value={full.platePrices} onChange={(v) => setFull({ ...full, platePrices: v })} placeholder="e.g. ₹500 – ₹800" />
-                <TagsInput label="Food types" value={full.foodTypes} onChange={(v) => setFull({ ...full, foodTypes: v })} placeholder="e.g. Veg" /> */}
-                <TagsInput label="Service tags" value={full.serviceTags} onChange={(v) => setFull({ ...full, serviceTags: v })} placeholder="e.g. Live Counters" />
+            <Section num="4" title="Cuisines, Plate prices, Food types & Service tags"
+                right={<SaveSection
+                    updates={[
+                        { path: "catering.full.cuisines", value: full.cuisines },
+                        { path: "catering.full.platePrices", value: full.platePrices },
+                        { path: "catering.full.foodTypes", value: full.foodTypes },
+                        { path: "catering.full.serviceTags", value: full.serviceTags },
+                    ]}
+                    label="catering options" onSave={saveSection} />}>
+                <TagsInput label="Cuisines" value={full.cuisines || []}
+                    onChange={(v) => setFull({ ...full, cuisines: v })} placeholder="Add cuisine…" />
+                <TagsInput label="Plate price ranges" value={full.platePrices || []}
+                    onChange={(v) => setFull({ ...full, platePrices: v })} placeholder="e.g. ₹500 – ₹800" />
+                <TagsInput label="Food types" value={full.foodTypes || []}
+                    onChange={(v) => setFull({ ...full, foodTypes: v })} placeholder="e.g. Veg" />
+                <TagsInput label="Service tags" value={full.serviceTags || []}
+                    onChange={(v) => setFull({ ...full, serviceTags: v })} placeholder="e.g. Live Counters" />
             </Section>
 
             {/* <Section num="3" title="Full menu" sub="Categories appear as dropdowns inside the detailed quote modal.">
@@ -329,7 +360,7 @@ function FullTab({ data, patch, saveSection }) {
                 />
             </Section> */}
 
-            <Section num="3" title="Reviews"
+            <Section num="5" title="Reviews"
                 right={<SaveSection path="catering.full.reviews" value={full.reviews || []} label="reviews" onSave={saveSection} />}>
                 <Repeater
                     items={full.reviews || []}

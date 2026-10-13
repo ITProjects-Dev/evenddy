@@ -457,7 +457,7 @@ function EnquiryForm({ variant = "theme", subject = "", onSuccess }) {
       </div>
 
       <div className={row}>
-        <Field id="email" label="Email (Optional)">
+        <Field id="email" label="Email ">
           <input id="dc-email" className={FIELD} type="email" value={f.email} onChange={set("email")} placeholder="name@domain.com" autoComplete="email" />
         </Field>
         <Field id="date" label="Event Date *" error={err.date}>
