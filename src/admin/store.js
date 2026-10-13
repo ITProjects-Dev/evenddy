@@ -106,6 +106,8 @@ export const DEFAULT_DATA = {
     ],
 
     full: {
+      hero: "",
+      about: "Evenddy Full Catering Service delivers end-to-end dining with a wide range of multi-cuisine menus: Indian, Continental, Chinese, Mexican and Lebanese, from intimate gatherings to large-scale celebrations. We take care of everything from menu planning to live counters, serving staff and setup so your guests experience a seamless, flavourful occasion.",
       gallery: ["", "", "", ""],
       cuisines: ["North Indian", "South Indian", "Continental", "Chinese", "Mexican", "Lebanese"],
       platePrices: ["₹500 – ₹800", "₹800 – ₹1,200", "₹1,200 – ₹2,000", "₹2,000+"],

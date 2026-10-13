@@ -209,7 +209,7 @@
   border-radius: 18px;
   padding: 40px;
   box-shadow: 0 2px 3px rgba(50, 30, 20, 0.06);
-  max-width: 1000px;
+  max-width: 1380px;
   margin: 0 auto;
   width: 100%;
   min-height: 500px;
@@ -690,4 +690,333 @@
     height: 16px;
     position: relative;
     top: 1px;    /* Micro-adjust if the icon looks slightly high */
+}
+
+/* ===== Compact category step ===== */
+
+.vendor-category-step {
+    padding: 0;
+}
+
+.vendor-category-step h3 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    line-height: 1.3;
+}
+
+.vendor-category-step .step-desc {
+    margin: 0 0 16px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* Desktop: 2 columns x 3 rows visible */
+.vendor-category-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: 65px;
+    gap: 10px !important;
+
+    height: 224px;
+    max-height: 224px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+
+    padding: 2px 8px 2px 2px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--brand-maroon) var(--brand-bg-beige);
+    align-content: start;
+}
+
+/* Small, horizontal cards */
+.vendor-category-grid .vendor-category-card {
+    box-sizing: border-box;
+    width: 100%;
+    height: 68px;
+    min-height: 68px;
+    margin: 0;
+    padding: 9px 11px !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px !important;
+
+    text-align: left;
+    border-radius: 10px;
+    cursor: pointer;
+    overflow: hidden;
+    font: inherit;
+    color: inherit;
+}
+
+/* Icon */
+.vendor-category-grid .vendor-category-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    margin: 0 !important;
+}
+
+/* Text container */
+.vendor-category-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    flex: 1;
+    gap: 3px;
+}
+
+.vendor-category-grid .vendor-category-title {
+    display: block;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 17px;
+}
+
+.vendor-category-grid .vendor-category-desc {
+    display: block;
+    margin: 0;
+    font-size: 11px;
+    line-height: 14px;
+    opacity: 0.8;
+}
+
+/* Keyboard accessibility */
+.vendor-category-grid .vendor-category-card:focus-visible {
+    outline: 2px solid var(--brand-maroon);
+    outline-offset: 2px;
+}
+
+.vendor-category-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.vendor-category-grid::-webkit-scrollbar-track {
+    background: var(--brand-bg-beige);
+    border-radius: 8px;
+}
+
+.vendor-category-grid::-webkit-scrollbar-thumb {
+    background: var(--brand-maroon);
+    border-radius: 8px;
+}
+
+/* Reduce excess whitespace in the main onboarding layout */
+.onboarding-header {
+    margin-bottom: 16px !important;
+}
+
+.onboarding-header h2 {
+    margin-top: 4px;
+    margin-bottom: 6px;
+    line-height: 1.3;
+}
+
+.onboarding-header .onboarding-subtitle {
+    margin-bottom: 0;
+}
+
+.onboarding-card-wrapper {
+    min-height: 0;
+    padding: 16px 28px 12px;
+}
+
+.onboarding-main {
+    min-width: 0;
+    padding: 24px 32px;
+}
+
+.onboarding-sidebar {
+    padding: 24px 20px;
+}
+
+.step-item {
+    padding-bottom: 22px;
+}
+
+.onboarding-footer {
+    margin-top: 16px;
+}
+
+.onboarding-form-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 18px;
+    row-gap: 16px;
+    align-items: stretch;
+}
+
+.onboarding-form-grid .full-width {
+    grid-column: 1 / -1;
+}
+
+.onboarding-form-grid .textarea-field {
+    grid-column: span 2;
+}
+
+.onboarding-form-grid .upload-field {
+    grid-column: span 2;
+}
+
+.onboarding-field {
+    min-width: 0;
+    gap: 6px;
+}
+
+.onboarding-input,
+.onboarding-select,
+.onboarding-textarea {
+    box-sizing: border-box;
+    min-width: 0;
+    padding: 10px 12px;
+    font-size: 12px;
+}
+
+.onboarding-textarea {
+    min-height: 40px;
+    padding: 8px 10px;
+}
+
+.file-upload-box {
+    box-sizing: border-box;
+    min-height: 34px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-field {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 44px;
+    gap: 10px;
+}
+
+.toggle-name {
+    min-width: 0;
+    flex: 0 1 auto;
+    line-height: 1.4;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--brand-text-dark);
+}
+
+.onboarding-toggle-wrapper {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 7px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+}
+
+.onboarding-toggle-wrapper:focus-visible {
+    outline: 2px solid var(--brand-maroon);
+    outline-offset: 3px;
+    border-radius: 14px;
+}
+
+.onboarding-card-wrapper {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1080px;
+    padding: 20px 24px 16px;
+}
+
+@media (min-width: 801px) {
+    .onboarding-form-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1024px) {
+    .onboarding-form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 16px;
+    }
+}
+
+@media (max-width: 800px) {
+    .onboarding-form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Mobile: one column, with six compact cards visible */
+@media (max-width: 640px) {
+    .onboarding-main {
+        padding: 16px;
+    }
+
+    .onboarding-sidebar {
+        padding: 12px 16px;
+    }
+
+    .vendor-category-grid {
+        grid-template-columns: minmax(0, 1fr);
+        grid-auto-rows: 58px;
+        gap: 8px !important;
+        height: 388px;
+        max-height: 388px;
+    }
+
+    .onboarding-card-wrapper {
+        padding: 14px 16px 10px;
+    }
+
+    .onboarding-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .onboarding-form-grid .full-width,
+    .onboarding-form-grid .upload-field,
+    .onboarding-form-grid .textarea-field {
+        grid-column: 1;
+    }
+
+    .onboarding-footer {
+        flex-direction: row;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .btn-onboard-primary,
+    .btn-onboard-outline {
+        padding: 11px 14px;
+    }
+
+    .vendor-category-grid .vendor-category-card {
+        height: 58px;
+        min-height: 58px;
+        padding: 7px 10px !important;
+    }
+
+    .vendor-category-grid .vendor-category-icon {
+        flex-basis: 34px;
+        width: 34px;
+        height: 34px;
+    }
+
+    .vendor-category-step h3 {
+        font-size: 20px;
+    }
+
+    .onboarding-header h2 {
+        font-size: 24px;
+    }
 }

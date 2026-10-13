@@ -1,5 +1,7 @@
 import { useState } from "react";
 import PlannerMap from "../../components/PlannerMap/PlannerMap";
+import emailjs from "@emailjs/browser";
+
 export default function PlannerForm() {
 
   const serviceOptions = [
@@ -74,12 +76,55 @@ export default function PlannerForm() {
   };
 
 
-  const handleSubmit = (e) => {
+  // const handleSubmit = (e) => {
 
+  //   e.preventDefault();
+
+  //   console.log("Planner form submitted:", formData);
+
+  // };
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitMessage("");
 
-    console.log("Planner form submitted:", formData);
+    try {
 
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          name: formData.name,
+          phone: formData.phone,
+          event_type: formData.eventType,
+          event_date: formData.eventDate,
+          location: formData.location,
+          services: formData.services.join(", "),
+        },
+        {
+          publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+        }
+      );
+      setSubmitMessage("Form request sent successfully!");
+
+      setFormData({
+        name: "",
+        phone: "",
+        eventType: "",
+        eventDate: "",
+        location: "",
+        services: [],
+      });
+    } catch (error) {
+      console.error("Email sending failed:", error);
+      setSubmitMessage("Unable to send. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
 
@@ -326,9 +371,14 @@ export default function PlannerForm() {
         <button
           type="submit"
           className="planner-submit"
+          disabled={isSubmitting}
         >
-          Request my quote
+          {isSubmitting ? "Sending..." : "Request my quote"}
         </button>
+
+        {submitMessage && (
+          <p role="status">{submitMessage}</p>
+        )}
 
 
         {/* DISCLAIMER */}
@@ -369,11 +419,11 @@ export default function PlannerForm() {
 
           {/* MAP */}
 
-                  {/* SERVICE AREA */}
+          {/* SERVICE AREA */}
 
-        <div className="planner-service-area">
+          <div className="planner-service-area">
 
-          {/* <span className="planner-area-label">
+            {/* <span className="planner-area-label">
             SERVICE AREA
           </span>
 
@@ -385,11 +435,11 @@ export default function PlannerForm() {
             Local crews, local pricing — operating across the Vizag belt.
           </p> */}
 
-          {/* REAL MAP */}
-          <PlannerMap />
+            {/* REAL MAP */}
+            <PlannerMap />
 
-          {/* LOCATION TAGS */}
-          {/* <div className="planner-area-tags">
+            {/* LOCATION TAGS */}
+            {/* <div className="planner-area-tags">
             <span><b>●</b> Visakhapatnam</span>
             <span><b>●</b> Bheemili</span>
             <span><b>●</b> Gajuwaka</span>
@@ -398,7 +448,7 @@ export default function PlannerForm() {
             <span><b>●</b> Araku</span>
           </div> */}
 
-        </div>
+          </div>
 
 
           {/* LOCATION TAGS */}

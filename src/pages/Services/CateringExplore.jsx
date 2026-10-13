@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useId } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useSiteData } from "../../admin/SiteDataContext";
-import { addEnquiry } from "../../admin/store";
+import { addEnquiry, DEFAULT_DATA } from "../../admin/store";
 import "./Catering.css";
 
 /* ======================================================
@@ -757,7 +757,7 @@ function FullCatering({ go, embedded }) {
   const data = useSiteData();
   const FULL = data.catering.full;
   const landing = data.catering.landing.find((c) => c.id === "full");
-  const IMG_FULL = landing?.image || "https://images.unsplash.com/photo-1555244162-803834f70033?w=900";
+  const IMG_FULL = FULL.hero || landing?.image || "https://images.unsplash.com/photo-1555244162-803834f70033?w=900";
 
   const TABS = [["about", "About"], ["portfolio", "Portfolio (140)"], ["reviews", "Reviews (84)"]];
   const [tab, setTab] = useState("about");
@@ -792,7 +792,7 @@ function FullCatering({ go, embedded }) {
             <section className="panel">
               <div className="step pink">ABOUT</div>
               <h3>Evenddy Full Catering Service</h3>
-              <p className="fc-text">Evenddy Full Catering Service delivers end-to-end dining with a wide range of multi-cuisine menus: Indian, Continental, Chinese, Mexican and Lebanese, from intimate gatherings to large-scale celebrations. We take care of everything from menu planning to live counters, serving staff and setup so your guests experience a seamless, flavourful occasion.</p>
+              <p className="fc-text">{FULL.about ?? DEFAULT_DATA.catering.full.about}</p>
               <div className="step pink mt">CUISINES &amp; SERVICES</div>
               <div className="chips">
                 {SERVICE_TAGS.map((t) => <span className="chip" key={t}>{t}</span>)}

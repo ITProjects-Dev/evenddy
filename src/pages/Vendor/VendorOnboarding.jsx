@@ -73,12 +73,30 @@ const VendorOnboarding = () => {
     ];
 
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+        const { name, value, type, checked, files } = e.target;
+        const nextValue = type === 'checkbox'
+            ? checked
+            : type === 'file'
+                ? files?.[0] || null
+                : value;
+        setFormData(prev => ({
+            ...prev,
+            [name]: nextValue,
+            ...(name === 'phone' && prev.sameAsWhatsapp ? { whatsapp: value } : {}),
+        }));
     };
 
     const handleToggle = (name) => {
-        setFormData(prev => ({ ...prev, [name]: !prev[name] }));
+        setFormData(prev => {
+            const value = !prev[name];
+            const next = { ...prev, [name]: value };
+
+            if (name === 'gstRegistered' && !value) next.gstFile = null;
+            if (name === 'alcoholPermitted' && !value) next.alcoholPolicy = '';
+            if (name === 'sameAsWhatsapp') next.whatsapp = value ? prev.phone : '';
+
+            return next;
+        });
     };
     const handleNext = () => {
         if (step < 6) setStep(prev => prev + 1);
@@ -119,82 +137,121 @@ const VendorOnboarding = () => {
 
     const ToggleField = ({ label, name, value, onChange, optional }) => (
         <div className="onboarding-field toggle-field">
-            <label>{label} {optional && <span className="opt">(optional)</span>}</label>
-            <div className="onboarding-toggle-wrapper" onClick={() => onChange(name)}>
-                <div className={`onboarding-toggle ${value ? 'on' : 'off'}`}>
-                    <div className="toggle-dot"></div>
-                </div>
+            <span className="toggle-name">
+                {label} {optional && <span className="opt"></span>}
+            </span>
+            <button
+                type="button"
+                role="switch"
+                aria-checked={value}
+                aria-label={label}
+                className="onboarding-toggle-wrapper"
+                onClick={() => onChange(name)}
+            >
+                <span className={`onboarding-toggle ${value ? 'on' : 'off'}`}>
+                    <span className="toggle-dot"></span>
+                </span>
                 <span className="toggle-label">{value ? 'Yes' : 'No'}</span>
-            </div>
+            </button>
         </div>
     );
 
-    const FileUpload = ({ label, name, required, note, onChange }) => (
-        <div className="onboarding-field full-width">
+    const FileUpload = ({ label, name, required, note, value, accept, onChange }) => (
+        <div className="onboarding-field upload-field">
             <label>{label} {required && <span className="req">*</span>}</label>
             {note && <p className="field-note">{note}</p>}
             <div className="file-upload-box">
-                <input type="file" id={name} name={name} onChange={onChange} className="file-input-hidden" />
+                <input type="file" id={name} name={name} accept={accept} onChange={onChange} className="file-input-hidden" />
                 <label htmlFor={name} className="file-upload-label">
-                    <span className="upload-icon">↑</span> Choose file
+                    <span className="upload-icon">↑</span> {value?.name || 'Choose file'}
                 </label>
             </div>
         </div>
     );
 
-    const renderStep1 = () => {
-        const categories = [
-            { id: 'photography', title: 'Photography & Video', desc: 'Candid, traditional, films', icon: <Camera size={20} /> },
-            { id: 'venues', title: 'Venues', desc: 'Banquets, lawns, resorts', icon: <Building size={20} /> },
-            { id: 'catering', title: 'Catering', desc: 'Buffets, live counters, meal boxes', icon: <Utensils size={20} /> },
-            { id: 'decor', title: 'Decor', desc: 'Stages, mandaps, florals', icon: <Flower2 size={20} /> },
-            { id: 'makeup', title: 'Makeup & Hair', desc: 'Bridal, party, groom', icon: <Scissors size={20} /> },
-            { id: 'priest', title: 'Priest / Rituals', desc: 'Pandits, poojas, muhurtham', icon: <Flame size={20} /> },
-            { id: 'entertainment', title: 'Entertainment & DJ', desc: 'DJs, bands, dhol, dancers', icon: <Music size={20} /> },
-            { id: 'mehndi', title: 'Mehndi', desc: 'Bridal & guest mehndi', icon: <Hand size={20} /> },
-            { id: 'invitations', title: 'Invitations', desc: 'Cards, e-invites, gifting', icon: <Mail size={20} /> },
-            { id: 'transport', title: 'Transport', desc: 'Cars, buses, vintage rides', icon: <Car size={20} /> },
-            { id: 'anchor', title: 'Anchor / Host', desc: 'Emcees and hosts', icon: <Mic size={20} /> },
-            { id: 'other', title: 'Something else', desc: 'Tell us what you do', icon: <PlusCircle size={20} /> },
-        ];
 
-        return (
-            <div className="step-content">
-                <h3>Vendor type</h3>
-                <p className="step-desc">What do you do?</p>
-                <div className="onboarding-grid">
-                    {categories.map(cat => (
-                        <div
+const renderStep1 = () => {
+    const categories = [
+        { id: 'photography', title: 'Photography & Video', desc: 'Candid, traditional, films', icon: <Camera size={19} /> },
+        { id: 'venues', title: 'Venues', desc: 'Banquets, lawns, resorts', icon: <Building size={19} /> },
+        { id: 'catering', title: 'Catering', desc: 'Buffets, live counters, meal boxes', icon: <Utensils size={19} /> },
+        { id: 'decor', title: 'Decor', desc: 'Stages, mandaps, florals', icon: <Flower2 size={19} /> },
+        { id: 'makeup', title: 'Makeup & Hair', desc: 'Bridal, party, groom', icon: <Scissors size={19} /> },
+        { id: 'priest', title: 'Priest / Rituals', desc: 'Pandits, poojas, muhurtham', icon: <Flame size={19} /> },
+        { id: 'entertainment', title: 'Entertainment & DJ', desc: 'DJs, bands, dhol, dancers', icon: <Music size={19} /> },
+        { id: 'mehndi', title: 'Mehndi', desc: 'Bridal & guest mehndi', icon: <Hand size={19} /> },
+        { id: 'invitations', title: 'Invitations', desc: 'Cards, e-invites, gifting', icon: <Mail size={19} /> },
+        { id: 'transport', title: 'Transport', desc: 'Cars, buses, vintage rides', icon: <Car size={19} /> },
+        { id: 'anchor', title: 'Anchor / Host', desc: 'Emcees and hosts', icon: <Mic size={19} /> },
+        { id: 'other', title: 'Something else', desc: 'Tell us what you do', icon: <PlusCircle size={19} /> },
+    ];
+
+    return (
+        <div className="step-content vendor-category-step mb-4">
+            <h3>Choose your category</h3>
+            <p className="step-desc">Select the service you provide.</p>
+
+            <div className="onboarding-grid vendor-category-grid">
+                {categories.map((cat) => {
+                    const selected = formData.vendorType === cat.title;
+
+                    return (
+                        <button
                             key={cat.id}
-                            className={`onboarding-card ${formData.vendorType === cat.title ? 'selected' : ''}`}
-                            onClick={() => updateFormData('vendorType', cat.title)}
+                            type="button"
+                            aria-pressed={selected}
+                            className={`onboarding-card vendor-category-card ${
+                                selected ? 'selected' : ''
+                            }`}
+                            onClick={() =>
+                                updateFormData('vendorType', cat.title)
+                            }
                         >
-                            <div className="card-icon">{cat.icon}</div>
-                            <h4>{cat.title}</h4>
-                            <p>{cat.desc}</p>
-                        </div>
-                    ))}
-                </div>
+                            <span className="card-icon vendor-category-icon">
+                                {cat.icon}
+                            </span>
+
+                            <span className="vendor-category-text">
+                                <span className="vendor-category-title">
+                                    {cat.title}
+                                </span>
+                                <span className="vendor-category-desc">
+                                    {cat.desc}
+                                </span>
+                            </span>
+                        </button>
+                    );
+                })}
             </div>
-        );
-    };
+        </div>
+    );
+};
+
 
     // ... (Keep all other renderStep functions exactly the same as your current file) ...
 
     const renderStep2 = () => (
         <div className="step-content">
-            <h3>Business Info</h3>
+            <h3 className='pb-1'>Business Info</h3>
             <div className="onboarding-form-grid">
                 <InputField label="Business / brand name" name="businessName" placeholder="e.g. Lens & Light Studios" value={formData.businessName} onChange={handleChange} />
                 <InputField label="Your name" name="yourName" placeholder="Full name" required value={formData.yourName} onChange={handleChange} />
                 <SelectField label="Years in business" name="yearsInBusiness" options={['0-1 years', '1-2 years', '3-5 years', '5+ years']} required value={formData.yearsInBusiness} onChange={handleChange} />
                 <SelectField label="Team size" name="teamSize" options={['1-5', '6-15', '16-50', '50+']} required value={formData.teamSize} onChange={handleChange} />
-                <div className="onboarding-field full-width">
+                <div className="onboarding-field textarea-field">
                     <label>Short description of your work</label>
                     <textarea name="description" placeholder="A couple of lines couples should know about you" value={formData.description} onChange={handleChange} className="onboarding-textarea"></textarea>
                 </div>
                 <ToggleField label="Business registration / GST" name="gstRegistered" value={formData.gstRegistered} onChange={handleToggle} optional />
-                <FileUpload label="Business registration / GST" name="gstFile" note="Optional — adds a Registered Business' badge to your profile" onChange={handleChange} />
+                {formData.gstRegistered && (
+                    <FileUpload
+                        label="GST / registration document"
+                        name="gstFile"
+                        value={formData.gstFile}
+                        accept=".pdf,image/*"
+                        onChange={handleChange}
+                    />
+                )}
             </div>
         </div>
     );
@@ -212,10 +269,12 @@ const VendorOnboarding = () => {
                 <SelectField label="Catering policy" name="cateringPolicy" options={['In-house', 'Outside allowed', 'Both']} required value={formData.cateringPolicy} onChange={handleChange} />
                 <SelectField label="Decor policy" name="decorPolicy" options={['In-house', 'Outside allowed', 'Both']} required value={formData.decorPolicy} onChange={handleChange} />
                 <ToggleField label="Alcohol permitted" name="alcoholPermitted" value={formData.alcoholPermitted} onChange={handleToggle} optional />
-                <SelectField label="Alcohol policy" name="alcoholPolicy" options={['BYOB', 'In-house', 'Not allowed']} value={formData.alcoholPolicy} onChange={handleChange} />
+                {formData.alcoholPermitted && (
+                    <SelectField label="Alcohol policy" name="alcoholPolicy" options={['BYOB', 'In-house']} value={formData.alcoholPolicy} onChange={handleChange} />
+                )}
                 <ToggleField label="Entertainment/DJ permitted" name="entertainmentPermitted" value={formData.entertainmentPermitted} onChange={handleToggle} optional />
                 <div className="onboarding-field full-width">
-                    <label>Amenities <span className="opt">(optional)</span></label>
+                    <label>Amenities <span className="opt"></span></label>
                     <div className="amenities-wrap">
                         {['Air conditioning', 'Parking', 'Valet', 'Power backup', 'Wi-Fi', 'Bridal room', 'Groom room'].map(amenity => (
                             <button
@@ -242,7 +301,7 @@ const VendorOnboarding = () => {
             <p className="step-desc">Where and how much</p>
             <div className="onboarding-form-grid">
                 <InputField label="Base city" name="baseCity" placeholder="e.g. Visakhapatnam" required value={formData.baseCity} onChange={handleChange} />
-                <div className="onboarding-field full-width">
+                <div className="onboarding-field textarea-field">
                     <label>Venue address <span className="req">*</span></label>
                     <textarea name="venueAddress" placeholder="Full address with landmark" value={formData.venueAddress} onChange={handleChange} className="onboarding-textarea" required></textarea>
                 </div>
@@ -260,8 +319,18 @@ const VendorOnboarding = () => {
                 <InputField label="Phone number" name="phone" placeholder="10- digit mobile number" required value={formData.phone} onChange={handleChange} />
                 <InputField label="Email" name="email" type="email" placeholder="you@business.com" required value={formData.email} onChange={handleChange} />
                 <ToggleField label="Phone number same as WhatsApp number" name="sameAsWhatsapp" value={formData.sameAsWhatsapp} onChange={handleToggle} optional />
-                <InputField label="WhatsApp number" name="whatsapp" placeholder="10- digit mobile number" required value={formData.whatsapp} onChange={handleChange} />
-                <FileUpload label="Cover photo" name="coverPhoto" note="This is the first image hosts see on your profile" required onChange={handleChange} />
+                {!formData.sameAsWhatsapp && (
+                    <InputField label="WhatsApp number" name="whatsapp" placeholder="10- digit mobile number" required value={formData.whatsapp} onChange={handleChange} />
+                )}
+                <FileUpload
+                    label="Cover photo"
+                    name="coverPhoto"
+                    value={formData.coverPhoto}
+                    accept="image/*"
+                    note="This is the first image hosts see on your profile"
+                    required
+                    onChange={handleChange}
+                />
                 <InputField label="Website" name="website" placeholder="https://" value={formData.website} onChange={handleChange} optional />
                 <InputField label="Instagram handle" name="instagram" placeholder="@yourstudio" value={formData.instagram} onChange={handleChange} optional />
             </div>
@@ -338,6 +407,9 @@ const VendorOnboarding = () => {
         <div className="onboarding-layout">
             {/* Sidebar */}
             <aside className="onboarding-sidebar">
+                <div className="onboarding-top-nav flex justify-start">
+                    <a href="/demo/" className="back-link"> <ArrowLeft size={16} /> Back to Home</a>
+                </div>
                 <div className="onboarding-stepper">
                     {steps.map((label, index) => {
                         const stepNumber = index + 1;
@@ -356,9 +428,7 @@ const VendorOnboarding = () => {
 
             {/* Main Content */}
             <main className="onboarding-main" ref={mainRef}>
-                <div className="onboarding-top-nav">
-                    <a href="/demo/" className="back-link"> <ArrowLeft size={16} /> Back to Home</a>
-                </div>
+
 
                 <div className="onboarding-header">
                     <p className="onboarding-eyebrow">Vendor Onboarding</p>
