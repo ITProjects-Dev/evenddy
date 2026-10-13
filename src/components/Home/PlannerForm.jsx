@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PlannerMap from "../../components/PlannerMap/PlannerMap";
 import emailjs from "@emailjs/browser";
+import { LocationEdit, PhoneCall, Star } from "lucide-react";
 
 export default function PlannerForm() {
 
@@ -290,7 +291,7 @@ export default function PlannerForm() {
           <div className="planner-location-input">
 
             <span className="location-icon">
-              ⌖
+              <LocationEdit size={16}/>
             </span>
 
             <input
@@ -343,12 +344,12 @@ export default function PlannerForm() {
                 >
 
                   {service}
-
+{/* 
                   {selected && (
                     <span className="service-check">
                       ✓
                     </span>
-                  )}
+                  )} */}
 
                 </button>
 
@@ -419,73 +420,9 @@ export default function PlannerForm() {
 
           {/* MAP */}
 
-          {/* SERVICE AREA */}
-
           <div className="planner-service-area">
-
-            {/* <span className="planner-area-label">
-            SERVICE AREA
-          </span>
-
-          <h3>
-            Visakhapatnam &amp; nearby
-          </h3>
-
-          <p>
-            Local crews, local pricing — operating across the Vizag belt.
-          </p> */}
-
-            {/* REAL MAP */}
             <PlannerMap />
-
-            {/* LOCATION TAGS */}
-            {/* <div className="planner-area-tags">
-            <span><b>●</b> Visakhapatnam</span>
-            <span><b>●</b> Bheemili</span>
-            <span><b>●</b> Gajuwaka</span>
-            <span><b>●</b> Anakapalle</span>
-            <span><b>●</b> Vizianagaram</span>
-            <span><b>●</b> Araku</span>
-          </div> */}
-
           </div>
-
-
-          {/* LOCATION TAGS */}
-
-          {/* <div className="planner-area-tags">
-
-            <span>
-              <b>●</b>
-              Visakhapatnam
-            </span>
-
-            <span>
-              <b>●</b>
-              Bheemili
-            </span>
-
-            <span>
-              <b>●</b>
-              Gajuwaka
-            </span>
-
-            <span>
-              <b>●</b>
-              Anakapalle
-            </span>
-
-            <span>
-              <b>●</b>
-              Vizianagaram
-            </span>
-
-            <span>
-              <b>●</b>
-              Araku
-            </span>
-
-          </div> */}
 
         </div>
 
@@ -498,7 +435,7 @@ export default function PlannerForm() {
           <div className="planner-contact-item">
 
             <div className="contact-icon">
-              ☎
+              <PhoneCall size={16}/>
             </div>
 
             <div>
@@ -519,7 +456,7 @@ export default function PlannerForm() {
           <div className="planner-contact-item">
 
             <div className="contact-icon booking-icon">
-              ✦
+              <Star size={16}/>
             </div>
 
             <div>
