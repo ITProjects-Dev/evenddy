@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { sendMail } from "./sendmail";
 
 /* Event Management / Plan Your Event page (single file, like CateringExplore / DecorExplore).
    Rendered by ServiceDetails when the slug contains "event".
@@ -143,6 +144,8 @@ export default function EventManagementExplore() {
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [mailError, setMailError] = useState("");
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
   const setType = (e) => setForm({ ...form, eventType: e.target.value, subtype: "" }); // subtype depends on type
@@ -167,8 +170,9 @@ export default function EventManagementExplore() {
       form.story && `Notes: ${form.story}`,
     ].filter(Boolean).join("\n");
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
+    if (sending) return;
     const v = {};
     if (!form.name.trim()) v.name = "Enter your name";
     if (!/^\d{10}$/.test(form.phone)) v.phone = "Enter a 10-digit number";
@@ -182,9 +186,17 @@ export default function EventManagementExplore() {
       document.getElementById(`em-${Object.keys(v)[0]}`)?.focus();
       return;
     }
-    // TODO: send `form` to your backend / CRM here
-    console.log("Event enquiry:", form);
-    setSent(true);
+    // E-mail the brief to the business, then show the success popup
+    setSending(true);
+    setMailError("");
+    try {
+      await sendMail({ subject: "Event management enquiry", lines: [summary()] });
+      setSent(true);
+    } catch {
+      setMailError("Sorry, we couldn't send your enquiry. Please try again or call us.");
+    } finally {
+      setSending(false);
+    }
   };
 
   const whatsapp = () =>
@@ -335,8 +347,9 @@ export default function EventManagementExplore() {
                 <WaIcon />
                 Continue WhatsApp
               </button>
-              <button type="submit" className={BTN_SOLID}>Request Quote</button>
+              <button type="submit" className={cx(BTN_SOLID, "disabled:opacity-60")} disabled={sending}>{sending ? "Sending…" : "Request Quote"}</button>
             </div>
+            {mailError && <p role="alert" className="mb-0 mt-3! text-center text-[11px] text-red-600">{mailError}</p>}
             <p className="mb-0 mt-12! text-center text-[11px] text-[#a8a2a6]">
               A dedicated Evenddy planner will review your brief and connect within 24 hours.
             </p>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { sendMail } from "./sendmail";
 
 /* Decor explore flow (single file, like CateringExplore), styled with Tailwind only.
    You can delete Decor.css and its import. Font comes from your global Sora setup.
@@ -416,11 +417,14 @@ const Field = ({ id, label, error, children }) => (
 function EnquiryForm({ variant = "theme", subject = "", onSuccess }) {
   const [f, setF] = useState({ name: "", phone: "", email: "", date: "", occasion: "", budget: BUDGETS[1], city: "" });
   const [err, setErr] = useState({});
+  const [sending, setSending] = useState(false);
+  const [mailError, setMailError] = useState("");
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const row = "grid grid-cols-1 gap-x-3 min-[600px]:grid-cols-2";
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
+    if (sending) return;
     const v = {};
     if (!f.name.trim()) v.name = "Enter your name";
     if (!/^\d{10}$/.test(f.phone)) v.phone = "Enter a 10-digit number";
@@ -428,9 +432,32 @@ function EnquiryForm({ variant = "theme", subject = "", onSuccess }) {
     if (variant === "custom" && !f.occasion) v.occasion = "Select an occasion";
     setErr(v);
     if (Object.keys(v).length) return;
-    // TODO: send `f` + `subject` to your backend / CRM here
-    console.log("Decor enquiry:", { variant, subject, ...f });
-    onSuccess?.(f);
+
+    // E-mail the enquiry to the business (no WhatsApp redirect), then show the success popup
+    setSending(true);
+    setMailError("");
+    try {
+      await sendMail({
+        subject: `Decor enquiry${subject ? ` – ${subject}` : ""}`,
+        replyTo: f.email || undefined,
+        lines: [
+          `Decor enquiry${subject ? ` – ${subject}` : ""}`,
+          `Type: ${variant === "custom" ? "Customized decor" : "Kit / theme"}`,
+          `Name: ${f.name}`,
+          `Phone: +91 ${f.phone}`,
+          f.email && `Email: ${f.email}`,
+          `Event date: ${f.date}`,
+          variant === "custom" && `Occasion: ${f.occasion}`,
+          variant === "custom" && `Budget: ${f.budget}`,
+          f.city && `Venue / City: ${f.city}`,
+        ],
+      });
+      onSuccess?.(f);
+    } catch {
+      setMailError("Sorry, we couldn't send your enquiry. Please try again or chat with us on WhatsApp.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -487,7 +514,8 @@ function EnquiryForm({ variant = "theme", subject = "", onSuccess }) {
         </Field>
       </div>
 
-      <button type="submit" className={BTN_BLOCK}>Send Enquiry <Icon name="send" size={16} /></button>
+      <button type="submit" className={cx(BTN_BLOCK, "disabled:opacity-60")} disabled={sending}>{sending ? "Sending…" : "Send Enquiry"} <Icon name="send" size={16} /></button>
+      {mailError && <p role="alert" className="mb-0 mt-2.5! text-center text-[11px] text-[#c0262d]">{mailError}</p>}
       <a className={WA_BTN} target="_blank" rel="noreferrer"
          href={waLink(`Hi Evenddy, I'd like a decor quote${subject ? ` for: ${subject}` : ""}.${f.name ? ` Name: ${f.name}.` : ""}`)}>
         <span className="text-[#25d366]"><Icon name="wa" size={20} /></span>Chat Directly on WhatsApp
