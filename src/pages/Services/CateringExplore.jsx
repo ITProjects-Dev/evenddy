@@ -3,9 +3,9 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useSiteData } from "../../admin/SiteDataContext";
 import { addEnquiry } from "../../admin/store";
 import { sendMail } from "./sendmail";
+import "./Catering.css";
 
-/* Styled with Tailwind utility classes only (no Catering.css needed, delete it and its import).
-   Font comes from your global Sora setup, so no font-family anywhere here.
+/* Font comes from your global Sora setup, so no font-family anywhere here.
 
    NOTE: your global CSS has unlayered rules (a{color:inherit}, button{border:0},
    h1,h2{font-weight/letter-spacing}, h1-h4,p{margin-top:0}). Tailwind v4 utilities live in a
@@ -91,6 +91,7 @@ const checkBasics = (f) => {
 const WRAP = "mx-auto w-full max-w-[1120px] px-6";
 const LAYOUT = "grid items-start gap-[22px] min-[900px]:grid-cols-[1fr_360px]";
 const PANEL = "mb-5 rounded-2xl bg-white px-[18px] py-5 shadow-[0_2px_14px_rgba(60,40,30,.06)] min-[560px]:px-7 min-[560px]:py-[26px]";
+const SUMMARY = "summary rounded-2xl bg-white px-6 pb-[22px] pt-[26px] shadow-[0_2px_14px_rgba(60,40,30,.06)] min-[900px]:sticky min-[900px]:top-4";
 const H3 = "mb-[18px] text-xl font-medium text-[#1f1819]";
 const STEP = "mb-1.5 text-[10.5px] font-medium tracking-[.08em] text-[#6b4a46]";
 const STEP_PINK = "mb-1.5 text-[10.5px] font-semibold tracking-[.1em] text-[#8c1c4f]";
@@ -218,97 +219,12 @@ function Radios({ name, value, onChange, labelId }) {
   );
 }
 
-function WhatsAppRow({ on, setOn }) {
-  return (
-    <div className="mb-3.5 mt-[18px] flex items-center gap-2.5 rounded-xl border border-[#ecdccf] bg-[#fcf4ee] px-3 py-2.5">
-      <span className="flex text-[#4b4547]"><Icon name="chat" size={16} /></span>
-      <span className="flex flex-1 flex-col gap-px">
-        <b className="text-[12.5px] font-bold text-[#1f1819]">Notify me on WhatsApp</b>
-        <small className="text-[10.5px] text-[#6f6366]">We'll send quote there</small>
-      </span>
-      <Switch on={on} onClick={() => setOn(!on)} label="Notify on WhatsApp" />
-    </div>
-  );
-}
-
-/* Send Enquiry + Call Us (icon and label always on one centred line) */
-function SummaryActions({ onSend, sending }) {
-  const data = useSiteData();
-  const PHONE = data.global.phone;
-  return (
-    <>
-      <button className="block w-full rounded-[10px] bg-[#6d0a38] py-3.5 text-[15px] font-bold text-white transition hover:brightness-110 disabled:opacity-60" onClick={onSend} disabled={sending}>
-        {sending ? "Sending…" : "Send Enquiry"}
-      </button>
-      <a
-        className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-[10px] bg-white py-3.5 text-[13px] font-semibold text-[#1f1819]! shadow-[inset_0_0_0_1px_#d9d2cd] transition hover:bg-[#faf7f4]"
-        href={`tel:${PHONE.replace(/\s/g, "")}`}
-      >
-        <Icon name="phone" size={15} />
-        Call Us
-      </a>
-    </>
-  );
-}
-
-const SUMMARY = "rounded-2xl bg-white px-6 pb-[22px] pt-[26px] shadow-[0_2px_14px_rgba(60,40,30,.06)] min-[900px]:sticky min-[900px]:top-4";
-const NOTE = "mb-0 pt-4 text-center text-[11px] leading-normal text-[#4b4547]";
-const TOAST = "mb-2.5 rounded-[10px] bg-[#e7f6ec] p-2.5 text-[13px] text-[#14532d]";
-
-/* ---------- Success popup: "Enquiry Sent" after Send Enquiry, "Quote Request" variant for the detailed quote form ---------- */
-function SuccessModal({ onClose, quote }) {
-  useEffect(() => {
-    const onKey = (e) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [onClose]);
-
-  return (
-    <div className="fixed inset-0 z-[1100] grid place-items-center bg-[rgba(35,26,29,.55)] p-4 backdrop-blur-[2px]" onClick={onClose}>
-      <div
-        className="w-full max-w-[400px] rounded-[18px] bg-white px-6 pb-6 pt-7 text-center shadow-[0_24px_60px_rgba(35,26,29,.35)]"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="success-title"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* maroon check inside a thin ring */}
-        <div className="mx-auto mb-4 grid size-[60px] place-items-center rounded-full shadow-[inset_0_0_0_1.5px_#6b0a35]">
-          <span className="grid size-[46px] place-items-center rounded-full bg-[#6b0a35] text-white">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M5 12.5l4.5 4.5L19 7.5" />
-            </svg>
-          </span>
-        </div>
-        <h3 id="success-title" className="mb-3 text-[22px] font-bold leading-[1.25] text-[#1f1819]">
-          {quote ? "Quote Request Submitted Successfully!" : "Enquiry Sent Successfully!"}
-        </h3>
-        <p className="mb-2 text-xs leading-[1.6] text-[#3f3a3c]">
-          Thank you for choosing <b className="font-bold text-[#6b0a35]">Evenddy</b>. We've received your {quote ? "request" : "enquiry"} and our team will review your requirements.
-        </p>
-        <p className="mb-5 text-[11.5px] leading-[1.6] text-[#6f6366]">
-          {quote ? "Our team will get in touch with you shortly to discuss your requirements and provide the quote." : "Our team will get in touch with you shortly to confirm the details."}
-        </p>
-        <button
-          autoFocus
-          className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#6b0a35] py-3 text-[13px] font-semibold text-white transition hover:brightness-110"
-          onClick={onClose}
-        >
-          Continue Browsing →
-        </button>
-      </div>
-    </div>
-  );
-}
-
 /* ---------- Order summary ---------- */
 function OrderSummary({ lines, submitLines, total, totalNote, onRemove, showGuests, showDelivery, header, bold }) {
-  const [form, setForm] = useState({ name: "", phone: "", guests: "", date: "", delivery: "yes", serving: "no", location: "", wa: true });
+  const data = useSiteData();
+  const PHONE = data.global.phone;
+
+  const [form, setForm] = useState({ name: "", phone: "", guests: "", date: "", delivery: "yes", serving: "no", location: "" });
   const [errors, setErrors] = useState({});
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
@@ -405,11 +321,10 @@ function OrderSummary({ lines, submitLines, total, totalNote, onRemove, showGues
           <Radios name="serving" value={form.serving} onChange={(v) => setForm({ ...form, serving: v })} labelId="lab-serving" />
         </div>
       )}
-      <WhatsAppRow on={form.wa} setOn={(v) => setForm({ ...form, wa: v })} />
-      <SummaryActions onSend={send} sending={sending} />
-      {mailError && <p role="alert" className="mb-0 mt-2.5! text-center text-[11px] text-red-600">{mailError}</p>}
-      {sent && <SuccessModal onClose={() => setSent(false)} />}
-      <p className={NOTE}>No payment required now. Our team will contact you to confirm details.</p>
+      {sent && <div className="toast" role="status">Enquiry sent. Our team will contact you to confirm details.</div>}
+      <button className="btn block" onClick={send}>Send Enquiry</button>
+      <a className="btn block ghost call" href={`tel:${PHONE.replace(/\s/g, "")}`}>Call Us</a>
+      <p className="note">No payment required now. Our team will contact you to confirm details.</p>
     </aside>
   );
 }
@@ -594,7 +509,6 @@ function Landing({ go, embedded }) {
     title: c.title,
     eyebrow: c.eyebrow,
     icon: c.icon,
-    tone: c.tone,
     image: c.image || FALLBACK[c.id] || FALLBACK.full,
     price: c.price,
     paras: c.paras || [],
@@ -604,9 +518,9 @@ function Landing({ go, embedded }) {
   }));
 
   const picks = [
-    ["box", "Meal Box", "Individual portions, perfect for structured meals.", "mealbox", "green"],
-    ["truck", "Delivery Box", "Bulk food delivered hot to your venue or home.", "delivery", "gold"],
-    ["fork", "Full Catering", "Complete service with custom menu and live counters.", "full", "orange"],
+    ["box", "Meal Box", "Individual portions, perfect for structured meals.", "mealbox"],
+    ["truck", "Delivery Box", "Bulk food delivered hot to your venue or home.", "delivery"],
+    ["fork", "Full Catering", "Complete service with custom menu and live counters.", "full"],
   ];
 
   return (
@@ -621,57 +535,34 @@ function Landing({ go, embedded }) {
           <p className="mb-0 text-base text-[#4b4547]">Choose the catering experience that best fits your event.</p>
         </section>
 
-        <div className="mx-auto grid max-w-[820px] gap-10 pb-2 pt-6 min-[860px]:gap-16">
-          {options.map((o) => {
-            const t = TONES[o.tone] || TONES.gold;
-            return (
-              <article key={o.id} className={cx("grid items-stretch", o.flip ? "min-[860px]:grid-cols-[1fr_300px]" : "min-[860px]:grid-cols-[300px_1fr]")}>
-                <div
-                  className={cx("relative z-[1] min-h-[240px] rounded-t-2xl bg-cover bg-center shadow-[0_14px_30px_rgba(60,30,20,.22)] min-[860px]:-my-6 min-[860px]:min-h-[300px] min-[860px]:rounded-[14px]", o.flip && "min-[860px]:order-2")}
-                  role="img"
-                  aria-label={o.title}
-                  style={{ backgroundImage: `url(${o.image})` }}
-                />
-                <div
-                  className={cx(
-                    "relative flex flex-col justify-center gap-2.5 overflow-hidden rounded-b-2xl bg-white px-6 py-7 shadow-[0_6px_24px_rgba(60,30,20,.08)] min-[860px]:px-10 min-[860px]:py-10",
-                    o.flip ? "min-[860px]:rounded-[16px_0_0_16px]" : "min-[860px]:rounded-[0_16px_16px_0]"
-                  )}
-                >
-                  <div className={cx("absolute inset-x-0 top-0 h-0.5", t.bg)} />
-                  <span className={cx("flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[.1em]", t.text)}>
-                    <Icon name={o.icon} size={15} />{o.eyebrow}
-                  </span>
-                  <div className="flex flex-wrap items-center gap-3.5">
-                    <h2 className="mb-0 text-[27px] font-semibold! leading-tight tracking-[-.01em]! text-[#1a1516]">{o.title}</h2>
-                    {o.price && <span className="rounded-full bg-[#fbe3d6] px-4 py-2 text-[13px] font-semibold text-[#c4510d]">{o.price}</span>}
-                  </div>
-                  <div className="flex flex-col gap-3.5">
-                    {o.paras.map((p, i) => <p key={i} className="mb-0 text-sm leading-[1.7] text-[#3f3a3c]">{p}</p>)}
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {o.chips.map(([ic, tx], i) => <span key={i} className={CHIP}><Icon name={ic} size={12} />{tx}</span>)}
-                  </div>
-                  <button className={cx("mt-4 self-start rounded-full px-7 py-[13px] text-[13px] font-semibold text-white transition hover:brightness-110", t.bg)} onClick={() => go(o.id)}>
-                    {o.cta}
-                  </button>
+        <div className="opts">
+          {options.map((o) => (
+            <article key={o.id} className={cx("opt", o.flip && "flip")}>
+              <div className="media" role="img" aria-label={o.title} style={{ backgroundImage: `url(${o.image})` }} />
+              <div className="body">
+                <span className="tag"><Icon name={o.icon} size={15} />{o.eyebrow}</span>
+                <div className="title-row">
+                  <h2>{o.title}</h2>
+                  {o.price && <span className="price-badge">{o.price}</span>}
                 </div>
+                {o.paras.map((p, i) => <p key={i}>{p}</p>)}
+                <div className="chips">
+                  {o.chips.map(([ic, tx], i) => <span key={i} className="chip"><Icon name={ic} size={12} />{tx}</span>)}
+                </div>
+                <button className="btn" onClick={() => go(o.id)}>{o.cta}</button>
+              </div>
               </article>
-            );
-          })}
+            )
+          )}
         </div>
 
-        <h2 className="mb-[26px] pt-16 text-center text-[22px] font-medium text-[#1f1819] min-[860px]:pt-24">Choose the right catering experience</h2>
-        <div className="mx-auto grid max-w-[820px] gap-[18px] min-[860px]:grid-cols-3">
-          {picks.map(([ic, t, d, id, tone]) => (
-            <button
-              key={id}
-              onClick={() => go(id)}
-              className="flex flex-col items-start gap-1.5 rounded-[14px] bg-white px-5 pb-6 pt-[22px] text-left text-inherit shadow-[inset_0_0_0_1px_#ece3da] transition hover:-translate-y-[3px] hover:shadow-[inset_0_0_0_1px_#ece3da,0_10px_24px_rgba(60,30,20,.1)] motion-reduce:transition-none"
-            >
-              <span className={cx("mb-2 grid size-10 place-items-center rounded-[10px]", MINI_TONES[tone])}><Icon name={ic} size={20} /></span>
-              <h4 className="mb-0 text-[15px] font-semibold text-[#1a1516]">{t}</h4>
-              <p className="mb-0 text-xs leading-[1.55] text-[#6f6366]">{d}</p>
+        <h2 className="choose">Choose the right catering experience</h2>
+        <div className="three">
+          {picks.map(([ic, t, d, id]) => (
+            <button key={id} className="mini" onClick={() => go(id)}>
+              <span className="mi"><Icon name={ic} size={20} /></span>
+              <h4>{t}</h4>
+              <p>{d}</p>
             </button>
           ))}
         </div>
@@ -713,6 +604,8 @@ function MealBox({ go, embedded }) {
   const [touched, setTouched] = useState(false);
   const [size, setSize] = useState(0);
   const [picks, setPicks] = useState(() => MEALBOX_SLOTS.map(() => 0));
+  const [changeTarget, setChangeTarget] = useState(null);
+  const [pendingOption, setPendingOption] = useState(null);
   const [guests, setGuests] = useState(MIN_G);
   const [extra, setExtra] = useState({});
   const [swapSlot, setSwapSlot] = useState(null); // index of the slot being changed (null = popup closed)
@@ -735,15 +628,46 @@ function MealBox({ go, embedded }) {
     return c;
   };
 
-  /* Called from the "Change Item" popup when the person presses Confirm Change */
-  const confirmSwap = (name) => {
-    const i = swapSlot;
-    const o = MEALBOX_SLOTS[i]?.options || [];
-    const idx = o.findIndex((x) => x.n === name);
-    if (idx >= 0) setPicks((p) => p.map((v, k) => (k === i ? idx : v)));
-    setTouched(true);
-    setSwapSlot(null);
+  const availableOptions = (i) => (MEALBOX_SLOTS[i]?.options || [])
+    .map((item, index) => ({ item, index }))
+    .filter(({ item }) => includeNonVeg || item.v);
+
+  const openChange = (i) => {
+    const options = availableOptions(i);
+    if (!options.length) return;
+    const selected = options.find(({ item }) => item === current(i)) || options[0];
+    setChangeTarget(i);
+    setPendingOption(selected.index);
   };
+
+  const closeChange = () => {
+    setChangeTarget(null);
+    setPendingOption(null);
+  };
+
+  const confirmChange = () => {
+    if (changeTarget === null || pendingOption === null) return;
+    setPicks((previous) => previous.map((value, index) => index === changeTarget ? pendingOption : value));
+    setTouched(true);
+    closeChange();
+  };
+
+  useEffect(() => {
+    if (changeTarget === null) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setChangeTarget(null);
+        setPendingOption(null);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [changeTarget]);
 
   const toggle = (m) => {
     setTouched(true);
@@ -809,11 +733,11 @@ function MealBox({ go, embedded }) {
                 {MEALBOX_SLOTS.slice(0, slotCount).map((s, i) => {
                   const c = current(i);
                   return (
-                    <div className="mb-2.5 flex items-center gap-3 rounded-xl bg-[#fdf3ef] px-4 py-3" key={i}>
-                      <span role="img" aria-label={c.v ? "Veg" : "Non-veg"} className={cx("size-[7px] shrink-0 rounded-full", c.v ? "bg-[#16a34a] shadow-[0_0_0_3px_rgba(22,163,74,.16)]" : "bg-[#e11d48] shadow-[0_0_0_3px_rgba(225,29,72,.16)]")} />
-                      <div className="grid size-[38px] shrink-0 place-items-center rounded-[9px] bg-[#ebe5e2] text-[#5b4a4c]"><Icon name={s.icon} size={18} /></div>
-                      <span className="flex-1 text-[13px] font-medium text-[#1f1819]">{c.n}</span>
-                      <button className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#6b0a35]" onClick={() => setSwapSlot(i)}><Icon name="swap" size={13} />Change</button>
+                    <div className="slot" key={i}>
+                      <span role="img" aria-label={c.v ? "Veg" : "Non-veg"} className={cx("vdot", !c.v && "nv")} />
+                      <div className="ic"><Icon name={s.icon} size={18} /></div>
+                      <span className="n">{c.n}</span>
+                      <button className="link" onClick={() => openChange(i)}><Icon name="swap" size={13} />Change</button>
                     </div>
                   );
                 })}
@@ -864,15 +788,63 @@ function MealBox({ go, embedded }) {
         />
       </div>
 
-      {swapSlot !== null && MEALBOX_SLOTS[swapSlot] && (
-        <ChangeItemModal
-          key={swapSlot}
-          slot={MEALBOX_SLOTS[swapSlot]}
-          currentName={current(swapSlot).n}
-          includeNonVeg={includeNonVeg}
-          onClose={() => setSwapSlot(null)}
-          onConfirm={confirmSwap}
-        />
+      {changeTarget !== null && (
+        <div className="item-change-backdrop" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) closeChange();
+        }}>
+          <section className="item-change-dialog" role="dialog" aria-modal="true" aria-labelledby="item-change-title">
+            <header className="item-change-header">
+              <div>
+                <h3 id="item-change-title">Change Item</h3>
+                <p>Replacing {current(changeTarget).n}</p>
+              </div>
+              <button className="item-change-close" type="button" onClick={closeChange} aria-label="Close item selector">×</button>
+            </header>
+            <div className="item-change-body">
+              <p className="item-change-hint">ⓘ Choose an alternative item for your Meal Box.</p>
+              {availableOptions(changeTarget).length ? (
+                <div className="item-change-options" role="radiogroup" aria-label="Available meal choices">
+                  {availableOptions(changeTarget).map(({ item, index }) => {
+                    const selected = pendingOption === index;
+                    const isCurrent = current(changeTarget) === item;
+                    return (
+                      <button
+                        key={`${item.n}-${index}`}
+                        type="button"
+                        className={`item-change-option${selected ? " selected" : ""}`}
+                        role="radio"
+                        aria-checked={selected}
+                        onClick={() => setPendingOption(index)}
+                      >
+                        <span className={`vdot${item.v ? "" : " nv"}`} aria-hidden="true" />
+                        <span className="item-change-copy">
+                          <span className="item-change-name">{item.n}</span>
+                          {isCurrent && <small className="item-change-current">Current selection</small>}
+                        </span>
+                        {selected
+                          ? <span className="item-change-selected" aria-hidden="true">✓</span>
+                          : ""}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="item-change-empty">No alternative items are available for this category.</p>
+              )}
+            </div>
+            <footer className="item-change-actions">
+              <button type="button" className="item-change-cancel" onClick={closeChange}>Cancel</button>
+              <button
+                type="button"
+                className="item-change-confirm"
+                disabled={pendingOption === null}
+                onClick={confirmChange}
+              >
+                Confirm Change
+              </button>
+            </footer>
+          </section>
+        </div>
       )}
     </div>
   );
@@ -931,14 +903,8 @@ function DeliveryBox({ go, embedded }) {
 /* ======================================================
    FULL CATERING
 ====================================================== */
-function buildMsg(title, rows) {
-  return [title, ...rows.filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`)].join("\n");
-}
-
-/* Detailed quote form (modal) */
 function QuoteModal({ onClose }) {
   const data = useSiteData();
-  const WHATSAPP_NUMBER = data.global.whatsapp;
   const CUISINES = data.catering.full.cuisines;
   const PLATE_PRICES = data.catering.full.platePrices;
   const FOOD_TYPES = data.catering.full.foodTypes;
@@ -966,18 +932,8 @@ function QuoteModal({ onClose }) {
     return !Object.keys(e).length;
   };
 
-  const message = () =>
-    buildMsg("Full catering enquiry", [
-      ["Name", form.name], ["Phone", form.phone], ["Cuisine", form.cuisine], ["Plate price", form.plate],
-      ["Guests", form.guests], ["Event date", form.date], ["Food type", vegOnly ? "Veg only" : form.foodType],
-      ["Location", form.location], ["Live counter", form.counter === "yes" ? "Yes" : "No"],
-      ...Object.entries(menu).map(([k, v]) => [k, v]),
-    ]);
-
-  const whatsapp = () => validate() && window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message())}`, "_blank");
-
-  const request = async () => {
-    if (sending || !validate()) return;
+  const request = async() => {
+    if (!validate()) return;
 
     addEnquiry({
       type: "Full Catering",
@@ -1062,11 +1018,9 @@ function QuoteModal({ onClose }) {
           {sent && <SuccessModal quote onClose={onClose} />}
         </div>
 
-        <div className="grid grid-cols-1 gap-3.5 border-t border-[#eadfd8] bg-[#fdf8f4] px-5 pb-5 pt-4 min-[560px]:grid-cols-2 min-[560px]:px-7">
-          <button className="flex items-center justify-center gap-2 rounded-lg bg-white py-3.5 text-sm font-bold text-[#1f9d55] shadow-[inset_0_0_0_1.5px_#25b866]" onClick={whatsapp}>
-            <Icon name="chat" size={16} />Continue on WhatsApp
-          </button>
-          <button className="flex items-center justify-center gap-2 rounded-lg bg-[#6b0a35] py-3.5 text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-60" onClick={request} disabled={sending}>{sending ? "Sending…" : "Request Quote"}</button>
+        {sent && <div className="toast mt" role="status">Quote request sent. Our team will contact you shortly.</div>}
+        <div className="modal-actions">
+          <button className="btn" onClick={request}>Request Quote</button>
         </div>
       </div>
     </div>
@@ -1075,7 +1029,10 @@ function QuoteModal({ onClose }) {
 
 /* Side "Request Quote" card */
 function QuoteSide({ onOpenDetailed }) {
-  const [form, setForm] = useState({ name: "", phone: "", guests: "", date: "", location: "", wa: true });
+  const data = useSiteData();
+  const PHONE = data.global.phone;
+
+  const [form, setForm] = useState({ name: "", phone: "", guests: "", date: "", location: "" });
   const [errors, setErrors] = useState({});
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
@@ -1125,12 +1082,11 @@ function QuoteSide({ onOpenDetailed }) {
       <Field label="Number of Guests" type="number" min="1" placeholder="Enter guest count" value={form.guests} onChange={set("guests")} error={errors.guests} />
       <Field label="Event Date" type="date" icon="calendar" value={form.date} onChange={set("date")} error={errors.date} />
       <Field label="Event location/city" icon="pin" placeholder="Enter city or area" value={form.location} onChange={set("location")} />
-      <WhatsAppRow on={form.wa} setOn={(v) => setForm({ ...form, wa: v })} />
-      <SummaryActions onSend={send} sending={sending} />
-      {mailError && <p role="alert" className="mb-0 mt-2.5! text-center text-[11px] text-red-600">{mailError}</p>}
-      {sent && <SuccessModal onClose={() => setSent(false)} />}
-      <button className="mx-auto mt-3 flex text-[13px] font-medium text-[#6b0a35]" onClick={onOpenDetailed}>Customise menu &amp; get a detailed quote</button>
-      <p className={NOTE}>No payment required now. Our team will contact you to confirm details.</p>
+      {sent && <div className="toast" role="status">Enquiry sent. Our team will contact you to confirm details.</div>}
+      <button className="btn block" onClick={send}>Send Enquiry</button>
+      <a className="btn block ghost call" href={`tel:${PHONE.replace(/\s/g, "")}`}>Call Us</a>
+      <button className="link block" onClick={onOpenDetailed}>Customise menu &amp; get a detailed quote</button>
+      <p className="note">No payment required now. Our team will contact you to confirm details.</p>
     </aside>
   );
 }
@@ -1139,7 +1095,7 @@ function FullCatering({ go, embedded }) {
   const data = useSiteData();
   const FULL = data.catering.full;
   const landing = data.catering.landing.find((c) => c.id === "full");
-  const IMG_FULL = landing?.image || "https://images.unsplash.com/photo-1555244162-803834f70033?w=900";
+  const IMG_FULL = FULL.hero || landing?.image || "https://images.unsplash.com/photo-1555244162-803834f70033?w=900";
 
   const TABS = [["about", "About"], ["portfolio", "Portfolio (140)"], ["reviews", "Reviews (84)"]];
   const [tab, setTab] = useState("about");
@@ -1194,13 +1150,13 @@ function FullCatering({ go, embedded }) {
           </div>
 
           {tab === "about" && (
-            <section className={PANEL}>
-              <div className={STEP_PINK}>ABOUT</div>
-              <h3 className="mb-3.5 text-xl font-medium text-[#5b0a2e]">Evenddy Full Catering Service</h3>
-              <p className="mb-[22px] text-[13.5px] leading-[1.75] text-[#3f3a3c]">Evenddy Full Catering Service delivers end-to-end dining with a wide range of multi-cuisine menus: Indian, Continental, Chinese, Mexican and Lebanese, from intimate gatherings to large-scale celebrations. We take care of everything from menu planning to live counters, serving staff and setup so your guests experience a seamless, flavourful occasion.</p>
-              <div className={STEP_PINK}>CUISINES &amp; SERVICES</div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {SERVICE_TAGS.map((t) => <span className="inline-flex items-center rounded-full bg-[#f6e9e4] px-3.5 py-[7px] text-[11px] font-medium text-[#3a2a2c]" key={t}>{t}</span>)}
+            <section className="panel">
+              <div className="step pink">ABOUT</div>
+              <h3>Evenddy Full Catering Service</h3>
+              <p className="fc-text">{FULL.about ?? DEFAULT_DATA.catering.full.about}</p>
+              <div className="step pink mt">CUISINES &amp; SERVICES</div>
+              <div className="chips">
+                {SERVICE_TAGS.map((t) => <span className="chip" key={t}>{t}</span>)}
               </div>
               <div className="mt-[22px] grid gap-3 min-[860px]:grid-cols-3">
                 {[["500+", "Events Catered", "text-[#5b0a2e]"], ["15+", "Cuisine Types", "text-[#8a5a1f]"], ["3", "Price Ranges", "text-[#5b0a2e]"]].map(([n, l, c]) => (
@@ -1270,7 +1226,7 @@ export default function CateringExplore({ embedded = false }) {
   const go = (v) => { setParams(v === "landing" ? {} : { view: v }); window.scrollTo({ top: 0 }); };
 
   return (
-    <div className={cx("min-h-[70vh] text-[#231a1d]", view === "landing" ? "bg-[#fdf9f3]" : "bg-[#f8f5f2]")}>
+    <div className={cx("ev min-h-[70vh] text-[#231a1d]", view !== "landing" && "is-booking", view === "landing" ? "bg-[#fdf9f3]" : "bg-[#f8f5f2]")}>
       {view === "landing" && <Landing go={go} embedded={embedded} />}
       {view === "mealbox" && <MealBox go={go} embedded={embedded} />}
       {view === "delivery" && <DeliveryBox go={go} embedded={embedded} />}

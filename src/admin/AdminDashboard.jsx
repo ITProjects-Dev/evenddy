@@ -58,11 +58,11 @@ export default function AdminDashboard() {
       <div className="adm-card">
         <div className="adm-card-h">
           <div><h3>Site status</h3><p>Everything is wired and live from the store.</p></div>
-          {newEnq > 0 && (
+          {/* {newEnq > 0 && (
             <Link className="adm-btn sm" to="/admin/enquiries" style={{ marginLeft: "auto" }}>
               {newEnq} new enqu{newEnq === 1 ? "iry" : "iries"} →
             </Link>
-          )}
+          )} */}
         </div>
         <div className="adm-card-b">
           <StatusRow on label="Catering page"        detail="Reads Meal Box, Menu & Full Catering from store" />

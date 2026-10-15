@@ -112,22 +112,22 @@ const SELECT_ARROW = {
 };
 const FOCUS_RING = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4005f]";
 const BTN =
-  "inline-flex min-h-[56px] items-center justify-center gap-3.5 rounded-[10px] px-5 text-[15px] font-bold tracking-[.01em] transition " +
+  "inline-flex min-h-[50px] items-center justify-center gap-3 rounded-[10px] px-5 text-sm font-bold tracking-[.01em] transition " +
   FOCUS_RING;
 const BTN_SOLID = BTN + " bg-[#750a3d] text-white shadow-[inset_0_0_0_1.5px_#750a3d] hover:brightness-110";
 const BTN_WA = BTN + " bg-white text-[#1ebe5d] shadow-[inset_0_0_0_2px_#25d366] hover:bg-[#f1fbf5]";
 const CARD = "rounded-3xl bg-[#fffdfa] shadow-[0_6px_24px_rgba(60,20,30,.06)]";
 
 /* Responsive grids: 1 col on phones, 2 from 601px, full layout from 961px (same breakpoints as the old CSS) */
-const G2 = "grid grid-cols-1 gap-x-4 min-[601px]:grid-cols-2";
-const G3 = "grid grid-cols-1 gap-x-4 min-[601px]:grid-cols-2 min-[961px]:grid-cols-[1fr_1fr_1.25fr]";
-const G4 = "grid grid-cols-1 gap-x-4 min-[601px]:grid-cols-2 min-[961px]:grid-cols-4";
+const G2 = "grid grid-cols-1 gap-x-5 min-[601px]:grid-cols-2";
+const G3 = "grid grid-cols-1 gap-x-5 min-[601px]:grid-cols-2";
+const G4 = "grid grid-cols-1 gap-x-5 min-[601px]:grid-cols-2";
 
 /* Label + control + error message wrapper */
 function F({ id, label, req, error, children }) {
   return (
     <div className="mb-4">
-      <label htmlFor={id} className={LABEL}>
+      <label htmlFor={id} className={cx(LABEL, "text-xs")}>
         {label}
         {req && <>{" "}<i className="not-italic text-[#750a3d]">*</i></>}
       </label>
@@ -206,21 +206,23 @@ export default function EventManagementExplore() {
 
   return (
     <div className="min-h-[70vh] bg-[#faf5ee] pb-16 text-[#1a1516]">
-      <div className="mx-auto w-full max-w-[1120px] px-6">
-        <nav className="flex flex-wrap gap-2 pb-[22px] pt-[34px] text-[10.5px] font-medium uppercase tracking-[.07em] text-[#6b6567]" aria-label="Breadcrumb">
-          <Link className={cx("text-inherit no-underline hover:text-[#750a3d]!", FOCUS_RING)} to="/services">Our Services</Link>
-          <span>›</span>
-          <span>Event Planning</span>
-          <span>›</span>
-          <b className="font-bold text-[#1a1516]">Plan Your Event</b>
+      <div className="container">
+        <nav className="flex flex-wrap items-center py-5 pb-[14px] text-xs text-[#6f6366]" aria-label="Breadcrumb">
+          <Link className="text-inherit no-underline hover:text-[#750a3d]" to="/">Home</Link>
+          <span className="mx-1.5 text-[#a79a9e]">›</span>
+          <Link className="text-inherit no-underline hover:text-[#750a3d]" to="/services">Services</Link>
+          <span className="mx-1.5 text-[#a79a9e]">›</span>
+          <button type="button" className="border-0 bg-transparent p-0 text-xs font-semibold text-[#750a3d] hover:text-[#750a3d]" aria-current="page" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+            Event Management
+          </button>
         </nav>
 
-        <div className="grid items-start gap-7 min-[961px]:grid-cols-[340px_1fr]">
+        <div className="grid items-start gap-7 min-[961px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.7fr)]">
           {/* ---------- LEFT INTRO CARD ---------- */}
           <aside
             className={cx(
               CARD,
-              "px-3.5 pb-6 pt-3.5",
+              "px-5 pb-7 pt-5",
               "min-[601px]:grid min-[601px]:grid-cols-2 min-[601px]:items-center min-[601px]:gap-x-5",
               "min-[961px]:sticky min-[961px]:top-4 min-[961px]:block"
             )}
@@ -243,9 +245,9 @@ export default function EventManagementExplore() {
           </aside>
 
           {/* ---------- RIGHT FORM CARD ---------- */}
-          <form className={cx(CARD, "px-[18px] pb-7 pt-[22px] min-[601px]:px-8 min-[601px]:pt-[30px]")} onSubmit={submit} noValidate>
+          <form id="event-enquiry" className={cx(CARD, "scroll-mt-20 px-5 pb-6 pt-5 min-[601px]:px-7 min-[601px]:pb-7 min-[601px]:pt-7")} onSubmit={submit} noValidate>
             <h2 className="mb-1.5 text-xl font-bold! tracking-[-.01em]! text-[#1a1516]">Tell us about your celebration</h2>
-            <p className="mb-[22px] max-w-[480px] text-xs leading-[1.6] text-[#6b6567]">
+            <p className="mb-4 text-xs leading-[1.6] text-[#6b6567]">
               Share your vision and event details so our senior event planning team can curate your custom proposal.
             </p>
 
@@ -342,15 +344,14 @@ export default function EventManagementExplore() {
               />
             </F>
 
-            <div className="mt-6 grid grid-cols-1 gap-5 border-t border-[#ddd6d2] pt-3.5 min-[601px]:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-3 border-t border-[#ddd6d2] pt-4 min-[601px]:grid-cols-2">
               <button type="button" className={BTN_WA} onClick={whatsapp}>
                 <WaIcon />
                 Continue WhatsApp
               </button>
               <button type="submit" className={cx(BTN_SOLID, "disabled:opacity-60")} disabled={sending}>{sending ? "Sending…" : "Request Quote"}</button>
             </div>
-            {mailError && <p role="alert" className="mb-0 mt-3! text-center text-[11px] text-red-600">{mailError}</p>}
-            <p className="mb-0 mt-12! text-center text-[11px] text-[#a8a2a6]">
+            <p className="mb-0 mt-6! text-center text-[11px] text-[#a8a2a6]">
               A dedicated Evenddy planner will review your brief and connect within 24 hours.
             </p>
           </form>

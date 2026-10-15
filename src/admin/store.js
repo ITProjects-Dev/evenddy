@@ -16,7 +16,7 @@ export const DEFAULT_DATA = {
     landing: [
       {
         id: "mealbox", title: "Meal Box", eyebrow: "Individual & Packed Meals",
-        icon: "box", tone: "gold", image: "", price: "",
+        icon: "box", image: "", price: "",
         paras: [
           "Perfect for individual meals, small celebrations, office meals, birthdays, gatherings and functions.",
           "Choose from structured meal boxes with 3, 5 or 6 items and customize eligible items with same-price swaps.",
@@ -30,7 +30,7 @@ export const DEFAULT_DATA = {
       },
       {
         id: "delivery", title: "Delivery Box", eyebrow: "Party Food Delivered To You",
-        icon: "truck", tone: "maroon", image: "", price: "",
+        icon: "truck", image: "", price: "",
         paras: [
           "Perfect for house parties, get-togethers, farm-house parties and casual events, generally for 10+ people.",
           "Choose party food, select quantities based on people or servings, and get it delivered to your event location.",
@@ -44,7 +44,7 @@ export const DEFAULT_DATA = {
       },
       {
         id: "full", title: "Full Catering", eyebrow: "Complete Event Catering",
-        icon: "fork", tone: "orange", image: "", price: "Starting from ₹200 /plate",
+        icon: "fork", image: "", price: "Starting from ₹200 /plate",
         paras: [
           "Best for weddings, celebrations, corporate events and other occasions requiring complete food service.",
           "Build your menu, customize food selections, request items that are not listed and add live counters.",
@@ -106,6 +106,8 @@ export const DEFAULT_DATA = {
     ],
 
     full: {
+      hero: "",
+      about: "Evenddy Full Catering Service delivers end-to-end dining with a wide range of multi-cuisine menus: Indian, Continental, Chinese, Mexican and Lebanese, from intimate gatherings to large-scale celebrations. We take care of everything from menu planning to live counters, serving staff and setup so your guests experience a seamless, flavourful occasion.",
       gallery: ["", "", "", ""],
       cuisines: ["North Indian", "South Indian", "Continental", "Chinese", "Mexican", "Lebanese"],
       platePrices: ["₹500 – ₹800", "₹800 – ₹1,200", "₹1,200 – ₹2,000", "₹2,000+"],
@@ -234,12 +236,22 @@ export function loadData() {
     const raw = localStorage.getItem(KEY);
     if (!raw) { localStorage.setItem(KEY, JSON.stringify(DEFAULT_DATA)); return DEFAULT_DATA; }
     const parsed = JSON.parse(raw);
-    return { ...DEFAULT_DATA, ...parsed };
+    // Merge nested sections too, so older saved data keeps new Catering defaults.
+    const merge = (defaults, saved) => {
+      if (!defaults || typeof defaults !== "object" || Array.isArray(defaults)) return saved ?? defaults;
+      if (!saved || typeof saved !== "object" || Array.isArray(saved)) return saved ?? defaults;
+      return Object.fromEntries(Object.keys({ ...defaults, ...saved }).map((key) => [
+        key,
+        key in saved ? merge(defaults[key], saved[key]) : defaults[key],
+      ]));
+    };
+    return merge(DEFAULT_DATA, parsed);
   } catch { return DEFAULT_DATA; }
 }
 export function saveData(d) {
   try {
     localStorage.setItem(KEY, JSON.stringify(d));
+    window.dispatchEvent(new Event("evenddy:data-updated"));
     return true;
   } catch {
     return false;
