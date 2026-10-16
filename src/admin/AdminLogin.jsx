@@ -1,24 +1,35 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import logoImage from "../assets/evenddy-logo.svg";
 
-export default function AdminLogin({ onLogin }) {
+export default function AdminLogin({ onLogin, notice = "" }) {
   const nav = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "", remember: true });
+  const location = useLocation();
+  const [form, setForm] = useState({ username: "", password: "", remember: true });
   const [errors, setErrors] = useState({});
   const [show, setShow] = useState(false);
+  const [requestError, setRequestError] = useState(notice);
+  const [submitting, setSubmitting] = useState(false);
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     const v = {};
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) v.email = "Enter a valid email address";
-    if (form.password.length < 6) v.password = "Password must be at least 6 characters";
+    if (!form.username.trim()) v.username = "Enter your username";
+    if (!form.password) v.password = "Enter your password";
     setErrors(v);
     if (Object.keys(v).length) return;
-    onLogin?.({ email: form.email });
-    nav("/admin/dashboard", { replace: true });
+    setSubmitting(true);
+    setRequestError("");
+    try {
+      await onLogin?.({ username: form.username.trim(), password: form.password, remember: form.remember });
+      nav("/admin/dashboard", { replace: true });
+    } catch (error) {
+      setRequestError(error.message || "Sign in failed. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -51,21 +62,24 @@ export default function AdminLogin({ onLogin }) {
         <main className="adm-auth-panel">
           <div className="adm-auth-card">
             <h2>Welcome back</h2>
-            <p className="sub">Sign in to manage your services and enquiries.</p>
+            <p className="sub">Sign in to manage your services and user accounts.</p>
 
+            {location.state?.registered && (
+              <p className="adm-form-message success" role="status">Account created successfully. Sign in to continue.</p>
+            )}
             <form onSubmit={submit} noValidate>
               <div className="adm-field">
-                <label htmlFor="adm-email">Email address <i>*</i></label>
+                <label htmlFor="adm-username">Username <i>*</i></label>
                 <input
-                  id="adm-email"
-                  type="email"
-                  className={errors.email ? "err" : ""}
-                  value={form.email}
-                  onChange={set("email")}
-                  placeholder="admin@evenddy.com"
-                  autoComplete="email"
+                  id="adm-username"
+                  type="text"
+                  className={errors.username ? "err" : ""}
+                  value={form.username}
+                  onChange={set("username")}
+                  placeholder="Enter your username"
+                  autoComplete="username"
                 />
-                {errors.email && <small className="adm-err" role="alert">{errors.email}</small>}
+                {errors.username && <small className="adm-err" role="alert">{errors.username}</small>}
               </div>
 
               <div className="adm-field">
@@ -104,11 +118,13 @@ export default function AdminLogin({ onLogin }) {
                 <Link className="adm-linkbtn" to="/admin/forgot">Forgot password?</Link>
               </div>
 
-              <button className="adm-btn block" type="submit">Sign in</button>
+              {requestError && <p className="adm-form-message error" role="alert">{requestError}</p>}
+              <button className="adm-btn block" type="submit" disabled={submitting}>
+                {submitting ? "Signing in..." : "Sign in"}
+              </button>
             </form>
-
-            <p className="adm-hint" style={{ marginTop: 18, textAlign: "center" }}>
-              Static demo — any valid email + 6-char password works.
+            <p className="adm-hint adm-login-register">
+              First time here? <Link className="adm-linkbtn" to="/admin/register">Create an account</Link>
             </p>
           </div>
         </main>

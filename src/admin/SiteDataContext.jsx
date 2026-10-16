@@ -15,9 +15,11 @@ export function SiteDataProvider({ children }) {
       if (!e.key || e.key === "evenddy_admin_v2") reread();
     };
     window.addEventListener("storage", onStorage);
+    window.addEventListener("evenddy:data-updated", reread);
     window.addEventListener("focus", reread);
     return () => {
       window.removeEventListener("storage", onStorage);
+      window.removeEventListener("evenddy:data-updated", reread);
       window.removeEventListener("focus", reread);
     };
   }, []);

@@ -236,12 +236,22 @@ export function loadData() {
     const raw = localStorage.getItem(KEY);
     if (!raw) { localStorage.setItem(KEY, JSON.stringify(DEFAULT_DATA)); return DEFAULT_DATA; }
     const parsed = JSON.parse(raw);
-    return { ...DEFAULT_DATA, ...parsed };
+    // Merge nested sections too, so older saved data keeps new Catering defaults.
+    const merge = (defaults, saved) => {
+      if (!defaults || typeof defaults !== "object" || Array.isArray(defaults)) return saved ?? defaults;
+      if (!saved || typeof saved !== "object" || Array.isArray(saved)) return saved ?? defaults;
+      return Object.fromEntries(Object.keys({ ...defaults, ...saved }).map((key) => [
+        key,
+        key in saved ? merge(defaults[key], saved[key]) : defaults[key],
+      ]));
+    };
+    return merge(DEFAULT_DATA, parsed);
   } catch { return DEFAULT_DATA; }
 }
 export function saveData(d) {
   try {
     localStorage.setItem(KEY, JSON.stringify(d));
+    window.dispatchEvent(new Event("evenddy:data-updated"));
     return true;
   } catch {
     return false;

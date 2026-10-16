@@ -2,13 +2,16 @@ import { useState } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import AdminLayout from "./AdminLayout";
 import AdminLogin from "./AdminLogin";
+import AdminRegister from "./AdminRegister";
 import AdminForgot from "./AdminForgot";
 import AdminDashboard from "./AdminDashboard";
 import CateringAdmin from "./catering/CateringAdmin";
 import DecorAdmin from "./decor/DecorAdmin";
 import EventAdmin from "./event/EventAdmin";
 import ProfileAdmin from "./ProfileAdmin";
-import { isLoggedIn, setLoggedIn } from "./store";
+import { setLoggedIn } from "./store";
+import { clearAuthTokens, getAccessToken, getSavedUsername, login as authenticate, logout as endSession } from "../services/authService";
+import UsersAdmin from "./UsersAdmin";
 import "./admin.css";
 import { Construction } from "lucide-react";
 
@@ -26,19 +29,35 @@ function Soon({ title, text }) {
 export default function AdminApp() {
   const nav = useNavigate();
   const [user, setUser] = useState(() =>
-    isLoggedIn() ? { email: localStorage.getItem("evenddy_admin_email") || "admin@evenddy.com" } : null
+    getAccessToken() ? { username: getSavedUsername() || "admin" } : null
   );
-  const login = (u) => {
+  const [authNotice, setAuthNotice] = useState("");
+  const login = async (credentials) => {
+    await authenticate(credentials);
     setLoggedIn(true);
-    try { localStorage.setItem("evenddy_admin_email", u?.email || "admin@evenddy.com"); } catch {}
-    setUser(u || { email: "admin@evenddy.com" });
+    setAuthNotice("");
+    setUser({ username: credentials.username });
   };
-  const logout = () => { setLoggedIn(false); setUser(null); nav("/admin/login", { replace: true }); };
+  const logout = async () => {
+    let notice = "";
+    try {
+      await endSession();
+    } catch (error) {
+      notice = `Signed out locally, but the server logout failed: ${error.message}`;
+    } finally {
+      clearAuthTokens();
+      setLoggedIn(false);
+      setUser(null);
+      setAuthNotice(notice);
+      nav("/admin/login", { replace: true });
+    }
+  };
 
   if (!user) return (
     <Routes>
-      <Route path="login" element={<AdminLogin onLogin={login} />} />
+      <Route path="login" element={<AdminLogin onLogin={login} notice={authNotice} />} />
       <Route path="forgot" element={<AdminForgot />} />
+      <Route path="register" element={<AdminRegister />} />
       <Route path="*" element={<Navigate to="/admin/login" replace />} />
     </Routes>
   );
@@ -52,6 +71,7 @@ export default function AdminApp() {
         <Route path="decor" element={<DecorAdmin />} />
         <Route path="event" element={<EventAdmin />} />
         <Route path="profile" element={<ProfileAdmin />} />
+        <Route path="users" element={<UsersAdmin />} />
         <Route path="login" element={<Navigate to="/admin/dashboard" replace />} />
         {/* <Route path="enquiries" element={<Soon title="Enquiries" text="Connect this page to your enquiry API." />} />
         <Route path="settings" element={<Soon title="Settings" text="Workspace preferences go here." />} /> */}
