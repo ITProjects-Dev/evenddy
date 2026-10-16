@@ -400,6 +400,35 @@
 .adm .adm-burger:hover{background:#f1e8df}
 .adm .adm-card{border-color:var(--line);border-radius:var(--radius);box-shadow:0 8px 24px rgba(50,25,20,.045)}
 .adm .adm-card-h{border-bottom-color:var(--line)}
+.adm-user-create{max-width:900px}
+.adm-password-reset{max-width:900px;margin-bottom:18px}
+.adm-password-reset .adm-card-b{padding:24px}
+.adm-password-reset-actions{display:flex;align-items:center;gap:18px}
+.adm-user-create-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;background:var(--accent-soft);color:var(--accent)}
+.adm-user-create .adm-card-b{padding:24px}
+.adm-user-create-actions{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:8px}
+.adm-form-message{display:flex;align-items:center;gap:8px;margin:0 0 16px;padding:11px 13px;border-radius:10px;font-size:13px;line-height:1.45}
+.adm-form-message.error{color:var(--err);background:#fcebed}
+.adm-form-message.success{color:var(--ok);background:#e8f4ec}
+.adm-reset-done{text-align:center}
+.adm-reset-done>span{width:58px;height:58px;display:grid;place-items:center;margin:0 auto 22px;border-radius:50%;background:#e6f6ee;color:#0b7a45}
+.adm-login-register{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:18px}
+.adm-register-card{max-width:650px}
+.adm-menu-section{margin-bottom:18px}
+.adm-menu-section .adm-card-b{padding:20px}
+.adm-menu-api-state{padding:5px 10px;border-radius:999px;background:#f3f0ec;color:var(--mut);font-size:12px;font-weight:600;white-space:nowrap}
+.adm-menu-api-state.connected{background:#e8f4ec;color:var(--ok)}
+.adm-menu-section-description{margin:0 0 12px}
+.adm-menu-category-row{display:flex;align-items:flex-end;gap:10px;padding:14px 0;border-bottom:1px solid var(--line)}
+.adm-menu-category-fields{display:grid;flex:1;grid-template-columns:1.2fr 1fr .7fr .8fr 1.5fr;gap:0 12px}
+.adm-menu-category-fields .adm-field{min-width:0;margin-bottom:0}
+.adm-menu-category-fields .adm-field:nth-child(5){grid-column:1/-1}
+.adm-menu-category-row>.adm-btn{margin-bottom:16px}
+.adm-menu-section-actions{display:flex;justify-content:space-between;gap:12px;margin-top:16px}
+.adm-menu-section-actions .adm-btn{gap:7px}
+@media(max-width:600px){.adm-user-create .adm-card-b,.adm-password-reset .adm-card-b{padding:18px}.adm-user-create-actions{align-items:stretch;flex-direction:column}.adm-user-create-actions .adm-btn{width:100%}.adm-password-reset-actions{align-items:flex-start;flex-direction:column}}
+@media(max-width:760px){.adm-menu-category-fields{grid-template-columns:1fr 1fr}.adm-menu-category-fields .adm-field:nth-child(5){grid-column:1/-1}}
+@media(max-width:480px){.adm-menu-section .adm-card-b{padding:16px}.adm-menu-category-fields{grid-template-columns:1fr}.adm-menu-category-fields .adm-field:nth-child(5){grid-column:auto}.adm-menu-category-row{align-items:flex-start}.adm-menu-section-actions{align-items:stretch;flex-direction:column}.adm-menu-section-actions .adm-btn{justify-content:center}}
 .adm .adm-stat .kpi{background:#f6e8ed;color:var(--pink)}
 .adm .adm-stat b{color:var(--ink)}
 .adm .adm-stat span,.adm .adm-hint{color:var(--muted)}

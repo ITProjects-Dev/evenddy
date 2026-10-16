@@ -8,6 +8,7 @@ import {
     Menu,
     Utensils,
     UserRound,
+    UserPlus,
     X,
 } from "lucide-react";
 import logoImage from "../assets/evenddy-logo.svg";
@@ -23,6 +24,7 @@ const NAV = [
             { to: "/admin/catering", icon: Utensils, label: "Catering" },
             { to: "/admin/decor", icon: Flower2, label: "Decor" },
             { to: "/admin/event", icon: CalendarDays, label: "Event Management" },
+            { to: "/admin/users", icon: UserPlus, label: "Users" },
             { to: "/admin/profile", icon: UserRound, label: "Profile & Settings" },
         ]
     },
@@ -37,6 +39,7 @@ const TITLES = {
     "/admin/catering": ["Catering", "Manage Meal Box, Delivery Box and Full Catering"],
     "/admin/decor": ["Decor", "Manage DIY kits, themes and custom decor"],
     "/admin/event": ["Event Management", "Manage event types, priorities and landing"],
+    "/admin/users": ["Users", "Create and manage user accounts"],
     "/admin/profile": ["Profile & Settings", "Manage business contacts and enquiry options"],
     //   "/admin/enquiries": ["Enquiries", "Customer enquiries and quote requests"],
     //   "/admin/settings":  ["Settings", "Workspace preferences"],
@@ -47,7 +50,8 @@ export default function AdminLayout({ onLogout, user }) {
     const [open, setOpen] = useState(false);
     const base = Object.keys(TITLES).find((k) => pathname.startsWith(k)) || "/admin/dashboard";
     const [title, sub] = TITLES[base];
-    const initials = (user?.email || "AD").slice(0, 2).toUpperCase();
+    const username = user?.username || user?.email || "admin";
+    const initials = username.slice(0, 2).toUpperCase();
 
     return (
         <div className="adm">
@@ -56,7 +60,6 @@ export default function AdminLayout({ onLogout, user }) {
                 <aside className={`adm-side ${open ? "open" : ""}`}>
                     <NavLink className="adm-brand" to="/admin/dashboard" aria-label="Evenddy Admin home">
                         <img src={logoImage} alt="Evenddy" />
-                        <span>Admin</span>
                     </NavLink>
                     <nav className="adm-nav">
                         {NAV.map((g) => (
@@ -77,9 +80,9 @@ export default function AdminLayout({ onLogout, user }) {
                         <div className="adm-userchip">
                             <span className="adm-avatar">{initials}</span>
                             <div style={{ minWidth: 0 }}>
-                                <b>Admin</b>
+                                <b>{username}</b>
                                 <small style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                    {user?.email || "admin@evenddy.com"}
+                                   {username}
                                 </small>
                             </div>
                             <button className="adm-logout" onClick={onLogout} title="Sign out" aria-label="Sign out">
