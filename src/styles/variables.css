@@ -1,6 +1,6 @@
 :root {
   --font-family-base: "Sora", sans-serif;
-  --font-size-body: 15px;
+  --font-size-body: 12px;
   --font-size-page-title: clamp(36px, 5vw, 56px);
   --font-size-section-title: clamp(30px, 4vw, 44px);
   --cream: #f8f3eb;
@@ -12,7 +12,7 @@
   --pink-2: #d0006f;
   --dark: #211816;
   --white: #ffffff;
-  --max-width: 1180px;
+  --max-width: 1380px;
   --radius: 8px;
   --shadow: 0 15px 35px rgba(50, 25, 20, 0.08);
 }

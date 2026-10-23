@@ -28,7 +28,8 @@ import {
 
     ArrowLeft,
 
-    ArrowRight
+    ArrowRight,
+    UploadIcon
 
 } from 'lucide-react';
 
@@ -48,27 +49,44 @@ const InputField = ({ label, name, type = 'text', placeholder, required, value, 
 
 );
 
-const SelectField = ({ label, name, options, required, value, onChange }) => (
 
+const SelectField = ({
+    label,
+    name,
+    options,
+    required,
+    value,
+    onChange
+}) => (
     <div className="onboarding-field">
-
-        <label>{label} {required && <span className="req">*</span>}</label>
+        <label>
+            {label} {required && <span className="req">*</span>}
+        </label>
 
         <div className="onboarding-select-wrapper">
-
-            <select name={name} value={value} onChange={onChange} className="onboarding-select">
-
+            <select
+                name={name}
+                value={value}
+                onChange={onChange}
+                className="onboarding-select"
+                onFocus={(e) =>
+                    e.currentTarget.parentElement.classList.add("is-open")
+                }
+                onBlur={(e) =>
+                    e.currentTarget.parentElement.classList.remove("is-open")
+                }
+            >
                 <option value="">Select an option</option>
-
-                {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-
+                {options.map(opt => (
+                    <option key={opt} value={opt}>
+                        {opt}
+                    </option>
+                ))}
             </select>
-
         </div>
-
     </div>
-
 );
+
 
 const ToggleField = ({ label, name, value, onChange, optional }) => (
 
@@ -124,7 +142,7 @@ const FileUpload = ({ label, name, required, note, value, accept, onChange }) =>
 
             <label htmlFor={name} className="file-upload-label">
 
-                <span className="upload-icon">↑</span> {value?.name || 'Choose file'}
+                <span className="upload-icon"><UploadIcon/></span> {value?.name || 'Choose file'}
 
             </label>
 
@@ -474,7 +492,7 @@ const VendorOnboarding = () => {
 
             <h3>Service details</h3>
 
-            <p className="step-desc">Your specifics</p>
+            {/* <p className="step-desc">Your specifics</p> */}
 
             <div className="onboarding-form-grid">
 
@@ -550,24 +568,24 @@ const VendorOnboarding = () => {
 
             <h3>Address & pricing</h3>
 
-            <p className="step-desc">Where and how much</p>
+            {/* <p className="step-desc">Where and how much</p> */}
 
             <div className="onboarding-form-grid">
 
                 <InputField label="Base city" name="baseCity" placeholder="e.g. Visakhapatnam" required value={formData.baseCity} onChange={handleChange} />
 
-                <div className="onboarding-field textarea-field">
+               
+
+                <InputField label="Starting price" name="startingPrice" placeholder="e.g. ₹25,000" required value={formData.startingPrice} onChange={handleChange} />
+
+                <InputField label="Typical price range" name="typicalPriceRange" placeholder="e.g. ₹25,000 – ₹1,50,000" required value={formData.typicalPriceRange} onChange={handleChange} />
+ <div className="onboarding-field textarea-field">
 
                     <label>Venue address <span className="req">*</span></label>
 
                     <textarea name="venueAddress" placeholder="Full address with landmark" value={formData.venueAddress} onChange={handleChange} className="onboarding-textarea" required></textarea>
 
                 </div>
-
-                <InputField label="Starting price" name="startingPrice" placeholder="e.g. ₹25,000" required value={formData.startingPrice} onChange={handleChange} />
-
-                <InputField label="Typical price range" name="typicalPriceRange" placeholder="e.g. ₹25,000 – ₹1,50,000" required value={formData.typicalPriceRange} onChange={handleChange} />
-
             </div>
 
         </div>
@@ -580,7 +598,7 @@ const VendorOnboarding = () => {
 
             <h3>Contact & more</h3>
 
-            <p className="step-desc">How we reach you</p>
+            {/* <p className="step-desc">How we reach you</p> */}
 
             <div className="onboarding-form-grid">
 
@@ -628,7 +646,7 @@ const VendorOnboarding = () => {
 
             <h3>Review</h3>
 
-            <p className="step-desc">Confirm and submit</p>
+            {/* <p className="step-desc">Confirm and submit</p> */}
 
             <div className="review-block">
 

@@ -340,28 +340,41 @@
   min-height: 100px;
 }
 
-/* Custom Select Dropdown */
+
 .onboarding-select-wrapper {
-  position: relative;
+    position: relative;
 }
 
 .onboarding-select-wrapper::after {
-  content: "⌄";
-  position: absolute;
-  top: 50%;
-  right: 13px;
-  transform: translateY(-50%);
-  color: var(--brand-text-muted);
-  font-size: 14px;
-  pointer-events: none;
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    width: 16px;
+    height: 16px;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23665a55' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+
+    transform: translateY(-50%) rotate(0deg);
+    transition: transform 0.25s ease;
+    pointer-events: none;
+}
+
+.onboarding-select-wrapper.is-open::after {
+    transform: translateY(-50%) rotate(180deg);
 }
 
 .onboarding-select {
-  appearance: none;
-  -webkit-appearance: none;
-  padding-right: 35px;
-  cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 35px;
+    cursor: pointer;
 }
+
 
 /* =========================================
    TOGGLES
@@ -465,7 +478,7 @@
 }
 
 .amenity-pill {
-  padding: 8px 16px;
+  padding: 1px 12px;
   border: 1px solid var(--brand-input-border);
   border-radius: 20px;
   background-color: var(--brand-input-bg);
@@ -571,7 +584,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1000px;
+  max-width: 1300px;
   margin: 32px auto 0;
   width: 100%;
 }
@@ -586,7 +599,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;              /* Space between icon and text */
-    padding: 12px 24px;
+    padding: 6px 12px;
     border-radius: 22px;
     font-size: 12px;
     font-weight: 500;
@@ -843,9 +856,7 @@
     padding-bottom: 22px;
 }
 
-.onboarding-footer {
-    margin-top: 16px;
-}
+
 
 .onboarding-form-grid {
     display: grid;
@@ -901,6 +912,7 @@
     align-items: center;
     min-height: 44px;
     gap: 10px;
+    margin-top: 6%;
 }
 
 .toggle-name {
@@ -930,12 +942,7 @@
     border-radius: 14px;
 }
 
-.onboarding-card-wrapper {
-    box-sizing: border-box;
-    width: 100%;
-    max-width: 1080px;
-    padding: 20px 24px 16px;
-}
+
 
 @media (min-width: 801px) {
     .onboarding-form-grid {

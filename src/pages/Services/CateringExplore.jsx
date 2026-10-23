@@ -88,7 +88,7 @@ const checkBasics = (f) => {
 };
 
 /* ---------- Shared class strings ---------- */
-const WRAP = "mx-auto w-full max-w-[1120px] px-6";
+const WRAP = "mx-auto w-full max-w-[1380px]";
 const LAYOUT = "grid items-start gap-[22px] min-[900px]:grid-cols-[1fr_360px]";
 const PANEL = "mb-5 rounded-2xl bg-white px-[18px] py-5 shadow-[0_2px_14px_rgba(60,40,30,.06)] min-[560px]:px-7 min-[560px]:py-[26px]";
 const SUMMARY = "summary rounded-2xl bg-white px-6 pb-[22px] pt-[26px] shadow-[0_2px_14px_rgba(60,40,30,.06)] min-[900px]:sticky min-[900px]:top-4";
@@ -141,10 +141,10 @@ function Field({ label, error, icon, modal, onChange, ...p }) {
   const extra = isTel
     ? { inputMode: "numeric", maxLength: 10, autoComplete: "tel-national" }
     : isNum
-    ? { type: "text", inputMode: "numeric", maxLength: 4, min: undefined }
-    : isDate
-    ? { min: todayISO() }
-    : {};
+      ? { type: "text", inputMode: "numeric", maxLength: 4, min: undefined }
+      : isDate
+        ? { min: todayISO() }
+        : {};
   const msg = typeof error === "string" ? error : null;
   return (
     <div className="mb-4">
@@ -374,7 +374,7 @@ function VegToggle({ includeNonVeg, setIncludeNonVeg }) {
 
 const Tab = ({ on, small, ...p }) => (
   <button
-    className={cx("rounded-full text-xs font-medium transition-colors", small ? "px-[18px] py-2" : "px-[18px] py-[9px] text-[12.5px]", on ? "bg-[#5b0a2e] text-white" : "bg-[#f4e8e5] text-[#3a2a2c] hover:bg-[#efdcd7]")}
+    className={cx("rounded-full text-xs font-medium transition-colors", small ? "px-[18px] py-2" : "px-[18px] py-[6px] text-[10.5px]", on ? "bg-[#5b0a2e] text-white" : "bg-[#f4e8e5] text-[#3a2a2c] hover:bg-[#efdcd7]")}
     {...p}
   />
 );
@@ -551,8 +551,8 @@ function Landing({ go, embedded }) {
                 </div>
                 <button className="btn" onClick={() => go(o.id)}>{o.cta}</button>
               </div>
-              </article>
-            )
+            </article>
+          )
           )}
         </div>
 
@@ -932,7 +932,7 @@ function QuoteModal({ onClose }) {
     return !Object.keys(e).length;
   };
 
-  const request = async() => {
+  const request = async () => {
     if (!validate()) return;
 
     addEnquiry({
@@ -1107,8 +1107,8 @@ function FullCatering({ go, embedded }) {
 
   const share = () => {
     const url = window.location.href;
-    if (navigator.share) navigator.share({ title: "Evenddy Full Catering Service", url }).catch(() => {});
-    else if (navigator.clipboard) navigator.clipboard.writeText(url).catch(() => {});
+    if (navigator.share) navigator.share({ title: "Evenddy Full Catering Service", url }).catch(() => { });
+    else if (navigator.clipboard) navigator.clipboard.writeText(url).catch(() => { });
   };
 
   return (
