@@ -155,21 +155,21 @@ export default function EventManagementExplore() {
   }, []);
 
   useEffect(() => {
-  let active = true;
-  listPublicEventManagementIntros()
-    .then((intros) => {
-      if (active) {
-        const intro = intros.find((item) => typeof item.status === "string" && item.status.toUpperCase() === "ACTIVE") || intros[0] || null;
-        setPublicIntro(intro);
-        setIntroLoadFailed(false);
-      }
-    })
-    .catch(() => {
-      if (active) setIntroLoadFailed(true);
-    });
-  return () => {
-    active = false;
-  };
+    let active = true;
+    listPublicEventManagementIntros()
+      .then((intros) => {
+        if (active) {
+          const intro = intros.find((item) => typeof item.status === "string" && item.status.toUpperCase() === "ACTIVE") || null;
+          setPublicIntro(intro);
+          setIntroLoadFailed(false);
+        }
+      })
+      .catch(() => {
+        if (active) setIntroLoadFailed(true);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   const eventTypes = useMemo(() => {
@@ -206,6 +206,7 @@ export default function EventManagementExplore() {
   const selectedSubtypeOptions = Array.isArray(eventTypes[form.eventType]) ? eventTypes[form.eventType] : [];
   const set = (k) => (e) => setForm((current) => ({ ...current, [k]: e.target.value }));
   const setType = (e) => setForm((current) => ({ ...current, eventType: e.target.value, subtype: "" }));
+  const hasActiveIntro = typeof publicIntro?.status === "string" && publicIntro.status.toUpperCase() === "ACTIVE";
 
   useEffect(() => {
     setForm((current) => {
@@ -299,40 +300,44 @@ export default function EventManagementExplore() {
           </button>
         </nav>
 
-        <div className="grid items-start gap-7 min-[961px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.7fr)]">
-          {/* ---------- LEFT INTRO CARD ---------- */}
-          <aside
-            className={cx(
-              CARD,
-              "px-5 pb-7 pt-5",
-              "min-[601px]:grid min-[601px]:grid-cols-2 min-[601px]:items-center min-[601px]:gap-x-5",
-              "min-[961px]:sticky min-[961px]:top-4 min-[961px]:block"
-            )}
-          >
-            <img
-              className="mb-4 block h-[220px] w-full rounded-2xl object-cover min-[601px]:row-[1/4] min-[601px]:mb-0 min-[601px]:h-[260px] min-[961px]:row-auto min-[961px]:mb-5 min-[961px]:h-[290px]"
-              src={publicIntro?.bannerImageUrl ? getPublicEventManagementBannerUrl(publicIntro.bannerImageUrl) : SIDE_IMAGE || BANNER}
-              alt="Beautifully styled banquet hall"
-              onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = BANNER; }}
-            />
-            <p className="mb-2.5 px-1.5 text-[10px] font-bold tracking-[.1em] text-[#750a3d]">
-              {publicIntro?.eyebrow }
-            </p>
-            <h1 className="mb-3.5 px-1.5 text-[28px] font-bold! leading-[1.1] tracking-[-.025em]! text-[#1a1516]">
-              {publicIntro?.heading}
-            </h1>
-            <p className="mb-0 px-1.5 text-[11.5px] leading-[1.75] text-[#6b6567]">
-              {publicIntro?.leadParagraph }
-            </p>
-            {introLoadFailed && (
-              <p className="mb-0 mt-3 px-1.5 text-[11px] text-[#9a5b00]" role="status">
-                Live event introduction is unavailable; showing the default content.
+        <div className={cx(
+          "grid items-start gap-7",
+          hasActiveIntro && "min-[961px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.7fr)]"
+        )}>
+          {hasActiveIntro && (
+            <aside
+              className={cx(
+                CARD,
+                "px-5 pb-7 pt-5",
+                "min-[601px]:grid min-[601px]:grid-cols-2 min-[601px]:items-center min-[601px]:gap-x-5",
+                "min-[961px]:sticky min-[961px]:top-4 min-[961px]:block"
+              )}
+            >
+              <img
+                className="mb-4 block h-[220px] w-full rounded-2xl object-cover min-[601px]:row-[1/4] min-[601px]:mb-0 min-[601px]:h-[260px] min-[961px]:row-auto min-[961px]:mb-5 min-[961px]:h-[290px]"
+                src={publicIntro.bannerImageUrl ? getPublicEventManagementBannerUrl(publicIntro.bannerImageUrl) : SIDE_IMAGE || BANNER}
+                alt="Beautifully styled banquet hall"
+                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = BANNER; }}
+              />
+              <p className="mb-2.5 px-1.5 text-[10px] font-bold tracking-[.1em] text-[#750a3d]">
+                {publicIntro.eyebrow}
               </p>
-            )}
-          </aside>
+              <h1 className="mb-3.5 px-1.5 text-[28px] font-bold! leading-[1.1] tracking-[-.025em]! text-[#1a1516]">
+                {publicIntro.heading}
+              </h1>
+              <p className="mb-0 px-1.5 text-[11.5px] leading-[1.75] text-[#6b6567]">
+                {publicIntro.leadParagraph}
+              </p>
+            </aside>
+          )}
 
           {/* ---------- RIGHT FORM CARD ---------- */}
           <form id="event-enquiry" className={cx(CARD, "scroll-mt-20 px-5 pb-6 pt-5 min-[601px]:px-7 min-[601px]:pb-7 min-[601px]:pt-7")} onSubmit={submit} noValidate>
+            {introLoadFailed && (
+              <p className="mb-4 text-xs text-[#9a5b00]" role="status">
+                Live event introduction is unavailable.
+              </p>
+            )}
             <h2 className="mb-1.5 text-xl font-bold! tracking-[-.01em]! text-[#1a1516]">Tell us about your celebration</h2>
             <p className="mb-4 text-xs leading-[1.6] text-[#6b6567]">
               Share your vision and event details so our senior event planning team can curate your custom proposal.
