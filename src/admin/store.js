@@ -214,19 +214,9 @@ export const DEFAULT_DATA = {
       heading: "Your entire celebration, seamlessly planned.",
       lead: "Tell us what you're planning, your budget, and what you need. From curated decor and artisanal catering to venue scouting and on-ground coordination, our captains bring your vision to life.",
     },
-    eventTypes: {
-      Wedding: ["Traditional Wedding", "Destination Wedding", "Intimate Wedding"],
-      Engagement: ["Ring Ceremony", "Roka / Sagai"],
-      Reception: ["Grand Reception", "Cocktail Evening"],
-      Birthday: ["Kids Birthday", "Adult Birthday", "Milestone Birthday"],
-      Anniversary: ["Silver / Golden Jubilee", "Romantic Dinner", "Family Celebration"],
-      "Baby Shower": ["Baby Shower", "Gender Reveal", "Naming Ceremony"],
-      "Corporate Event": ["Product Launch", "Annual Day", "Offsite", "Gala Dinner"],
-      "House Warming": ["Griha Pravesh", "Pooja & Lunch"],
-      Other: ["Other"],
-    },
-    venueStatus: ["Have a venue", "Looking for a venue", "Not decided yet"],
-    priorities: ["Beautiful Decor", "Great Food", "Budget-friendly", "Everything handled"],
+    eventTypes: {},
+    venueStatus: [],
+    priorities: [],
   },
 };
 

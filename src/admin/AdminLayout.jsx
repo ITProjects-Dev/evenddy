@@ -38,7 +38,7 @@ const TITLES = {
     "/admin/dashboard": ["Dashboard", "Overview of your services and enquiries"],
     "/admin/catering": ["Catering", "Manage Meal Box, Delivery Box and Full Catering"],
     "/admin/decor": ["Decor", "Manage DIY kits, themes and custom decor"],
-    "/admin/event": ["Event Management", "Manage event types, priorities and landing"],
+    "/admin/event": ["Event Management", "Manage intro content, event types and priorities"],
     "/admin/users": ["Users", "Create and manage user accounts"],
     "/admin/profile": ["Profile & Settings", "Manage business contacts and enquiry options"],
     //   "/admin/enquiries": ["Enquiries", "Customer enquiries and quote requests"],
