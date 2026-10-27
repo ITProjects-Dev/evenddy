@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { sendMail } from "./sendmail";
+import { useSiteData } from "../../admin/SiteDataContext";
+import { getPublicEventManagementPropertyOptions } from "../../services/eventManagementOptionsService";
+import { getPublicEventManagementBannerUrl, listPublicEventManagementIntros } from "../../services/eventManagementIntroService";
 
 /* Event Management / Plan Your Event page (single file, like CateringExplore / DecorExplore).
    Rendered by ServiceDetails when the slug contains "event".
@@ -69,23 +72,9 @@ function bannerArt() {
 
 const BANNER = bannerArt();
 
-const EVENT_TYPES = {
-  Wedding: ["Traditional Wedding", "Destination Wedding", "Intimate Wedding"],
-  Engagement: ["Ring Ceremony", "Roka / Sagai"],
-  Reception: ["Grand Reception", "Cocktail Evening"],
-  Birthday: ["Kids Birthday", "Adult Birthday", "Milestone Birthday"],
-  Anniversary: ["Silver / Golden Jubilee", "Romantic Dinner", "Family Celebration"],
-  "Baby Shower": ["Baby Shower", "Gender Reveal", "Naming Ceremony"],
-  "Corporate Event": ["Product Launch", "Annual Day", "Offsite", "Gala Dinner"],
-  "House Warming": ["Griha Pravesh", "Pooja & Lunch"],
-  Other: ["Other"],
-};
-const VENUE_STATUS = ["Have a venue", "Looking for a venue", "Not decided yet"];
-const PRIORITIES = ["Beautiful Decor", "Great Food", "Budget-friendly", "Everything handled"];
-
 const EMPTY = {
   name: "", phone: "", eventType: "", subtype: "", city: "", date: "", time: "",
-  guests: "", budget: "", venueStatus: VENUE_STATUS[0], venueName: "", priorities: [], story: "",
+  guests: "", budget: "", venueStatus: "", venueName: "", priorities: [], story: "",
 };
 
 const WaIcon = () => (
@@ -141,20 +130,114 @@ function F({ id, label, req, error, children }) {
    MAIN
 ====================================================== */
 export default function EventManagementExplore() {
-  const [form, setForm] = useState(EMPTY);
+  const siteData = useSiteData();
+  const configuredEventTypes = siteData.event?.eventTypes;
+  const [serverOptions, setServerOptions] = useState(null);
+  const [optionsLoadFailed, setOptionsLoadFailed] = useState(false);
+  const [publicIntro, setPublicIntro] = useState(null);
+  const [introLoadFailed, setIntroLoadFailed] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    getPublicEventManagementPropertyOptions()
+      .then((options) => {
+        if (active) {
+          setServerOptions(options);
+          setOptionsLoadFailed(false);
+        }
+      })
+      .catch(() => {
+        if (active) setOptionsLoadFailed(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    listPublicEventManagementIntros()
+      .then((intros) => {
+        if (active) {
+          const intro = intros.find((item) => typeof item.status === "string" && item.status.toUpperCase() === "ACTIVE") || null;
+          setPublicIntro(intro);
+          setIntroLoadFailed(false);
+        }
+      })
+      .catch(() => {
+        if (active) setIntroLoadFailed(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const eventTypes = useMemo(() => {
+    if (serverOptions) return serverOptions.eventTypes;
+    if (!configuredEventTypes || typeof configuredEventTypes !== "object" || Array.isArray(configuredEventTypes)) return {};
+    return Object.fromEntries(Object.entries(configuredEventTypes)
+      .filter(([type, subtypes]) => type.trim() && Array.isArray(subtypes))
+      .map(([type, subtypes]) => [
+        type.trim(),
+        subtypes.filter((subtype) => typeof subtype === "string" && subtype.trim()),
+      ]));
+  }, [configuredEventTypes, serverOptions]);
+  const eventTypeOptions = useMemo(() => Object.keys(eventTypes), [eventTypes]);
+  const venueOptions = useMemo(() => (
+    serverOptions
+      ? serverOptions.venueStatus
+      : Array.isArray(siteData.event?.venueStatus)
+        ? siteData.event.venueStatus.filter((option) => typeof option === "string" && option.trim())
+        : []
+  ), [serverOptions, siteData.event?.venueStatus]);
+  const priorityOptions = useMemo(() => (
+    serverOptions
+      ? serverOptions.priorities
+      : Array.isArray(siteData.event?.priorities)
+        ? siteData.event.priorities.filter((option) => typeof option === "string" && option.trim())
+        : []
+  ), [serverOptions, siteData.event?.priorities]);
+  const [form, setForm] = useState(() => ({ ...EMPTY, venueStatus: venueOptions[0] || "" }));
   const [errors, setErrors] = useState({});
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [mailError, setMailError] = useState("");
 
-  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
-  const setType = (e) => setForm({ ...form, eventType: e.target.value, subtype: "" }); // subtype depends on type
+  const selectedSubtypeOptions = Array.isArray(eventTypes[form.eventType]) ? eventTypes[form.eventType] : [];
+  const set = (k) => (e) => setForm((current) => ({ ...current, [k]: e.target.value }));
+  const setType = (e) => setForm((current) => ({ ...current, eventType: e.target.value, subtype: "" }));
+  const hasActiveIntro = typeof publicIntro?.status === "string" && publicIntro.status.toUpperCase() === "ACTIVE";
 
-  // "Everything handled" is exclusive; picking anything else clears it
+  useEffect(() => {
+    setForm((current) => {
+      const nextType = eventTypeOptions.includes(current.eventType) ? current.eventType : "";
+      const nextSubtypes = Array.isArray(eventTypes[nextType]) ? eventTypes[nextType] : [];
+      const nextVenue = venueOptions.includes(current.venueStatus) ? current.venueStatus : venueOptions[0] || "";
+      const nextPriorities = current.priorities.filter((priority) => priorityOptions.includes(priority));
+      const nextSubtype = nextSubtypes.includes(current.subtype) ? current.subtype : "";
+      if (
+        nextType === current.eventType
+        && nextSubtype === current.subtype
+        && nextVenue === current.venueStatus
+        && nextPriorities.length === current.priorities.length
+      ) return current;
+      return {
+        ...current,
+        eventType: nextType,
+        subtype: nextSubtype,
+        venueStatus: nextVenue,
+        priorities: nextPriorities,
+      };
+    });
+  }, [eventTypes, eventTypeOptions, priorityOptions, venueOptions]);
+
+  const resetForm = () => setForm({ ...EMPTY, venueStatus: venueOptions[0] || "" });
+
+  const exclusivePriority = priorityOptions.includes("Everything handled") ? "Everything handled" : "";
   const togglePriority = (p) =>
     setForm((f) => {
-      if (p === "Everything handled") return { ...f, priorities: f.priorities.includes(p) ? [] : [p] };
-      const rest = f.priorities.filter((x) => x !== "Everything handled");
+      if (exclusivePriority && p === exclusivePriority) return { ...f, priorities: f.priorities.includes(p) ? [] : [p] };
+      const rest = exclusivePriority ? f.priorities.filter((x) => x !== exclusivePriority) : f.priorities;
       return { ...f, priorities: rest.includes(p) ? rest.filter((x) => x !== p) : [...rest, p] };
     });
 
@@ -217,39 +300,53 @@ export default function EventManagementExplore() {
           </button>
         </nav>
 
-        <div className="grid items-start gap-7 min-[961px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.7fr)]">
-          {/* ---------- LEFT INTRO CARD ---------- */}
-          <aside
-            className={cx(
-              CARD,
-              "px-5 pb-7 pt-5",
-              "min-[601px]:grid min-[601px]:grid-cols-2 min-[601px]:items-center min-[601px]:gap-x-5",
-              "min-[961px]:sticky min-[961px]:top-4 min-[961px]:block"
-            )}
-          >
-            <img
-              className="mb-4 block h-[220px] w-full rounded-2xl object-cover min-[601px]:row-[1/4] min-[601px]:mb-0 min-[601px]:h-[260px] min-[961px]:row-auto min-[961px]:mb-5 min-[961px]:h-[290px]"
-              src={SIDE_IMAGE || BANNER}
-              alt="Beautifully styled banquet hall"
-              onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = BANNER; }}
-            />
-            <p className="mb-2.5 px-1.5 text-[10px] font-bold tracking-[.1em] text-[#750a3d]">EVENT PLANNING &amp; MANAGEMENT</p>
-            <h1 className="mb-3.5 px-1.5 text-[28px] font-bold! leading-[1.1] tracking-[-.025em]! text-[#1a1516]">
-              Your entire celebration, seamlessly planned.
-            </h1>
-            <p className="mb-0 px-1.5 text-[11.5px] leading-[1.75] text-[#6b6567]">
-              Tell us what you're planning, your budget, and what you need. From curated decor and
-              artisanal catering to venue scouting and on-ground coordination, our captains bring
-              your vision to life.
-            </p>
-          </aside>
+        <div className={cx(
+          "grid items-start gap-7",
+          hasActiveIntro && "min-[961px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.7fr)]"
+        )}>
+          {hasActiveIntro && (
+            <aside
+              className={cx(
+                CARD,
+                "px-5 pb-7 pt-5",
+                "min-[601px]:grid min-[601px]:grid-cols-2 min-[601px]:items-center min-[601px]:gap-x-5",
+                "min-[961px]:sticky min-[961px]:top-4 min-[961px]:block"
+              )}
+            >
+              <img
+                className="mb-4 block h-[220px] w-full rounded-2xl object-cover min-[601px]:row-[1/4] min-[601px]:mb-0 min-[601px]:h-[260px] min-[961px]:row-auto min-[961px]:mb-5 min-[961px]:h-[290px]"
+                src={publicIntro.bannerImageUrl ? getPublicEventManagementBannerUrl(publicIntro.bannerImageUrl) : SIDE_IMAGE || BANNER}
+                alt="Beautifully styled banquet hall"
+                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = BANNER; }}
+              />
+              <p className="mb-2.5 px-1.5 text-[10px] font-bold tracking-[.1em] text-[#750a3d]">
+                {publicIntro.eyebrow}
+              </p>
+              <h1 className="mb-3.5 px-1.5 text-[28px] font-bold! leading-[1.1] tracking-[-.025em]! text-[#1a1516]">
+                {publicIntro.heading}
+              </h1>
+              <p className="mb-0 px-1.5 text-[11.5px] leading-[1.75] text-[#6b6567]">
+                {publicIntro.leadParagraph}
+              </p>
+            </aside>
+          )}
 
           {/* ---------- RIGHT FORM CARD ---------- */}
           <form id="event-enquiry" className={cx(CARD, "scroll-mt-20 px-5 pb-6 pt-5 min-[601px]:px-7 min-[601px]:pb-7 min-[601px]:pt-7")} onSubmit={submit} noValidate>
+            {introLoadFailed && (
+              <p className="mb-4 text-xs text-[#9a5b00]" role="status">
+                Live event introduction is unavailable.
+              </p>
+            )}
             <h2 className="mb-1.5 text-xl font-bold! tracking-[-.01em]! text-[#1a1516]">Tell us about your celebration</h2>
             <p className="mb-4 text-xs leading-[1.6] text-[#6b6567]">
               Share your vision and event details so our senior event planning team can curate your custom proposal.
             </p>
+            {optionsLoadFailed && (
+              <p className="mb-4 text-xs text-[#9a5b00]" role="status">
+                Server event options are unavailable; showing the saved options for this site.
+              </p>
+            )}
 
             <div className={G2}>
               <F id="em-name" label="Name" req error={errors.name}>
@@ -262,15 +359,16 @@ export default function EventManagementExplore() {
 
             <div className={G3}>
               <F id="em-eventType" label="Event Type" req error={errors.eventType}>
-                <select id="em-eventType" className={ctl("eventType", SELECT)} style={SELECT_ARROW} value={form.eventType} onChange={setType} aria-invalid={!!errors.eventType}>
+                <select id="em-eventType" className={ctl("eventType", SELECT)} style={SELECT_ARROW} value={form.eventType} onChange={setType} disabled={eventTypeOptions.length === 0} aria-invalid={!!errors.eventType}>
                   <option value="">Select</option>
-                  {Object.keys(EVENT_TYPES).map((t) => <option key={t}>{t}</option>)}
+                  {eventTypeOptions.map((t) => <option key={t} value={t}>{t}</option>)}
                 </select>
+                {eventTypeOptions.length === 0 && <small className="mt-1 block text-[11px] text-[#6b6567]">No event types are configured in admin.</small>}
               </F>
               <F id="em-subtype" label="Event Subtype" req error={errors.subtype}>
-                <select id="em-subtype" className={ctl("subtype", SELECT)} style={SELECT_ARROW} value={form.subtype} onChange={set("subtype")} disabled={!form.eventType} aria-invalid={!!errors.subtype}>
-                  <option value="">{form.eventType ? "Select" : "Pick type first"}</option>
-                  {(EVENT_TYPES[form.eventType] || []).map((s) => <option key={s}>{s}</option>)}
+                <select id="em-subtype" className={ctl("subtype", SELECT)} style={SELECT_ARROW} value={form.subtype} onChange={set("subtype")} disabled={!form.eventType || selectedSubtypeOptions.length === 0} aria-invalid={!!errors.subtype}>
+                  <option value="">{!form.eventType ? "Pick type first" : selectedSubtypeOptions.length ? "Select an option" : "No subtypes configured"}</option>
+                  {selectedSubtypeOptions.map((subtype) => <option key={subtype} value={subtype}>{subtype}</option>)}
                 </select>
               </F>
               <F id="em-city" label="Location / City" req error={errors.city}>
@@ -302,11 +400,12 @@ export default function EventManagementExplore() {
 
             <div className={G2}>
               <F id="em-venueStatus" label="Venue Status">
-                <select id="em-venueStatus" className={cx(CONTROL, SELECT)} style={SELECT_ARROW} value={form.venueStatus} onChange={set("venueStatus")}>
-                  {VENUE_STATUS.map((s) => <option key={s}>{s}</option>)}
+                <select id="em-venueStatus" className={cx(CONTROL, SELECT)} style={SELECT_ARROW} value={form.venueStatus} onChange={set("venueStatus")} disabled={venueOptions.length === 0}>
+                  <option value="">{venueOptions.length ? "Select an option" : "No venue options configured"}</option>
+                  {venueOptions.map((option) => <option key={option} value={option}>{option}</option>)}
                 </select>
               </F>
-              <F id="em-venueName" label={form.venueStatus === VENUE_STATUS[0] ? "Confirmed Venue Name" : "Preferred Venue / Area"}>
+              <F id="em-venueName" label={form.venueStatus === venueOptions[0] ? "Confirmed Venue Name" : "Preferred Venue / Area"}>
                 <input id="em-venueName" className={CONTROL} value={form.venueName} onChange={set("venueName")} placeholder="e.g. Sea Pearl Banquet Hall, Beach Rd" />
               </F>
             </div>
@@ -314,7 +413,7 @@ export default function EventManagementExplore() {
             <div className="mb-4">
               <span className={LABEL} id="em-prio-label">Key Priorities for this Celebration</span>
               <div className="flex flex-wrap gap-2" role="group" aria-labelledby="em-prio-label">
-                {PRIORITIES.map((p) => {
+                {priorityOptions.map((p) => {
                   const on = form.priorities.includes(p);
                   return (
                     <button
@@ -334,6 +433,7 @@ export default function EventManagementExplore() {
                     </button>
                   );
                 })}
+                {priorityOptions.length === 0 && <p className="mb-0 text-[11px] text-[#6b6567]">No priorities are configured in admin.</p>}
               </div>
             </div>
 
@@ -367,7 +467,7 @@ export default function EventManagementExplore() {
             <p className="mb-3.5 text-xs leading-[1.6] text-[#6b6567]">
               Thank you for choosing <b>Evenddy</b>. Our planning team will review your brief and get in touch within 24 hours.
             </p>
-            <button className={cx(BTN_SOLID, "mt-1.5 w-full")} autoFocus onClick={() => { setSent(false); setForm(EMPTY); }}>
+            <button className={cx(BTN_SOLID, "mt-1.5 w-full")} autoFocus onClick={() => { setSent(false); resetForm(); }}>
               Continue Browsing →
             </button>
           </div>

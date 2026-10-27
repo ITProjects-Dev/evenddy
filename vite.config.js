@@ -25,6 +25,10 @@ export default defineConfig(({ mode }) => {
           target: gateway,
           changeOrigin: true,
         },
+        '/admin-service': {
+          target: gateway,
+          changeOrigin: true,
+        },
       },
     },
   }
