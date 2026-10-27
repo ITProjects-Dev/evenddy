@@ -3,6 +3,9 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useSiteData } from "../../admin/SiteDataContext";
 import { addEnquiry } from "../../admin/store";
 import { sendMail } from "./sendmail";
+import { fetchFullCateringImage, fromApiFullCatering, listPublicFullCatering, pageRows } from "../../services/fullcateringservice";
+import { listPublicDeliveryBoxes } from "../../services/deliveryBoxService"; /* NEW: adjust path to your service file */
+import { listPublicMealBoxes, getPublicMealSlots, getPublicGuestDefault, isLive } from "../../services/mealboxservice";
 import "./Catering.css";
 
 /* Font comes from your global Sora setup, so no font-family anywhere here.
@@ -19,6 +22,10 @@ const DISH_IMG = {
   // "Tandoori Roti": "https://your-cdn.com/tandoori-roti.jpg",
   // "Butter Naan": "https://your-cdn.com/butter-naan.jpg",
 };
+
+/* NEW: builds the plain-text enquiry message (was referenced but never defined) */
+const buildMsg = (title, pairs) =>
+  [title, ...pairs.filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`)].join("\n");
 
 /* ======================================================
    ICONS (kept local — UI primitive, not data)
@@ -215,6 +222,20 @@ function Radios({ name, value, onChange, labelId }) {
           {v === "yes" ? "Yes" : "No"}
         </label>
       ))}
+    </div>
+  );
+}
+
+/* NEW: success popup used by QuoteModal (was referenced but never defined) */
+function SuccessModal({ quote, onClose }) {
+  return (
+    <div className="fixed inset-0 z-[1100] grid place-items-center bg-[rgba(35,26,29,.55)] p-4" onClick={onClose}>
+      <div className="w-full max-w-[360px] rounded-2xl bg-white p-6 text-center shadow-[0_24px_60px_rgba(35,26,29,.35)]" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+        <span className="mb-3 flex justify-center text-[#2e9a6b]"><Icon name="checkCircle" size={44} /></span>
+        <h3 className="mb-1.5 text-xl font-semibold text-[#1f1819]">{quote ? "Quote request sent" : "Enquiry sent"}</h3>
+        <p className="mb-4 text-[13px] text-[#6f6366]">Our team will contact you shortly to confirm details.</p>
+        <button className={BTN_SOLID} onClick={onClose}>Close</button>
+      </div>
     </div>
   );
 }
@@ -493,10 +514,40 @@ function ChangeItemModal({ slot, currentName, includeNonVeg, onClose, onConfirm 
 /* ======================================================
    LANDING
 ====================================================== */
+
+/* NEW: API cards come with ids like "api-3", so work out which page each card opens */
+const VIEW_ORDER = ["mealbox", "delivery", "full"];
+const resolveView = (c, i) => {
+  const id = String(c.id || "").toLowerCase();
+  if (VIEW_ORDER.includes(id)) return id;
+  const t = [id, c.title, c.eyebrow, c.eyebrowTagline, c.cta, c.ctaButtonLabel]
+    .filter(Boolean).join(" ").toLowerCase();
+  if (t.includes("meal")) return "mealbox";
+  if (t.includes("delivery")) return "delivery";
+  if (t.includes("full")) return "full";
+  return VIEW_ORDER[i] || "full";
+};
+
+/* NEW: chips can be a JSON string ("[\"Wedding\",\"Birthday\"]"), a comma list, or an array of strings / {icon,text} */
+const parseChips = (raw) => {
+  let arr = raw;
+  if (typeof raw === "string") {
+    try { arr = JSON.parse(raw); } catch { arr = raw.split(",").map((s) => s.trim()).filter(Boolean); }
+  }
+  if (!Array.isArray(arr)) return [];
+  return arr
+    .map((ch) => (typeof ch === "string" ? ["checkCircle", ch] : [ch?.icon || "checkCircle", ch?.text]))
+    .filter(([, text]) => text);
+};
+
+/* NEW: paragraphs can be an array or one string with line breaks */
+const parseParas = (raw) =>
+  Array.isArray(raw) ? raw : String(raw || "").split(/\n+/).map((s) => s.trim()).filter(Boolean);
+
 function Landing({ go, embedded }) {
   const data = useSiteData();
   const PHONE = data.global.phone;
-  const landing = data.catering.landing;
+  const landing = data.catering.landing || []; /* NEW: safe fallback */
 
   const FALLBACK = {
     mealbox: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=900",
@@ -504,18 +555,24 @@ function Landing({ go, embedded }) {
     full: "https://images.unsplash.com/photo-1555244162-803834f70033?w=900",
   };
 
-  const options = landing.map((c, i) => ({
-    id: c.id,
-    title: c.title,
-    eyebrow: c.eyebrow,
-    icon: c.icon,
-    image: c.image || FALLBACK[c.id] || FALLBACK.full,
-    price: c.price,
-    paras: c.paras || [],
-    chips: (c.chips || []).map((ch) => [ch.icon, ch.text]),
-    cta: c.cta,
-    flip: i === 1,
-  }));
+  /* NEW: accepts both the converted shape and the raw API shape
+     (eyebrowTagline, iconKey, priceBadge, cardImageUrl, ctaButtonLabel, aboutParagraphs) */
+  const options = landing.map((c, i) => {
+    const view = resolveView(c, i);
+    return {
+      id: c.id,
+      view,
+      title: c.title,
+      eyebrow: c.eyebrow || c.eyebrowTagline,
+      icon: c.icon || c.iconKey,
+      image: c.image || c.cardImageUrl || "",
+      price: c.price ?? c.priceBadge,
+      paras: parseParas(c.paras ?? c.aboutParagraphs),
+      chips: parseChips(c.chips),
+      cta: c.cta || c.ctaButtonLabel,
+      flip: i === 1,
+    };
+  });
 
   const picks = [
     ["box", "Meal Box", "Individual portions, perfect for structured meals.", "mealbox"],
@@ -538,7 +595,7 @@ function Landing({ go, embedded }) {
         <div className="opts">
           {options.map((o) => (
             <article key={o.id} className={cx("opt", o.flip && "flip")}>
-              <div className="media" role="img" aria-label={o.title} style={{ backgroundImage: `url(${o.image})` }} />
+              <div className="media" role="img" aria-label={o.title} style={o.image ? { backgroundImage: `url(${o.image})` } : undefined} />
               <div className="body">
                 <span className="tag"><Icon name={o.icon} size={15} />{o.eyebrow}</span>
                 <div className="title-row">
@@ -549,11 +606,10 @@ function Landing({ go, embedded }) {
                 <div className="chips">
                   {o.chips.map(([ic, tx], i) => <span key={i} className="chip"><Icon name={ic} size={12} />{tx}</span>)}
                 </div>
-                <button className="btn" onClick={() => go(o.id)}>{o.cta}</button>
+                <button className="btn" onClick={() => go(o.view)}>{o.cta}</button>
               </div>
-              </article>
-            )
-          )}
+            </article>
+          ))}
         </div>
 
         <h2 className="choose">Choose the right catering experience</h2>
@@ -588,15 +644,81 @@ function Landing({ go, embedded }) {
 ====================================================== */
 function MealBox({ go, embedded }) {
   const data = useSiteData();
-  const cfg = data.catering.mealBox;
-  const MENU = data.catering.menuItems;
-  const menuCategories = data.catering.menuCategories;
+  /* NEW: no static data is rendered. Box sizes, slots and guest defaults come from the Meal Box APIs below,
+     the extra item tabs come from the public Delivery Box API. Nothing from the site data is used as a fallback. */
+  const [apiMenu, setApiMenu] = useState([]);
+  useEffect(() => {
+    let alive = true;
+    listPublicDeliveryBoxes()
+      .then((res) => {
+        if (!alive) return;
+        const arr = Array.isArray(res) ? res : res?.data || res?.content || [];
+        setApiMenu(arr.map((b) => ({
+          id: `api-${b.id ?? b.name}`,
+          name: b.name,
+          cat: b.category,
+          veg: String(b.type || "").toLowerCase() === "veg",
+        })));
+      })
+      .catch(() => { /* never show token / network errors on the page */ });
+    return () => { alive = false; };
+  }, []);
+  const MENU = apiMenu;
+  const menuCategories = [...new Set(apiMenu.map((i) => i.cat).filter(Boolean))];
 
-  const BOX_SIZES = cfg.boxSizes || [];
-  const MEALBOX_SLOTS = cfg.slots || [];
-  const PRESETS = cfg.presets || [10, 25, 50, 100, 250];
-  const MIN_G = cfg.minGuests ?? 10;
-  const GUEST_STEP = cfg.guestStep ?? 5;
+  /* NEW: items from the public Meal Box APIs (published only, no token):
+       GET /admin-service/api/public/meal-box/list     -> box sizes   { id, itemCount, price, note, published }
+       GET /admin-service/api/public/meal-box/{id}     -> { box, slots }  (slot rows: slotName, itemName, itemType, published)
+       GET /admin-service/api/public/guest-default     -> { minimumGuests, step, quickPresets }
+     Whatever loads replaces the matching part of the site-data config. If an API fails or returns
+     nothing, that part falls back to the site-data config, so the page always opens. */
+  const [apiMeal, setApiMeal] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const next = {};
+      try {
+        const res = await listPublicMealBoxes();
+        const arr = Array.isArray(res) ? res : res?.data || res?.content || [];
+        const boxes = arr
+          .filter(isLive)
+          .sort((a, b) => (Number(a.itemCount) || 0) - (Number(b.itemCount) || 0));
+        if (boxes.length) {
+          next.boxSizes = boxes.map((b) => ({ items: Number(b.itemCount) || 0, price: Number(b.price) || 0, note: b.note || "" }));
+          const rows = (await getPublicMealSlots(boxes)).filter(isLive);
+          if (rows.length) {
+            const order = [];
+            const groups = {};
+            [...rows].sort((a, b) => (Number(a.id) || 0) - (Number(b.id) || 0)).forEach((r) => {
+              const name = r.slotName || "Slot 1";
+              if (!groups[name]) { groups[name] = []; order.push(name); }
+              groups[name].push({ n: r.itemName || "", v: String(r.itemType || "").trim().toLowerCase() === "veg" });
+            });
+            order.sort((a, b) => (parseInt(a.replace(/\D/g, ""), 10) || 0) - (parseInt(b.replace(/\D/g, ""), 10) || 0));
+            next.slots = order.map((name) => ({ icon: "bowl", options: groups[name] }));
+          }
+        }
+      } catch { /* never show token / network errors on the page */ }
+      try {
+        const g = await getPublicGuestDefault();
+        const obj = Array.isArray(g) ? g[0] : g?.data ?? g;
+        if (obj && obj.minimumGuests != null) {
+          next.minGuests = Number(obj.minimumGuests) || undefined;
+          next.guestStep = Number(obj.step) || undefined;
+          if (Array.isArray(obj.quickPresets) && obj.quickPresets.length) next.presets = obj.quickPresets.map(Number);
+        }
+      } catch { /* no guest defaults saved yet */ }
+      if (alive && Object.keys(next).length) setApiMeal(next);
+    })();
+    return () => { alive = false; };
+    // eslint-disable-next-line
+  }, []);
+
+  const BOX_SIZES = apiMeal?.boxSizes || []; /* NEW: API only */
+  const MEALBOX_SLOTS = apiMeal?.slots || []; /* NEW */
+  const PRESETS = apiMeal?.presets || []; /* NEW */
+  const MIN_G = apiMeal?.minGuests ?? 1; /* NEW */
+  const GUEST_STEP = apiMeal?.guestStep ?? 1; /* NEW */
   const TABS = ["Meal Box", ...menuCategories];
 
   const [tab, setTab] = useState("Meal Box");
@@ -609,6 +731,12 @@ function MealBox({ go, embedded }) {
   const [guests, setGuests] = useState(MIN_G);
   const [extra, setExtra] = useState({});
   const [swapSlot, setSwapSlot] = useState(null); // index of the slot being changed (null = popup closed)
+
+  /* NEW: when the guest defaults arrive from the API, start from the saved minimum (until the customer changes it) */
+  useEffect(() => {
+    if (apiMeal?.minGuests && !touched) setGuests(apiMeal.minGuests);
+    // eslint-disable-next-line
+  }, [apiMeal]);
 
   /* Keep picks array length in sync if slots change from admin */
   useEffect(() => { setPicks(MEALBOX_SLOTS.map((_, i) => picks[i] ?? 0)); /* eslint-disable-next-line */ }, [MEALBOX_SLOTS.length]);
@@ -762,7 +890,7 @@ function MealBox({ go, embedded }) {
                     <span className="text-[13px] text-[#3a2a2c]">Boxes</span>
                   </div>
                 </div>
-                <div className="mt-[18px] flex flex-wrap items-center gap-2 text-[11px] text-[#6f6366]">
+                <div className={PRESETS.length === 0 ? "hidden" : "mt-[18px] flex flex-wrap items-center gap-2 text-[11px] text-[#6f6366]"}>
                   <span>Quick Presets:</span>
                   {PRESETS.map((n) => (
                     <button key={n} className={cx("rounded-full px-3.5 py-[7px] text-[11.5px] font-medium", guests === n ? "bg-[#5b0a2e] text-white" : "bg-[#f6ebe7] text-[#3a2a2c]")} onClick={() => setGuestCount(() => n)}>{n} Boxes</button>
@@ -851,12 +979,36 @@ function MealBox({ go, embedded }) {
 }
 
 /* ======================================================
-   DELIVERY BOX
+   DELIVERY BOX  (loads items from the public Delivery Box API)
 ====================================================== */
 function DeliveryBox({ go, embedded }) {
   const data = useSiteData();
-  const MENU = data.catering.menuItems;
-  const menuCategories = data.catering.menuCategories;
+
+  /* NEW: items from GET /admin-service/api/public/delivery-box/list (published only, no token).
+     Each API box { id, name, category, type: "Veg" | "Non-Veg" } becomes a menu item.
+     If the API fails or returns nothing, the page falls back to the site-data menu, so it always opens. */
+  const [apiItems, setApiItems] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    listPublicDeliveryBoxes()
+      .then((res) => {
+        if (!alive) return;
+        const arr = Array.isArray(res) ? res : res?.data || res?.content || [];
+        setApiItems(
+          arr.map((b) => ({
+            id: `api-${b.id ?? b.name}`,
+            name: b.name,
+            cat: b.category,
+            veg: String(b.type || "").toLowerCase() === "veg",
+          }))
+        );
+      })
+      .catch(() => { if (alive) setApiItems(null); }); /* never show token / network errors on the page */
+    return () => { alive = false; };
+  }, []);
+
+  const MENU = apiItems || []; /* NEW: API only, no static menu */
+  const menuCategories = [...new Set(MENU.map((i) => i.cat).filter(Boolean))];
   const FILTERS = ["All", ...menuCategories];
 
   const [filter, setFilter] = useState("All");
@@ -903,12 +1055,13 @@ function DeliveryBox({ go, embedded }) {
 /* ======================================================
    FULL CATERING
 ====================================================== */
-function QuoteModal({ onClose }) {
+function QuoteModal({ onClose, full }) {
   const data = useSiteData();
-  const CUISINES = data.catering.full.cuisines;
-  const PLATE_PRICES = data.catering.full.platePrices;
-  const FOOD_TYPES = data.catering.full.foodTypes;
-  const FULL_MENU = data.catering.full.menu;
+  const FULLD = full || {}; /* NEW: API data only, passed in by FullCatering */
+  const CUISINES = FULLD.cuisines || [];
+  const PLATE_PRICES = FULLD.platePrices || [];
+  const FOOD_TYPES = FULLD.foodTypes || [];
+  const FULL_MENU = FULLD.menu || {};
 
   const [vegOnly, setVegOnly] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", cuisine: "", plate: "", guests: "", date: "", foodType: "", location: "", counter: "yes" });
@@ -932,7 +1085,23 @@ function QuoteModal({ onClose }) {
     return !Object.keys(e).length;
   };
 
+  /* NEW: builds the quote e-mail text (was referenced but never defined) */
+  const message = () =>
+    buildMsg("Full catering – detailed quote request", [
+      ["Name", form.name],
+      ["Phone", form.phone],
+      ["Cuisine", form.cuisine],
+      ["Plate price", form.plate],
+      ["Guests", form.guests],
+      ["Event date", form.date],
+      ["Food type", vegOnly ? "Veg only" : form.foodType],
+      ["Location", form.location],
+      ["Counter", form.counter === "yes" ? "Yes" : "No"],
+      ...Object.entries(menu).filter(([, v]) => v).map(([k, v]) => [k, v]),
+    ]);
+
   const request = async() => {
+    if (sending) return;
     if (!validate()) return;
 
     addEnquiry({
@@ -1083,6 +1252,7 @@ function QuoteSide({ onOpenDetailed }) {
       <Field label="Event Date" type="date" icon="calendar" value={form.date} onChange={set("date")} error={errors.date} />
       <Field label="Event location/city" icon="pin" placeholder="Enter city or area" value={form.location} onChange={set("location")} />
       {sent && <div className="toast" role="status">Enquiry sent. Our team will contact you to confirm details.</div>}
+      {mailError && <p role="alert" className="mb-2 text-[11px] text-red-600">{mailError}</p>}
       <button className="btn block" onClick={send}>Send Enquiry</button>
       <a className="btn block ghost call" href={`tel:${PHONE.replace(/\s/g, "")}`}>Call Us</a>
       <button className="link block" onClick={onOpenDetailed}>Customise menu &amp; get a detailed quote</button>
@@ -1091,13 +1261,44 @@ function QuoteSide({ onOpenDetailed }) {
   );
 }
 
-function FullCatering({ go, embedded }) {
-  const data = useSiteData();
-  const FULL = data.catering.full;
-  const landing = data.catering.landing.find((c) => c.id === "full");
-  const IMG_FULL = FULL.hero || landing?.image || "https://images.unsplash.com/photo-1555244162-803834f70033?w=900";
+function FullCateringImage({ src, alt = "", className = "" }) {
+  const [loadedSrc, setLoadedSrc] = useState("");
+  useEffect(() => {
+    if (!src) { setLoadedSrc(""); return undefined; }
+    const controller = new AbortController();
+    let objectUrl = "";
+    setLoadedSrc("");
+    fetchFullCateringImage(src, controller.signal).then((url) => {
+      objectUrl = url;
+      setLoadedSrc(url);
+    }).catch(() => {
+      if (!controller.signal.aborted) setLoadedSrc("");
+    });
+    return () => {
+      controller.abort();
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [src]);
+  return loadedSrc ? <img src={loadedSrc} alt={alt} className={className} /> : null;
+}
 
-  const TABS = [["about", "About"], ["portfolio", "Portfolio (140)"], ["reviews", "Reviews (84)"]];
+function FullCatering({ go, embedded }) {
+  const [apiFull, setApiFull] = useState(null);
+  const [loadError, setLoadError] = useState("");
+  useEffect(() => {
+    let alive = true;
+    listPublicFullCatering(0, 10).then((res) => {
+      const rows = pageRows(res).filter((r) => r.published !== false && r.published !== 0 && r.published !== "0");
+      if (alive && rows.length) setApiFull(fromApiFullCatering(rows[0]));
+    }).catch((e) => {
+      if (alive) setLoadError(e?.message || "Full Catering is temporarily unavailable.");
+    });
+    return () => { alive = false; };
+  }, []);
+  const FULL = apiFull || {};
+  const IMG_FULL = FULL.hero || "";
+
+  const TABS = [["about", "About"], ["portfolio", `Portfolio (${(FULL.gallery || []).length})`], ["reviews", `Reviews (${(FULL.reviews || []).length})`]];
   const [tab, setTab] = useState("about");
   const [modal, setModal] = useState(false);
 
@@ -1116,8 +1317,11 @@ function FullCatering({ go, embedded }) {
       <Crumb go={go} current="Full Catering" embedded={embedded} />
       <div className={LAYOUT}>
         <div>
+          {loadError && <p role="status" className="mb-3 rounded-lg bg-white px-4 py-3 text-sm text-[#6f6366]">Full Catering details are temporarily unavailable.</p>}
           {/* hero photo + title card are one joined block */}
-          <div className="aspect-[16/7] min-h-[180px] rounded-t-[14px] bg-cover bg-center min-[860px]:min-h-[200px]" role="img" aria-label="Evenddy Full catering" style={{ backgroundImage: `url(${IMG_FULL})` }} />
+          <div className="relative aspect-[16/7] min-h-[180px] overflow-hidden rounded-t-[14px] bg-[#efeeec] min-[860px]:min-h-[200px]" role="img" aria-label="Evenddy Full catering">
+            <FullCateringImage src={IMG_FULL} alt="Evenddy Full catering" className="absolute inset-0 size-full object-cover object-center" />
+          </div>
           <div className="mb-3.5 rounded-b-[14px] bg-white px-[22px] pb-4 pt-[18px] shadow-[0_2px_14px_rgba(60,40,30,.06)]">
             <div className="mb-2 flex flex-wrap items-center gap-3">
               <h1 className="mb-0 text-2xl font-medium tracking-[-.01em]! text-[#5b0a2e]">Evenddy Full Catering Service</h1>
@@ -1125,12 +1329,6 @@ function FullCatering({ go, embedded }) {
               <button className="ml-auto grid size-[34px] place-items-center rounded-full bg-[#fbeee8] text-[#4b4547] hover:bg-[#f6e0d6]" type="button" aria-label="Share" onClick={share}>
                 <Icon name="share" size={16} />
               </button>
-            </div>
-            <div className="mt-1.5 flex flex-wrap items-center gap-x-[18px] gap-y-1.5 text-[12.5px] text-[#3f3a3c]">
-              <span className="inline-flex items-center gap-1.5"><Icon name="star" size={13} /><b className="font-semibold text-[#1f1819]">4.9</b><small className="text-[11.5px] text-[#6f6366]">(84 verified reviews)</small></span>
-              <span className="inline-flex items-center gap-1.5"><Icon name="pin" size={13} />Vizag, Andhra Pradesh, India</span>
-              <span className="inline-flex items-center gap-1.5"><Icon name="people" size={13} />120+ Grand Celebrations Served</span>
-              <span className="inline-flex items-center gap-1.5"><Icon name="bolt" size={13} />Avg. Response: 12 hrs</span>
             </div>
           </div>
 
@@ -1153,13 +1351,13 @@ function FullCatering({ go, embedded }) {
             <section className="panel">
               <div className="step pink">ABOUT</div>
               <h3>Evenddy Full Catering Service</h3>
-              <p className="fc-text">{FULL.about ?? DEFAULT_DATA.catering.full.about}</p>
+              <p className="fc-text">{FULL.about}</p>
               <div className="step pink mt">CUISINES &amp; SERVICES</div>
               <div className="chips">
                 {SERVICE_TAGS.map((t) => <span className="chip" key={t}>{t}</span>)}
               </div>
-              <div className="mt-[22px] grid gap-3 min-[860px]:grid-cols-3">
-                {[["500+", "Events Catered", "text-[#5b0a2e]"], ["15+", "Cuisine Types", "text-[#8a5a1f]"], ["3", "Price Ranges", "text-[#5b0a2e]"]].map(([n, l, c]) => (
+              <div className="mt-[22px] grid gap-3 min-[860px]:grid-cols-2">
+                {[[String((FULL.cuisines || []).length), "Cuisine Types", "text-[#5b0a2e]"], [String((FULL.platePrices || []).length), "Price Ranges", "text-[#8a5a1f]"]].map(([n, l, c]) => (
                   <div key={l} className="flex flex-col gap-[3px] rounded-xl bg-[#fbeee8] px-4 py-[18px]">
                     <b className={cx("block text-[26px] font-medium leading-[1.15]", c)}>{n}</b>
                     <span className="text-[11.5px] leading-snug text-[#6f6366]">{l}</span>
@@ -1172,31 +1370,22 @@ function FullCatering({ go, embedded }) {
           {(tab === "about" || tab === "portfolio") && (
             <section className={PANEL}>
               <div className={STEP_PINK}>OUR CELEBRATIONS</div>
-              <h3 className="mb-3.5 text-xl font-medium text-[#5b0a2e]">Portfolio Gallery (140)</h3>
+              <h3 className="mb-3.5 text-xl font-medium text-[#5b0a2e]">Portfolio Gallery ({GALLERY.length})</h3>
               <div className="grid grid-cols-1 gap-2.5 min-[560px]:grid-cols-2">
                 {GALLERY.length === 0 ? (
-                  <p className="mb-0 text-sm leading-[1.7] text-[#6f6366]">Add gallery images from the admin panel.</p>
+                  <p className="mb-0 text-sm leading-[1.7] text-[#6f6366]">No gallery images yet.</p>
                 ) : GALLERY.map((src, i) => (
-                  <div
-                    key={i}
-                    className={cx("aspect-[4/3] rounded-lg bg-cover bg-center", !src && "bg-[#f0eef7]")}
-                    role="img"
-                    aria-label={`Portfolio ${i + 1}`}
-                    style={src ? { backgroundImage: `url(${src})` } : undefined}
-                  />
+                  <div key={i} className="aspect-[4/3] overflow-hidden rounded-lg bg-[#f0eef7]" role="img" aria-label={`Portfolio ${i + 1}`}>
+                    <FullCateringImage src={src} alt={`Portfolio ${i + 1}`} className="size-full object-cover" />
+                  </div>
                 ))}
-              </div>
-              <div className="mt-[18px] text-center">
-                <button className="inline-flex items-center gap-2 rounded-full bg-[#f6e9e4] px-6 py-3 text-[13px] font-semibold text-[#5b0a2e] transition-colors hover:bg-[#f1ddd6]">
-                  Explore Entire Gallery (140 Images) →
-                </button>
               </div>
             </section>
           )}
 
           {tab === "reviews" && (
             <section className={PANEL}>
-              <h3 className="mb-3.5 text-xl font-medium text-[#5b0a2e]">Reviews (84)</h3>
+              <h3 className="mb-3.5 text-xl font-medium text-[#5b0a2e]">Reviews ({REVIEWS.length})</h3>
               {REVIEWS.length === 0 ? (
                 <p className="mb-0 text-sm leading-[1.7] text-[#6f6366]">No reviews yet.</p>
               ) : REVIEWS.map((r, i) => (
@@ -1209,7 +1398,7 @@ function FullCatering({ go, embedded }) {
         </div>
         <QuoteSide onOpenDetailed={() => setModal(true)} />
       </div>
-      {modal && <QuoteModal onClose={() => setModal(false)} />}
+      {modal && <QuoteModal full={FULL} onClose={() => setModal(false)} />}
     </div>
   );
 }

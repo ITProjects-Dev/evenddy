@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import AdminLayout from "./AdminLayout";
 import AdminLogin from "./AdminLogin";
@@ -14,6 +14,7 @@ import { clearAuthTokens, getAccessToken, getSavedUsername, login as authenticat
 import UsersAdmin from "./UsersAdmin";
 import "./admin.css";
 import { Construction } from "lucide-react";
+import { clearAuthInvalid, isAuthInvalid } from "../services/apiClient";
 
 function Soon({ title, text }) {
   return (
@@ -32,8 +33,22 @@ export default function AdminApp() {
     getAccessToken() ? { username: getSavedUsername() || "admin" } : null
   );
   const [authNotice, setAuthNotice] = useState("");
+  useEffect(() => {
+    const handleInvalidToken = () => {
+      clearAuthTokens();
+      setLoggedIn(false);
+      setUser(null);
+      setAuthNotice("Your session expired. Sign in again to save admin changes.");
+      nav("/admin/login", { replace: true });
+    };
+    window.addEventListener("evenddy:auth-invalid", handleInvalidToken);
+    if (isAuthInvalid()) handleInvalidToken();
+    return () => window.removeEventListener("evenddy:auth-invalid", handleInvalidToken);
+  }, [nav]);
+
   const login = async (credentials) => {
     await authenticate(credentials);
+    clearAuthInvalid();
     setLoggedIn(true);
     setAuthNotice("");
     setUser({ username: credentials.username });

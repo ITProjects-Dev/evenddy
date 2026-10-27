@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Eye, ImagePlus, Pencil, Plus, Save, Trash2, X } from "lucide-react";
+import { fetchFullCateringImage } from "../services/fullcateringservice";
 
 const SectionActionContext = createContext(null);
 
@@ -125,6 +126,27 @@ export function ImageUpload({ label, value, onChange, compact = false, hint, onR
   const [error, setError] = useState("");
   const inputRef = useRef(null);
   const uploadLabel = label || "image";
+  const [previewSrc, setPreviewSrc] = useState(value || "");
+
+  useEffect(() => {
+    if (!value || !String(value).includes("uploads/full-catering/")) {
+      setPreviewSrc(value || "");
+      return undefined;
+    }
+    const controller = new AbortController();
+    let objectUrl = "";
+    setPreviewSrc("");
+    fetchFullCateringImage(value, controller.signal).then((url) => {
+      objectUrl = url;
+      setPreviewSrc(url);
+    }).catch(() => {
+      if (!controller.signal.aborted) setPreviewSrc("");
+    });
+    return () => {
+      controller.abort();
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [value]);
 
   const selectImage = async (event) => {
     const file = event.target.files?.[0];
@@ -146,7 +168,9 @@ export function ImageUpload({ label, value, onChange, compact = false, hint, onR
     <>
       <div className="adm-image-preview">
         {value
-          ? <img src={value} alt={`${uploadLabel} preview`} />
+          ? previewSrc
+            ? <img src={previewSrc} alt={`${uploadLabel} preview`} />
+            : <span>{uploadLabel} preview unavailable</span>
           : <span><ImagePlus size={20} />{compact ? uploadLabel : "No image selected"}</span>}
         {value && (
           <button

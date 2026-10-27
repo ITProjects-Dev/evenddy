@@ -1,4 +1,8 @@
 const API_BASE_URL = "";
+let authInvalid = false;
+
+export const isAuthInvalid = () => authInvalid;
+export const clearAuthInvalid = () => { authInvalid = false; };
 
 export async function apiRequest(path, { token, baseUrl = API_BASE_URL, ...options } = {}) {
   const headers = new Headers(options.headers || {});
@@ -20,6 +24,10 @@ export async function apiRequest(path, { token, baseUrl = API_BASE_URL, ...optio
   }
 
   if (!response.ok) {
+    if (response.status === 401 && token && typeof window !== "undefined") {
+      authInvalid = true;
+      window.dispatchEvent(new CustomEvent("evenddy:auth-invalid"));
+    }
     const message = typeof data === "string"
       ? data
       : data?.message || data?.error || `Request failed with status ${response.status}`;
