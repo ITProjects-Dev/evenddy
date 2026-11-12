@@ -595,7 +595,7 @@ function Landing({ go, embedded }) {
         <div className="opts">
           {options.map((o) => (
             <article key={o.id} className={cx("opt", o.flip && "flip")}>
-              <div className="media" role="img" aria-label={o.title} style={o.image ? { backgroundImage: `url(${o.image})` } : undefined} />
+              <div className="media" role="img" aria-label={o.title}><CardImage src={o.image} alt={o.title} /></div>
               <div className="body">
                 <span className="tag"><Icon name={o.icon} size={15} />{o.eyebrow}</span>
                 <div className="title-row">
@@ -1281,7 +1281,12 @@ function FullCateringImage({ src, alt = "", className = "" }) {
   }, [src]);
   return loadedSrc ? <img src={loadedSrc} alt={alt} className={className} /> : null;
 }
-
+/* landing card photo: data:/blob: urls are shown directly, server paths are downloaded with the token */
+function CardImage({ src, alt = "" }) {
+  if (!src) return null;
+  if (/^(data:|blob:)/i.test(src)) return <img src={src} alt={alt} className="size-full object-cover" />;
+  return <FullCateringImage src={src} alt={alt} className="size-full object-cover" />;
+}
 function FullCatering({ go, embedded }) {
   const [apiFull, setApiFull] = useState(null);
   const [loadError, setLoadError] = useState("");
